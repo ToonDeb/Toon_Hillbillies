@@ -177,7 +177,7 @@ public class UnitTest {
 	
 	// setName uses the same tests as isValidName, because it
 	// calls the method to throw the exception
-	
+	/*
 	@Test
 	public void testGetSetOrientation(){
 		testingUnit.setOrientation((float)2.54);
@@ -189,7 +189,7 @@ public class UnitTest {
 		testingUnit.setOrientation((float) -Math.PI);
 		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), (float) Math.PI));
 	}
-
+	*/
 	@Test
 	public void testStartSprint(){
 		testingUnit.startSprint();
@@ -201,21 +201,7 @@ public class UnitTest {
 		testingUnit.stopSprint();
 		assertEquals(UnitStatus.IDLE, testingUnit.getStatus());
 	}
-	@Test
-	public void testCanSprint$TrueCase(){
-		testingUnit.setStatus(UnitStatus.WALKING);
-		assertTrue(testingUnit.canSprint());
-	}
-	@Test
-	public void testCanSprint$FalseCaseBadStatus(){
-		testingUnit.setStatus(UnitStatus.IDLE);
-		assertFalse(testingUnit.canSprint());
-	}
-	@Test
-	public void testCanSprint$FalseCaseBadStamina(){
-		testingUnit.setStamina(0);
-		assertFalse(testingUnit.canSprint());
-	}
+	
 	@Test
 	public void testIsMoving$TrueCaseWalking(){
 		testingUnit.setStatus(UnitStatus.WALKING);
