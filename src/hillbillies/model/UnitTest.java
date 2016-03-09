@@ -373,14 +373,6 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void testSetGetHP$ValidCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		testingUnit.setHP(50);
-		assertEquals(testingUnit.getHP(), 50);
-	}
-	
-	@Test
 	public void testGetMaxHP(){
 		testingUnit.setWeight(100);
 		testingUnit.setToughness(100);
@@ -406,14 +398,6 @@ public class UnitTest {
 		testingUnit.setWeight(100);
 		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidHP(500));
-	}
-	
-	@Test
-	public void testSetGetStamina(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		testingUnit.setStamina(50);
-		assertEquals(testingUnit.getStamina(), 50);
 	}
 	
 	@Test
@@ -510,7 +494,7 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void testStartDefaultBehaviour(){
+	public void testStartDefaultBehaviour(){ //TODO: check by seeing which of the effects has happened
 		testingUnit.startDefaultBehaviour();
 		assertTrue(testingUnit.getDefaultBoolean());
 	}

@@ -288,7 +288,8 @@ public class Unit {
 	public void moveToAdjacent(Vector3d adjacentDestination) throws IllegalArgumentException {
 		if (!isValidAdjacentDestination(adjacentDestination))
 			throw new IllegalArgumentException("Invalid adjacentDestination!");
-		this.setStatus(UnitStatus.WALKING);
+		if(this.getStatus() != UnitStatus.SPRINTING)
+			this.setStatus(UnitStatus.WALKING);
 		if (this.getPosition() == this.getFinalDestination()) {
 			this.setAdjacentDestination(adjacentDestination);
 			this.setFinalDestination(adjacentDestination);
@@ -1209,7 +1210,7 @@ public class Unit {
 	 *       	| new.getHP() == hp
 	 */
 	@Raw
-	public void setHP(int hp) {
+	private void setHP(int hp) {
 		assert isValidHP(hp);
 		this.hp = hp;
 	}
@@ -1257,7 +1258,7 @@ public class Unit {
 	 *       	| new.getStamina() == stamina
 	 */
 	@Raw
-	public void setStamina(int stamina) {
+	private void setStamina(int stamina) {
 		assert isValidStamina(stamina);
 		this.stamina = stamina;
 	}
@@ -1442,7 +1443,7 @@ public class Unit {
 	 * @param 	other
 	 *          The Unit attacking this Unit.
 	 * @effect 	If dodging succeeds, move to a random tile around the unit
-	 *         	| if (this.dodgeChance(other)) 
+	 *         	| if (this.dodgeChance(other)) TODO either this, this or this, effect 
 	 *         	| 	then this.dodge
 	 * @effect 	This Unit will face the attacking unit 
 	 * 			| this.face(other)
@@ -1474,7 +1475,10 @@ public class Unit {
 			return;
 		}
 		int newHP = this.getHP() - other.getStrength() / 10;
-		this.setHP(newHP);
+		if (newHP > 0)
+			this.setHP(newHP);
+		else
+			this.terminate(); //TODO:death
 	}
 
 	/**
@@ -1544,7 +1548,7 @@ public class Unit {
 	 *       	| if (this.getMaxHP != this.getHP) && (newTime >= 0) 
 	 *       	| 		then new.getHP == this.getHP + 1 
 	 *     		|		new.getRestTime == newTime
-	 * @post 	if this unit has maximum hp, does not have maximum stamina, and the
+	 * @post 	if this unit has maximum hp, does not have maximum stamina, and the TODO: use setRest
 	 *       	time needed to heal 1 stamina has passed 
 	 *       	| if (this.getMaxHP == this.getHP) && (this.getMaxStamina != this.getStamina) 
 	 *       	| 	&& (newTime1>= 0) 
