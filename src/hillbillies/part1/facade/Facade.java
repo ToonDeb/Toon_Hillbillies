@@ -429,6 +429,8 @@ public class Facade implements IFacade {
 		try{
 		if (value)
 			unit.startDefaultBehaviour();
+		else
+			unit.stopDefaultBehaviour();
 	} catch (IllegalArgumentException e){
 		throw new ModelException();
 	} catch (IllegalStateException e) {

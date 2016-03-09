@@ -329,11 +329,17 @@ public class Unit {
 		double xFinalDes = this.getFinalDestination().getX();
 		double yFinalDes = this.getFinalDestination().getY();
 		double zFinalDes = this.getFinalDestination().getZ();
-
+		System.out.println("finaldest");
+		System.out.println(xFinalDes);
+		System.out.println(yFinalDes);
+		System.out.println(zFinalDes);
 		double xThis = this.getPosition().getX();
 		double yThis = this.getPosition().getY();
 		double zThis = this.getPosition().getZ();
-
+		System.out.println("thispos");
+		System.out.println(xThis);
+		System.out.println(yThis);
+		System.out.println(zThis);
 		double xAdjDes;
 		double yAdjDes;
 		double zAdjDes;
@@ -400,7 +406,7 @@ public class Unit {
 			if (this.destinationIsReached(this.getPosition(), this.getFinalDestination())) {
 				this.setStatus(UnitStatus.IDLE);
 			} else {
-				this.setAdjacentDestination(this.findPath());
+				this.moveToAdjacent(this.findPath());
 			}
 		} else {
 			this.setPosition(nextPosition);
@@ -834,9 +840,9 @@ public class Unit {
 	 * 
 	 */
 	private void moveToRandom() {
-		double X = rnd.nextInt(MAX_X_POSITION);
-		double Y = rnd.nextInt(MAX_Y_POSITION);
-		double Z = rnd.nextInt(MAX_Z_POSITION);
+		double X = rnd.nextInt(MAX_X_POSITION) + 0.5;
+		double Y = rnd.nextInt(MAX_Y_POSITION) + 0.5;
+		double Z = rnd.nextInt(MAX_Z_POSITION) + 0.5;
 		this.moveTo(new Vector3d(X, Y, Z));
 	}
 
@@ -1781,6 +1787,7 @@ public class Unit {
 	 */
 	public void stopDefaultBehaviour() {
 		this.setDefaultBoolean(false);
+		this.setStatus(UnitStatus.IDLE);
 	}
 
 	/**
