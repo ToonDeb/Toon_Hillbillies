@@ -13,15 +13,18 @@ public class UnitTest {
 	private Unit testingUnit;
 	private Unit otherUnit;
 	private Unit farUnit;
+	private Unit positionUnit;
 	
 	@Before
 	public void setUp(){
-		Vector3d pos = new Vector3d(25d, 25d, 25d);
+		Vector3d pos = new Vector3d(25.5d, 25.5d, 25.5d);
 		testingUnit = new Unit("TestSubject", pos, 50, 50, 50, 50);
-		Vector3d other = new Vector3d(26d,25d,25d);
+		Vector3d other = new Vector3d(26.5d,25.5d,25.5d);
 		otherUnit = new Unit("OtherSubject", other ,50,50,50,50);
-		Vector3d far = new Vector3d(1d, 3d, 5d);
+		Vector3d far = new Vector3d(1.5d, 3.5d, 5.5d);
 		farUnit = new Unit("FarUnit", far, 50, 50, 50, 50);
+		Vector3d position = new Vector3d(40.5d,40.75d,40.49d);
+		positionUnit = new Unit("PositionUnit", position, 50,50,50,50);
 	}
 	
 	@Test
@@ -30,7 +33,7 @@ public class UnitTest {
 		Vector3d pos = new Vector3d(position);
 		Unit unit = new Unit("TestSubject", pos, 50, 50, 50, 50);
 		
-		assertEquals(unit.getPosition(), position);
+		assertEquals(unit.getPosition(), pos);
 		assertEquals(unit.getStrength(), 50);
 		assertEquals(unit.getAgility(), 50);
 		assertEquals(unit.getWeight(), 50);
@@ -84,46 +87,15 @@ public class UnitTest {
 	
 	
 	@Test
-	public void testSetGetPosition$LegalCase(){
-		double[] position = {40.5d,40.75d,40.49d};
-		Vector3d pos = new Vector3d(position);
-		testingUnit.setPosition(pos);
-		assertEquals(testingUnit.getPosition(), position);
+	public void testGetPosition$LegalCase(){
+		Vector3d pos = new Vector3d(40.5d,40.75d,40.49d);
+		assertEquals(positionUnit.getPosition(), pos);
 	}
 	
 	@Test
 	public void testGetCubePosition(){
-		double[] position = {40.5d,40.75d,40.49d};
-		Vector3d pos = new Vector3d(position);
-		testingUnit.setPosition(pos);
 		int[] cubePosition = {40,40,40};
-		assertArrayEquals(testingUnit.getCubePosition(), cubePosition);
-	}
-	
-	
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void testSetPosition$IllegalXCase() throws IllegalArgumentException{
-		Vector3d position = new Vector3d(100d, 40d, 40d);
-		testingUnit.setPosition(position);
-		fail("Exception Expected!");
-	}
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void testSetPosition$IllegalYCase() throws IllegalArgumentException{
-		
-		double[] position = {40d, 100d, 40d };
-		Vector3d pos = new Vector3d(position);
-		testingUnit.setPosition(pos);
-		fail("Exception Expected!");
-	}
-	
-	@Test (expected = IllegalArgumentException.class)
-	public void testSetPosition$IllegalZCase() throws IllegalArgumentException{
-		double[] position = {40d, 40d, -10d};
-		Vector3d pos = new Vector3d(position);
-		testingUnit.setPosition(pos);
-		fail("Exception Expected!");
+		assertArrayEquals(positionUnit.getCubePosition(), cubePosition);
 	}
 	
 	@Test
@@ -148,7 +120,67 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void testGetSetName$LegalCase(){
+	public void testMoveToAdjacent$LegalCase(){
+		Vector3d destination = new Vector3d(26.5d,25.5d,25.5d);
+		testingUnit.moveToAdjacent(destination);
+		assertTrue(testingUnit.getStatus()==UnitStatus.WALKING);
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void testMoveToAdjacent$IllegalCase(){
+		Vector3d destination = new Vector3d(1.5d,1.5d,1.5d);
+		testingUnit.moveToAdjacent(destination);
+		fail("Exception expected");
+	}
+	
+	@Test
+	public void testMoveTo$LegalCase(){
+		Vector3d destination = new Vector3d(5.5d,40.5d,5.5d);
+		testingUnit.moveTo(destination);
+		assertTrue(testingUnit.getStatus()==UnitStatus.WALKING);
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void testMoveTo$IllegalCase(){
+		Vector3d destination = new Vector3d(-5d,1d,1d);
+		testingUnit.moveTo(destination);
+		fail("Exception expected");
+	}
+	
+	@Test
+	public void testIsMoving$TrueWalkingCase(){
+		Vector3d destination = new Vector3d(5d,40d,5d);
+		testingUnit.moveTo(destination);
+		assertTrue(testingUnit.isMoving());
+	}
+	
+	@Test
+	public void testIsMoving$TrueSpringtingCase(){
+		Vector3d destination = new Vector3d(5d,40d,5d);
+		testingUnit.moveTo(destination);
+		testingUnit.startSprint();
+		assertTrue(testingUnit.isMoving());
+	}
+	
+	public void testIsMoving$FalseCase(){
+		testingUnit.attack(otherUnit);
+		assertFalse(testingUnit.isMoving());
+	}
+	
+	@Test
+	public void testStartSprint(){
+		testingUnit.startSprint();
+		assertEquals(UnitStatus.SPRINTING, testingUnit.getStatus());
+	}
+	@Test
+	public void testStopSprint(){
+		testingUnit.startSprint();
+		testingUnit.stopSprint();
+		assertEquals(UnitStatus.WALKING, testingUnit.getStatus());
+	}
+	
+	@Test
+	public void testGetName$LegalCase(){
 		testingUnit.setName("GLaDOS");
 		assertEquals(testingUnit.getName(), "GLaDOS");
 	}
@@ -179,73 +211,21 @@ public class UnitTest {
 	
 	// setName uses the same tests as isValidName, because it
 	// calls the method to throw the exception
-	/*
-	@Test
-	public void testGetSetOrientation(){
-		testingUnit.setOrientation((float)2.54);
-		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), (float) 2.54));
-	}
 	
 	@Test
-	public void testGetSetOrientation$WrongNumer(){
-		testingUnit.setOrientation((float) -Math.PI);
-		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), (float) Math.PI));
-	}
-	*/
-	@Test
-	public void testStartSprint(){
-		testingUnit.startSprint();
-		assertEquals(UnitStatus.SPRINTING, testingUnit.getStatus());
-	}
-	@Test
-	public void testStopSprint(){
-		testingUnit.startSprint();
-		testingUnit.stopSprint();
-		assertEquals(UnitStatus.IDLE, testingUnit.getStatus());
+	public void testGetOrientation(){
+		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), (double) Math.PI/2));
+		testingUnit.attack(otherUnit);
+		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), 0));
+		assertTrue(Util.fuzzyEquals(otherUnit.getOrientation(), Math.PI));
 	}
 	
-	@Test
-	public void testIsMoving$TrueCaseWalking(){
-		testingUnit.setStatus(UnitStatus.WALKING);
-		assertTrue(testingUnit.isMoving());
-	}
-	@Test
-	public void testIsMoving$TrueCaseSPRINTING(){
-		testingUnit.setStatus(UnitStatus.SPRINTING);
-		assertTrue(testingUnit.isMoving());
-	}
-	@Test
-	public void testIsMoving$FalseCase(){
-		testingUnit.setStatus(UnitStatus.IDLE);
-		assertFalse(testingUnit.isMoving());
-	}
-	
-	@Test
-	public void testUpdatePosition(){
-		assertTrue(true);
-	}
-	
-	@Test
-	public void testMoveTo(){
-		assertTrue(true);
-	}
-	
-	@Test
-	public void testMoveToAdjacent(){
-		assertTrue(true);
-	}
-	
-	@Test
-	public void testDodge(){
-		assertTrue(true);
-	}
 	
 	@Test
 	public void testGetWeight(){
-		testingUnit.setWeight(150);
-		assertEquals(testingUnit.getWeight(), 150);
+		assertEquals(testingUnit.getWeight(), 50);
 	}
-	
+	/*
 	@Test
 	public void testIsValidWeight$TrueCase(){
 		testingUnit.setAgility(50);
@@ -264,7 +244,7 @@ public class UnitTest {
 	public void testIsValidStartWeight$TrueCase(){
 		testingUnit.setAgility(50);
 		testingUnit.setStrength(50);
-		assertFalse(testingUnit.isValidStartWeight(60));
+		assertTrue(testingUnit.isValidStartWeight(60));
 	}
 	
 	@Test
@@ -296,7 +276,7 @@ public class UnitTest {
 		testingUnit.setWeight(50);
 		assertEquals(testingUnit.getWeight(), 100);
 	}
-	
+	*/
 	
 	@Test
 	public void testIsValidUnitAttribute$TrueCase(){
@@ -339,66 +319,38 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void testSetGetStrength$ValidCase(){
-		testingUnit.setStrength(50);
+	public void testGetStrength$ValidCase(){
 		assertEquals(testingUnit.getStrength(), 50);
 	}
 	
-	@Test
-	public void testSetGetStrength$InvalidCase(){
-		testingUnit.setStrength(-5);
-		assertEquals(testingUnit.getStrength(), 25);
-	}
 	
 	@Test
-	public void testSetGetAgility$ValidCase(){
-		testingUnit.setAgility(50);
+	public void testGetAgility(){
 		assertEquals(testingUnit.getAgility(), 50);
 	}
 	
 	@Test
-	public void testSetGetAgility$InvalidCase(){
-		testingUnit.setAgility(-5);
-		assertEquals(testingUnit.getAgility(), 25);
-	}
-	
-	@Test
-	public void testSetGetToughness$ValidCase(){
-		testingUnit.setToughness(50);
+	public void testGetToughness(){
 		assertEquals(testingUnit.getToughness(), 50);
 	}
 	
 	@Test
-	public void testSetGetToughness$InvalidCase(){
-		testingUnit.setToughness(-5);
-		assertEquals(testingUnit.getToughness(), 25);
-	}
-	
-	@Test
 	public void testGetMaxHP(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		assertEquals(testingUnit.getMaxHP(), 200);
+		assertEquals(testingUnit.getMaxHP(), 50);
 	}
 	
 	@Test
 	public void testIsValidHP$TrueCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		assertTrue(testingUnit.isValidHP(100));
+		assertTrue(testingUnit.isValidHP(50));
 	}
 	
 	@Test
 	public void testIsValidHP$TooLowCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidHP(-5));
 	}
 	
 	@Test
 	public void testIsValidHP$TooHighCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidHP(500));
 	}
 	
@@ -409,22 +361,16 @@ public class UnitTest {
 	
 	@Test
 	public void testIsValidStamina$TrueCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		assertTrue(testingUnit.isValidStamina(100));
+		assertTrue(testingUnit.isValidStamina(50));
 	}
 	
 	@Test
 	public void testIsValidStamina$TooLowCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidStamina(-5));
 	}
 	
 	@Test
 	public void testIsValidStamina$TooHighCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidStamina(500));
 	}
 	
@@ -436,8 +382,6 @@ public class UnitTest {
 	
 	@Test
 	public void testAttack$ValidCase(){
-		otherUnit.setPosition(new Vector3d(26d,25d,25d));
-		testingUnit.setPosition(new Vector3d(25d,25d,25d));
 		testingUnit.attack(otherUnit);
 		assertTrue(testingUnit.getStatus()== UnitStatus.ATTACKING);
 		assertTrue(otherUnit.getStatus()==UnitStatus.DEFENDING);
@@ -445,9 +389,7 @@ public class UnitTest {
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void testAttack$InvalidPositionCase(){
-		otherUnit.setPosition(new Vector3d(27d,25d,25d));
-		testingUnit.setPosition(new Vector3d(25d,25d,25d));
-		testingUnit.attack(otherUnit);
+		testingUnit.attack(farUnit);
 		fail("Exception Expected");
 	}
 	
@@ -457,17 +399,12 @@ public class UnitTest {
 		assertTrue(testingUnit.getStatus() == UnitStatus.REST);
 	}
 	
-	@Test (expected = IllegalArgumentException.class)
+	@Test (expected = AssertionError.class)
 	public void testRest$InvalidCase(){
-		otherUnit.setPosition(new Vector3d(26d,25d,25d));
-		testingUnit.setPosition(new Vector3d(25d,25d,25d));
 		testingUnit.attack(otherUnit);
 		testingUnit.rest();
-		fail("Exception Expected");
+		fail("AssertionError Expected");
 	}
-	
-	//getStatus is tested in the previous tests, because it is 
-	// called by the other methods
 	
 	@Test
 	public void testIsValidTime$TrueCase(){
