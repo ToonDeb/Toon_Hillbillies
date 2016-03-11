@@ -895,16 +895,13 @@ public class Unit {
 	 * 
 	 */
 	private boolean isValidAdjacentDestination(Vector3d adjacentDestination) {
-		return true;
-		/* TODO:isValidAdjacentDestination
 		return isValidPosition(adjacentDestination) &&
-		 (!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
-		 //Util.fuzzyEquals((adjacentDestination.x % 1), 0.5) &&
-		 (!(Math.abs(this.getPosition().y - adjacentDestination.y)>=1))&&
-		 //Util.fuzzyEquals((adjacentDestination.x % 1), 0.5) &&
-		 (!(Math.abs(this.getPosition().z - adjacentDestination.z)>=1));
-		 //Util.fuzzyEquals((adjacentDestination.x % 1), 0.5);
-		*/
+		((!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
+		(!(Math.abs(this.getPosition().y - adjacentDestination.y)>=1))&&
+		(!(Math.abs(this.getPosition().z - adjacentDestination.z)>=1)) || (
+		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)&&
+		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)&&
+		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)));
 	}
 
 	/**

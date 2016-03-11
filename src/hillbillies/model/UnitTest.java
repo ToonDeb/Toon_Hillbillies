@@ -121,22 +121,22 @@ public class UnitTest {
 	
 	@Test
 	public void testMoveToAdjacent$LegalCase(){
-		Vector3d destination = new Vector3d(26d,25d,25d);
+		Vector3d destination = new Vector3d(26.5d,25.5d,25.5d);
+		System.out.println(testingUnit.getPosition());
 		testingUnit.moveToAdjacent(destination);
 		assertTrue(testingUnit.getStatus()==UnitStatus.WALKING);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void testMoveToAdjacent$IllegalCase(){
-		Vector3d destination = new Vector3d(1d,1d,1d);
-		System.out.println(testingUnit.getPosition());
+		Vector3d destination = new Vector3d(1.5d,1.5d,1.5d);
 		testingUnit.moveToAdjacent(destination);
 		fail("Exception expected");
 	}
 	
 	@Test
 	public void testMoveTo$LegalCase(){
-		Vector3d destination = new Vector3d(5d,40d,5d);
+		Vector3d destination = new Vector3d(5.5d,40.5d,5.5d);
 		testingUnit.moveTo(destination);
 		assertTrue(testingUnit.getStatus()==UnitStatus.WALKING);
 	}
