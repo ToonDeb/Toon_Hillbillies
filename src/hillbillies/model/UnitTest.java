@@ -12,14 +12,16 @@ public class UnitTest {
 	
 	private Unit testingUnit;
 	private Unit otherUnit;
+	private Unit farUnit;
 	
 	@Before
 	public void setUp(){
-		double[] position = {25d, 25d, 25d};
-		Vector3d pos = new Vector3d(position);
+		Vector3d pos = new Vector3d(25d, 25d, 25d);
 		testingUnit = new Unit("TestSubject", pos, 50, 50, 50, 50);
 		Vector3d other = new Vector3d(26d,25d,25d);
 		otherUnit = new Unit("OtherSubject", other ,50,50,50,50);
+		Vector3d far = new Vector3d(1d, 3d, 5d);
+		farUnit = new Unit("FarUnit", far, 50, 50, 50, 50);
 	}
 	
 	@Test
