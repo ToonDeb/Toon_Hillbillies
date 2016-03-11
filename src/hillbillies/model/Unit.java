@@ -255,7 +255,7 @@ public class Unit {
 	 *         	| ! isValidPosition(this.getPosition())
 	 */
 	@Raw
-	public void setPosition(Vector3d position) throws IllegalArgumentException {
+	private void setPosition(Vector3d position) throws IllegalArgumentException {
 		if (!isValidPosition(position))
 			throw new IllegalArgumentException("the given position is not a valid position");
 		this.position = position;
@@ -330,17 +330,11 @@ public class Unit {
 		double xFinalDes = this.getFinalDestination().getX();
 		double yFinalDes = this.getFinalDestination().getY();
 		double zFinalDes = this.getFinalDestination().getZ();
-		System.out.println("finaldest");
-		System.out.println(xFinalDes);
-		System.out.println(yFinalDes);
-		System.out.println(zFinalDes);
+		
 		double xThis = this.getPosition().getX();
 		double yThis = this.getPosition().getY();
 		double zThis = this.getPosition().getZ();
-		System.out.println("thispos");
-		System.out.println(xThis);
-		System.out.println(yThis);
-		System.out.println(zThis);
+		
 		double xAdjDes;
 		double yAdjDes;
 		double zAdjDes;
@@ -879,7 +873,7 @@ public class Unit {
 	 */
 	@Basic
 	@Raw
-	public Vector3d getAdjacentDestination() {
+	private Vector3d getAdjacentDestination() {
 		return this.adjacentDestination;
 	}
 
@@ -902,7 +896,7 @@ public class Unit {
 	 */
 	private boolean isValidAdjacentDestination(Vector3d adjacentDestination) {
 		return true;
-		/*
+		/* TODO:isValidAdjacentDestination
 		return isValidPosition(adjacentDestination) &&
 		 (!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
 		 //Util.fuzzyEquals((adjacentDestination.x % 1), 0.5) &&
@@ -1279,7 +1273,7 @@ public class Unit {
 		this.setWorkTime(500.0d / strength);
 		this.setStatus(UnitStatus.WORKING);
 	}
-
+	
 	/**
 	 * Return the workTime of this Unit.
 	 */
@@ -1666,7 +1660,7 @@ public class Unit {
 	 *          | ! isValidStatus(getStatus())
 	 */
 	@Raw
-	public void setStatus(UnitStatus status) throws IllegalArgumentException {
+	private void setStatus(UnitStatus status) throws IllegalArgumentException {
 		if (!isValidStatus(status))
 			throw new IllegalArgumentException();
 		this.status = status;
@@ -1735,10 +1729,10 @@ public class Unit {
 	 * @return 	| result == ((time > 0) && (time < 0.2))
 	 */
 	public static boolean isValidTime(double time) {
-		return true;
-		// return Util.fuzzyGreaterThanOrEqualTo(time, 0) &&
-		// Util.fuzzyLessThanOrEqualTo(time, 0.2)
-		// && (! Util.fuzzyEquals(time, 0)) && (! Util.fuzzyEquals(time, 0.2));
+		//return true;
+		return Util.fuzzyGreaterThanOrEqualTo(time, 0) &&
+				Util.fuzzyLessThanOrEqualTo(time, 0.2)
+				&& (! Util.fuzzyEquals(time, 0)) && (! Util.fuzzyEquals(time, 0.2));
 	}
 
 
