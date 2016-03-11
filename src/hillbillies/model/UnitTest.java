@@ -17,11 +17,11 @@ public class UnitTest {
 	
 	@Before
 	public void setUp(){
-		Vector3d pos = new Vector3d(25d, 25d, 25d);
+		Vector3d pos = new Vector3d(25.5d, 25.5d, 25.5d);
 		testingUnit = new Unit("TestSubject", pos, 50, 50, 50, 50);
-		Vector3d other = new Vector3d(26d,25d,25d);
+		Vector3d other = new Vector3d(26.5d,25.5d,25.5d);
 		otherUnit = new Unit("OtherSubject", other ,50,50,50,50);
-		Vector3d far = new Vector3d(1d, 3d, 5d);
+		Vector3d far = new Vector3d(1.5d, 3.5d, 5.5d);
 		farUnit = new Unit("FarUnit", far, 50, 50, 50, 50);
 		Vector3d position = new Vector3d(40.5d,40.75d,40.49d);
 		positionUnit = new Unit("PositionUnit", position, 50,50,50,50);
@@ -122,7 +122,6 @@ public class UnitTest {
 	@Test
 	public void testMoveToAdjacent$LegalCase(){
 		Vector3d destination = new Vector3d(26.5d,25.5d,25.5d);
-		System.out.println(testingUnit.getPosition());
 		testingUnit.moveToAdjacent(destination);
 		assertTrue(testingUnit.getStatus()==UnitStatus.WALKING);
 	}
@@ -169,7 +168,19 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void testGetSetName$LegalCase(){
+	public void testStartSprint(){
+		testingUnit.startSprint();
+		assertEquals(UnitStatus.SPRINTING, testingUnit.getStatus());
+	}
+	@Test
+	public void testStopSprint(){
+		testingUnit.startSprint();
+		testingUnit.stopSprint();
+		assertEquals(UnitStatus.WALKING, testingUnit.getStatus());
+	}
+	
+	@Test
+	public void testGetName$LegalCase(){
 		testingUnit.setName("GLaDOS");
 		assertEquals(testingUnit.getName(), "GLaDOS");
 	}
@@ -204,30 +215,17 @@ public class UnitTest {
 	@Test
 	public void testGetOrientation(){
 		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), (double) Math.PI/2));
+		testingUnit.attack(otherUnit);
+		assertTrue(Util.fuzzyEquals(testingUnit.getOrientation(), 0));
+		assertTrue(Util.fuzzyEquals(otherUnit.getOrientation(), Math.PI));
 	}
-	
-	@Test
-	public void testStartSprint(){
-		testingUnit.startSprint();
-		assertEquals(UnitStatus.SPRINTING, testingUnit.getStatus());
-	}
-	@Test
-	public void testStopSprint(){
-		testingUnit.startSprint();
-		testingUnit.stopSprint();
-		assertEquals(UnitStatus.WALKING, testingUnit.getStatus());
-	}
-	
-	
-	
 	
 	
 	@Test
 	public void testGetWeight(){
-		testingUnit.setWeight(150);
-		assertEquals(testingUnit.getWeight(), 150);
+		assertEquals(testingUnit.getWeight(), 50);
 	}
-	
+	/*
 	@Test
 	public void testIsValidWeight$TrueCase(){
 		testingUnit.setAgility(50);
@@ -278,7 +276,7 @@ public class UnitTest {
 		testingUnit.setWeight(50);
 		assertEquals(testingUnit.getWeight(), 100);
 	}
-	
+	*/
 	
 	@Test
 	public void testIsValidUnitAttribute$TrueCase(){
@@ -321,66 +319,38 @@ public class UnitTest {
 	}
 	
 	@Test
-	public void testSetGetStrength$ValidCase(){
-		testingUnit.setStrength(50);
+	public void testGetStrength$ValidCase(){
 		assertEquals(testingUnit.getStrength(), 50);
 	}
 	
-	@Test
-	public void testSetGetStrength$InvalidCase(){
-		testingUnit.setStrength(-5);
-		assertEquals(testingUnit.getStrength(), 25);
-	}
 	
 	@Test
-	public void testSetGetAgility$ValidCase(){
-		testingUnit.setAgility(50);
+	public void testGetAgility(){
 		assertEquals(testingUnit.getAgility(), 50);
 	}
 	
 	@Test
-	public void testSetGetAgility$InvalidCase(){
-		testingUnit.setAgility(-5);
-		assertEquals(testingUnit.getAgility(), 25);
-	}
-	
-	@Test
-	public void testSetGetToughness$ValidCase(){
-		testingUnit.setToughness(50);
+	public void testGetToughness(){
 		assertEquals(testingUnit.getToughness(), 50);
 	}
 	
 	@Test
-	public void testSetGetToughness$InvalidCase(){
-		testingUnit.setToughness(-5);
-		assertEquals(testingUnit.getToughness(), 25);
-	}
-	
-	@Test
 	public void testGetMaxHP(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		assertEquals(testingUnit.getMaxHP(), 200);
+		assertEquals(testingUnit.getMaxHP(), 50);
 	}
 	
 	@Test
 	public void testIsValidHP$TrueCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		assertTrue(testingUnit.isValidHP(100));
+		assertTrue(testingUnit.isValidHP(50));
 	}
 	
 	@Test
 	public void testIsValidHP$TooLowCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidHP(-5));
 	}
 	
 	@Test
 	public void testIsValidHP$TooHighCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidHP(500));
 	}
 	
@@ -391,22 +361,16 @@ public class UnitTest {
 	
 	@Test
 	public void testIsValidStamina$TrueCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
-		assertTrue(testingUnit.isValidStamina(100));
+		assertTrue(testingUnit.isValidStamina(50));
 	}
 	
 	@Test
 	public void testIsValidStamina$TooLowCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidStamina(-5));
 	}
 	
 	@Test
 	public void testIsValidStamina$TooHighCase(){
-		testingUnit.setWeight(100);
-		testingUnit.setToughness(100);
 		assertFalse(testingUnit.isValidStamina(500));
 	}
 	
@@ -438,7 +402,6 @@ public class UnitTest {
 	@Test (expected = AssertionError.class)
 	public void testRest$InvalidCase(){
 		testingUnit.attack(otherUnit);
-		System.out.println(testingUnit.getStatus());
 		testingUnit.rest();
 		fail("AssertionError Expected");
 	}

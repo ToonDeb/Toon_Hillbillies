@@ -215,9 +215,9 @@ public class Unit {
 	 * Return the position of the cube occupied by this Unit.
 	 */
 	public int[] getCubePosition() {
-		int cubeX = (int) Math.floor(position.x);
-		int cubeY = (int) Math.floor(position.y);
-		int cubeZ = (int) Math.floor(position.z);
+		int cubeX = (int) Math.floor(this.getPosition().x);
+		int cubeY = (int) Math.floor(this.getPosition().y);
+		int cubeZ = (int) Math.floor(this.getPosition().z);
 		int[] cubePosition = { cubeX, cubeY, cubeZ };
 		return cubePosition;
 	}
@@ -877,7 +877,7 @@ public class Unit {
 		return this.adjacentDestination;
 	}
 
-	/** TODO afmaken
+	/** 
 	 * Check whether the given adjacentDestination is a valid
 	 * adjacentDestination for this unit.
 	 * 
@@ -885,23 +885,28 @@ public class Unit {
 	 *          The adjacentDestination to check.
 	 * @return 	True if the adjacentDestination is the centre of a valid
 	 *         	neighbouring position. 
-	 *         	| return (isValidPosition(adjacentDestination) && 
-	 *         	| 	(!(Math.abs(this.getPosition().x - adjacentDestination.x)>1)) &&
-	 *          | 	((adjacentDestination.x % 1) == 0.5) && 
-	 *          | 	(!(Math.abs(this.getPosition().y - adjacentDestination.y)>1)) &&
-	 *          | 	((adjacentDestination.x % 1) == 0.5) && 
-	 *          | 	(!(Math.abs(this.getPosition().z - adjacentDestination.z)>1)) &&
-	 *          | 	((adjacentDestination.x % 1) == 0.5))
+	 *         	TODO:doc isvalidadjacentDest
 	 * 
 	 */
 	private boolean isValidAdjacentDestination(Vector3d adjacentDestination) {
-		return isValidPosition(adjacentDestination) &&
+		int cubeX = (int) Math.floor(adjacentDestination.x);
+		int cubeY = (int) Math.floor(adjacentDestination.y);
+		int cubeZ = (int) Math.floor(adjacentDestination.z);
+		int[] testPos = { cubeX, cubeY, cubeZ };
+		int[] thisPos = this.getCubePosition();
+		for (int i = 0; i<3;i++){
+			if (Math.abs(thisPos[i]-testPos[i]) > 1)
+				return false;
+		}
+		return true;
+		/*return isValidPosition(adjacentDestination) &&
 		((!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
 		(!(Math.abs(this.getPosition().y - adjacentDestination.y)>=1))&&
 		(!(Math.abs(this.getPosition().z - adjacentDestination.z)>=1)) || (
 		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)&&
 		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)&&
 		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)));
+	*/
 	}
 
 	/**
@@ -996,7 +1001,7 @@ public class Unit {
 	 * @return 	| result == ((1 < weight) && (weight < 200)) && (weight >=
 	 *         		(this.getStrength() + this.getAgility())/2))
 	 */
-	public boolean isValidWeight(int weight) {
+	private boolean isValidWeight(int weight) {
 		return ((1 < weight) && (weight < 200) && (weight >= (this.getStrength() + this.getAgility()) / 2));
 	}
 
@@ -1009,7 +1014,7 @@ public class Unit {
 	 * @return 	| result == ((25 <= weight) && (weight <= 100) && (weight >=
 	 *         	(this.getStrength() + this.getAgility())/2))
 	 */
-	public boolean isValidStartWeight(int weight) {
+	private boolean isValidStartWeight(int weight) {
 		return ((25 <= weight) && (weight <= 100) && (weight >= (this.getStrength() + this.getAgility()) / 2));
 	}
 
@@ -1026,7 +1031,7 @@ public class Unit {
 	 *    		| 		this.weight = (this.getStrength() + this.getAgility())/2
 	 */
 	@Raw
-	public void setWeight(int weight) {
+	private void setWeight(int weight) {
 		if (isValidWeight(weight))
 			this.weight = weight;
 		else
@@ -1083,7 +1088,7 @@ public class Unit {
 	 *       	|		new.getStrength() == 25
 	 */
 	@Raw
-	public void setStrength(int strength) {
+	private void setStrength(int strength) {
 		if (isValidUnitAttribute(strength))
 			this.strength = strength;
 		else
@@ -1117,7 +1122,7 @@ public class Unit {
 	 *       	| 		new.getAgility() == 25
 	 */
 	@Raw
-	public void setAgility(int agility) {
+	private void setAgility(int agility) {
 		if (isValidUnitAttribute(agility))
 			this.agility = agility;
 		else
@@ -1151,7 +1156,7 @@ public class Unit {
 	 *       	|	 	new.getToughness() == 25
 	 */
 	@Raw
-	public void setToughness(int toughness) {
+	private void setToughness(int toughness) {
 		if (isValidUnitAttribute(toughness))
 			this.toughness = toughness;
 		else
