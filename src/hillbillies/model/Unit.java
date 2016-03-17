@@ -9,6 +9,10 @@ import javax.vecmath.*;
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
 
+import static hillbillies.model.Constants.MAX_X_POSITION;
+import static hillbillies.model.Constants.MAX_Y_POSITION;
+import static hillbillies.model.Constants.MAX_Z_POSITION;
+
 /**
  * @authors Toon Deburchgrave CWS-ELT, Nathan Cornille CWS-WTK repository:
  *          https://github.com/ToonDeb/Hillbillies_Project
@@ -68,11 +72,11 @@ import ogp.framework.util.Util;
  * 
  * @version 0.1
  */
-public class Unit {
+public class Unit extends GameEntity {
 	
-	private static final int MAX_X_POSITION = 50;
-	private static final int MAX_Y_POSITION = 50;
-	private static final int MAX_Z_POSITION = 50;
+	//private static final int MAX_X_POSITION = 50;
+	//private static final int MAX_Y_POSITION = 50;
+	//private static final int MAX_Z_POSITION = 50;
 	
 	/**
 	 * Initialize this new Unit with given position, strength, agility, weight
@@ -174,7 +178,9 @@ public class Unit {
 	 */
 	public Unit(String name, Vector3d position, int weight, int strength, int agility, int toughness)
 			throws IllegalArgumentException {
-
+		
+		super(position);
+		
 		if (!isValidStartAttribute(strength))
 			strength = 25;
 		setStrength(strength);
@@ -189,27 +195,28 @@ public class Unit {
 		setToughness(toughness);
 		this.setHP(this.getMaxHP());
 		this.setStamina(this.getMaxStamina());
-		this.setPosition(position);
+		
+		//this.setPosition(position);
 		this.setName(name);
 
 		this.setStatus(UnitStatus.IDLE);
 
-		Vector3d pos = new Vector3d(position);
-		this.setAdjacentDestination(pos);
-		this.setFinalDestination(pos);
+		//Vector3d pos = new Vector3d(position);
+		this.setAdjacentDestination(position);
+		this.setFinalDestination(position);
 
 		this.setOrigin(this.getCubePosition());
 
 	}
 
-	/**
-	 * Return the position of this Unit.
-	 */
-	@Basic
-	@Raw
-	public Vector3d getPosition() {
-		return this.position;
-	}
+//	/**
+//	 * Return the position of this Unit.
+//	 */
+//	@Basic
+//	@Raw
+//	public Vector3d getPosition() {
+//		return this.position;
+//	}
 
 	/**
 	 * Return the position of the cube occupied by this Unit.
@@ -222,49 +229,49 @@ public class Unit {
 		return cubePosition;
 	}
 
-	/**
-	 * Check whether the given position is a valid position for any Unit.
-	 *
-	 * @param 	position
-	 *          The position to check.
-	 * @return 	False if the given position is not effective. 
-	 * 		   	| if (position == null) 
-	 * 		   	| 		then result == false 
-	 * 		   	Otherwise, true if all three coordinates are within the boundaries of the map 
-	 * 		   	| else if 
-	 * 		   	| (position.x >= 0) && (position.x < 50) && 
-	 * 		   	| (position.y >= 0) && (position.y < 50) && 
-	 *         	| (position.z >= 0) && (position.z < 50) 
-	 *         	| 		then result == true
-	 */
-	public static boolean isValidPosition(Vector3d position) {
-		return position != null && (position.x >= 0) && (position.x < MAX_X_POSITION) 
-				&& (position.y >= 0) && (position.y < MAX_Y_POSITION)
-				&& (position.z >= 0) && (position.z < MAX_Z_POSITION);
-	}
+//	/**
+//	 * Check whether the given position is a valid position for any Unit.
+//	 *
+//	 * @param 	position
+//	 *          The position to check.
+//	 * @return 	False if the given position is not effective. 
+//	 * 		   	| if (position == null) 
+//	 * 		   	| 		then result == false 
+//	 * 		   	Otherwise, true if all three coordinates are within the boundaries of the map 
+//	 * 		   	| else if 
+//	 * 		   	| (position.x >= 0) && (position.x < 50) && 
+//	 * 		   	| (position.y >= 0) && (position.y < 50) && 
+//	 *         	| (position.z >= 0) && (position.z < 50) 
+//	 *         	| 		then result == true
+//	 */
+//	public static boolean isValidPosition(Vector3d position) {
+//		return position != null && (position.x >= 0) && (position.x < MAX_X_POSITION) 
+//				&& (position.y >= 0) && (position.y < MAX_Y_POSITION)
+//				&& (position.z >= 0) && (position.z < MAX_Z_POSITION);
+//	}
 
-	/**
-	 * Set the position of this Unit to the given position.
-	 *
-	 * @param 	position
-	 *          The new position for this Unit.
-	 * @post 	The position of this Unit is equal to the given position.
-	 *       	| new.getPosition() == position
-	 * @throws 	IllegalArgumentException
-	 *         	The given position is not a valid position for any Unit.
-	 *         	| ! isValidPosition(this.getPosition())
-	 */
-	@Raw
-	private void setPosition(Vector3d position) throws IllegalArgumentException {
-		if (!isValidPosition(position))
-			throw new IllegalArgumentException("the given position is not a valid position");
-		this.position = position;
-	}
+//	/**
+//	 * Set the position of this Unit to the given position.
+//	 *
+//	 * @param 	position
+//	 *          The new position for this Unit.
+//	 * @post 	The position of this Unit is equal to the given position.
+//	 *       	| new.getPosition() == position
+//	 * @throws 	IllegalArgumentException
+//	 *         	The given position is not a valid position for any Unit.
+//	 *         	| ! isValidPosition(this.getPosition())
+//	 */
+//	@Raw
+//	private void setPosition(Vector3d position) throws IllegalArgumentException {
+//		if (!isValidPosition(position))
+//			throw new IllegalArgumentException("the given position is not a valid position");
+//		this.position = position;
+//	}
 
-	/**
-	 * Variable registering the position of this Unit.
-	 */
-	private Vector3d position;
+//	/**
+//	 * Variable registering the position of this Unit.
+//	 */
+//	private Vector3d position;
 
 	/**
 	 * Sets the units status to walking, and the units adjacentDestination to
@@ -982,8 +989,7 @@ public class Unit {
 	 */
 	private Vector3d finalDestination = null;
 
-	/* END finalDestination */
-	/* Weight */
+	
 	/**
 	 * Return the weight of this Unit.
 	 */
@@ -1031,7 +1037,7 @@ public class Unit {
 	 *    		| 		this.weight = (this.getStrength() + this.getAgility())/2
 	 */
 	@Raw
-	private void setWeight(int weight) {
+	public void setWeight(int weight) {
 		if (isValidWeight(weight))
 			this.weight = weight;
 		else
@@ -1088,7 +1094,7 @@ public class Unit {
 	 *       	|		new.getStrength() == 25
 	 */
 	@Raw
-	private void setStrength(int strength) {
+	public void setStrength(int strength) {
 		if (isValidUnitAttribute(strength))
 			this.strength = strength;
 		else
@@ -1122,7 +1128,7 @@ public class Unit {
 	 *       	| 		new.getAgility() == 25
 	 */
 	@Raw
-	private void setAgility(int agility) {
+	public void setAgility(int agility) {
 		if (isValidUnitAttribute(agility))
 			this.agility = agility;
 		else
@@ -1156,7 +1162,7 @@ public class Unit {
 	 *       	|	 	new.getToughness() == 25
 	 */
 	@Raw
-	private void setToughness(int toughness) {
+	public void setToughness(int toughness) {
 		if (isValidUnitAttribute(toughness))
 			this.toughness = toughness;
 		else
