@@ -21,8 +21,8 @@ public abstract class GameObject extends GameEntity{
 	
 	Random rand;
 	
-	public GameObject(Vector3d position){
-		super(position);
+	public GameObject(Vector3d position, World world){
+		super(position, world);
 		
 		this.weight = MIN_OBJECT_WEIGHT + 
 				rand.nextInt((MAX_OBJECT_WEIGHT-MIN_OBJECT_WEIGHT) + 1);

@@ -12,6 +12,7 @@ import ogp.framework.util.Util;
 import static hillbillies.model.Constants.MAX_X_POSITION;
 import static hillbillies.model.Constants.MAX_Y_POSITION;
 import static hillbillies.model.Constants.MAX_Z_POSITION;
+import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
 
 /**
  * @authors Toon Deburchgrave CWS-ELT, Nathan Cornille CWS-WTK repository:
@@ -69,7 +70,10 @@ import static hillbillies.model.Constants.MAX_Z_POSITION;
  *
  * @invar The origin of each Unit must be a valid origin for any Unit.
  *        | isValidOrigin(getOrigin())
- * 
+ *
+ * @invar  The Faction of each Unit must be a valid Faction for any
+ *         Unit.
+ *       | isValidFaction(getFaction())
  * @version 0.1
  */
 public class Unit extends GameEntity {
@@ -175,11 +179,12 @@ public class Unit extends GameEntity {
 	 * 		   	The given position is not a valid position for this Unit
 	 * 			| ! isValidOrigin(new.getCubePosition)
 	 * 
+	 * TODO: hoe zit het nu juist met unit en world?
 	 */
-	public Unit(String name, Vector3d position, int weight, int strength, int agility, int toughness)
+	public Unit(String name, Vector3d position, int weight, int strength, int agility, int toughness, World world)
 			throws IllegalArgumentException {
 		
-		super(position);
+		super(position, world);
 		
 		if (!isValidStartAttribute(strength))
 			strength = 25;
@@ -1876,5 +1881,59 @@ public class Unit extends GameEntity {
 	 */
 
 	private boolean defaultBoolean = false;
+	
+	
+	/** TO BE ADDED TO CLASS HEADING
+	 * @invar  The Faction of each Unit must be a valid Faction for any
+	 *         Unit.
+	 *       | isValidFaction(getFaction())
+	 */
+
+	/**
+	 * Return the Faction of this Unit.
+	 */
+	@Basic @Raw
+	public Faction getFaction() {
+		return this.faction;
+	}
+
+	/**
+	 * Check whether the given Faction is a valid Faction for
+	 * any Unit. TODO: isvalidFaction unit
+	 *  
+	 * @param  Faction
+	 *         The Faction to check.
+	 * @return 
+	 *       | result == (faction.getNbUnits <= max_NB_Units_in_Faction)
+	*/
+	public static boolean isValidFaction(Faction faction) {
+		return (faction.getNbUnits() <= MAX_NB_UNITS_IN_FACTION);
+	}
+
+	/**
+	 * Set the Faction of this Unit to the given Faction.
+	 * 
+	 * @param  faction
+	 *         The new Faction for this Unit.
+	 * @post   The Faction of this new Unit is equal to
+	 *         the given Faction.
+	 *       | new.getFaction() == faction
+	 * @throws IllegalArgumentException
+	 *         The given Faction is not a valid Faction for any
+	 *         Unit.
+	 *       | ! isValidFaction(getFaction())
+	 */
+	@Raw
+	public void setFaction(Faction faction) 
+			throws IllegalArgumentException {
+		if (! isValidFaction(faction))
+			throw new IllegalArgumentException();
+		this.faction = faction;
+	}
+
+	/**
+	 * Variable registering the Faction of this Unit.
+	 */
+	private Faction faction = null;
 
 }

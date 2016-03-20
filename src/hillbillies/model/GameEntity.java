@@ -29,9 +29,11 @@ public abstract class GameEntity {
 	 *         the given position.
 	 *       | this.setPosition(position)
 	 */
-	public GameEntity(Vector3d position)
+	public GameEntity(Vector3d position, World world)
 			throws IllegalArgumentException {
 		this.setPosition(position);
+		
+		this.setWorld(world);
 	}
 
 
@@ -80,7 +82,7 @@ public abstract class GameEntity {
 	private Vector3d position;
 	
 	/**
-	 * Return the position of the cube occupied by this Unit.
+	 * Return the position of the cube occupied by this GameEntity.
 	 */
 	public int[] getCubePosition() {
 		int cubeX = (int) Math.floor(this.getPosition().x);
@@ -89,4 +91,52 @@ public abstract class GameEntity {
 		int[] cubePosition = { cubeX, cubeY, cubeZ };
 		return cubePosition;
 	}
+	
+	
+	/**
+	 * Return the World of this GameEntity.
+	 */
+	@Basic @Raw
+	public World getWorld() {
+		return this.world;
+	}
+
+	/** TODO: isValidWorld
+	 * Check whether the given World is a valid World for
+	 * any GameEntity.
+	 *  
+	 * @param  World
+	 *         The World to check.
+	 * @return 
+	 *       | result == true
+	*/
+	public static boolean isValidWorld(World world) {
+		return true;
+	}
+
+	/**
+	 * Set the World of this Log to the given World.
+	 * 
+	 * @param  world
+	 *         The new World for this GameEntity.
+	 * @post   The World of this new GameEntity is equal to
+	 *         the given World.
+	 *       | new.getWorld() == world
+	 * @throws IllegalArgumentException
+	 *         The given World is not a valid World for any
+	 *         GameEntity.
+	 *       | ! isValidWorld(getWorld())
+	 */
+	@Raw
+	public void setWorld(World world) 
+			throws IllegalArgumentException {
+		if (! isValidWorld(world))
+			throw new IllegalArgumentException();
+		this.world = world;
+	}
+
+	/**
+	 * Variable registering the World of this Log.
+	 */
+	private World world;
 }

@@ -14,5 +14,7 @@ public final class Constants {
 	
 	public static final int MAX_OBJECT_WEIGHT = 50;
 	public static final int MIN_OBJECT_WEIGHT = 10;
+	
+	public static final int MAX_NB_UNITS_IN_FACTION = 50;
 
 }
