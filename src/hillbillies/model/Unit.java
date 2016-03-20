@@ -9,14 +9,16 @@ import javax.vecmath.*;
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
 
-import static hillbillies.model.Constants.MAX_X_POSITION;
-import static hillbillies.model.Constants.MAX_Y_POSITION;
-import static hillbillies.model.Constants.MAX_Z_POSITION;
+//import static hillbillies.model.Constants.MAX_X_POSITION;
+//import static hillbillies.model.Constants.MAX_Y_POSITION;
+//import static hillbillies.model.Constants.MAX_Z_POSITION;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
 
 /**
- * @authors Toon Deburchgrave CWS-ELT, Nathan Cornille CWS-WTK repository:
- *          https://github.com/ToonDeb/Hillbillies_Project
+ * 
+ * 
+ * @authors Toon Deburchgrave CWS-ELT
+ *          
  * 
  *          A class for Units
  *
@@ -76,7 +78,7 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
  *       | isValidFaction(getFaction())
  * @version 0.1
  */
-public class Unit extends GameEntity {
+public class Unit extends GameObject {
 	
 	//private static final int MAX_X_POSITION = 50;
 	//private static final int MAX_Y_POSITION = 50;
@@ -181,10 +183,10 @@ public class Unit extends GameEntity {
 	 * 
 	 * TODO: hoe zit het nu juist met unit en world?
 	 */
-	public Unit(String name, Vector3d position, int weight, int strength, int agility, int toughness, World world)
+	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness)
 			throws IllegalArgumentException {
-		
-		super(position, world);
+		// null is given as the default world
+		super(position, null);
 		
 		if (!isValidStartAttribute(strength))
 			strength = 25;
@@ -205,10 +207,11 @@ public class Unit extends GameEntity {
 		this.setName(name);
 
 		this.setStatus(UnitStatus.IDLE);
-
+		
+		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
 		//Vector3d pos = new Vector3d(position);
-		this.setAdjacentDestination(position);
-		this.setFinalDestination(position);
+		this.setAdjacentDestination(vectorPosition);
+		this.setFinalDestination(vectorPosition);
 
 		this.setOrigin(this.getCubePosition());
 
@@ -223,16 +226,16 @@ public class Unit extends GameEntity {
 //		return this.position;
 //	}
 
-	/**
-	 * Return the position of the cube occupied by this Unit.
-	 */
-	public int[] getCubePosition() {
-		int cubeX = (int) Math.floor(this.getPosition().x);
-		int cubeY = (int) Math.floor(this.getPosition().y);
-		int cubeZ = (int) Math.floor(this.getPosition().z);
-		int[] cubePosition = { cubeX, cubeY, cubeZ };
-		return cubePosition;
-	}
+//	/**
+//	 * Return the position of the cube occupied by this Unit.
+//	 */
+//	public int[] getCubePosition() {
+//		int cubeX = (int) Math.floor(this.getPosition().x);
+//		int cubeY = (int) Math.floor(this.getPosition().y);
+//		int cubeZ = (int) Math.floor(this.getPosition().z);
+//		int[] cubePosition = { cubeX, cubeY, cubeZ };
+//		return cubePosition;
+//	}
 
 //	/**
 //	 * Check whether the given position is a valid position for any Unit.
@@ -325,7 +328,7 @@ public class Unit extends GameEntity {
 	 *          | ! isValidFinalDestination(finalDestination)
 	 */
 	public void moveTo(Vector3d finalDestination) throws IllegalArgumentException {
-		if (!isValidPosition(finalDestination))
+		if (!isValidPosition(finalDestination, this.getWorld()))
 			throw new IllegalArgumentException("Invalid final destination!");
 		this.setFinalDestination(finalDestination);
 		this.moveToAdjacent(this.findPath());
@@ -474,14 +477,14 @@ public class Unit extends GameEntity {
 	}
 
 	/**
-	 * Check whether the given origin is a valid origin for any Unit.
+	 * Check whether the given origin is a valid origin for this Unit.
 	 * 
 	 * @param 	origin
 	 *          The origin to check.
 	 * @return 	| result == (isValidPosition(origin))
 	 */
-	private static boolean isValidOrigin(int[] origin) {
-		return isValidPosition(new Vector3d(origin[0], origin[1], origin[2]));
+	private boolean isValidOrigin(int[] origin) {
+		return isValidPosition(new Vector3d(origin[0], origin[1], origin[2]), this.getWorld());
 	}
 
 	/**
@@ -803,7 +806,7 @@ public class Unit extends GameEntity {
 		double thisY = this.getPosition().y;
 		double thisZ = this.getPosition().z;
 
-		while ((!isValidPosition(newPosition)) && (counter < 10000)) {
+		while ((!isValidPosition(newPosition, this.getWorld())) && (counter < 10000)) {
 			// Returns a double between -1 and +1
 			double xJump = 2 * rnd.nextDouble() - 1;
 			double yJump = 2 * rnd.nextDouble() - 1;
@@ -811,7 +814,7 @@ public class Unit extends GameEntity {
 			newPosition.set(thisX + xJump, thisY + yJump, thisZ);
 			counter++;
 		}
-		if (isValidPosition(newPosition))
+		if (isValidPosition(newPosition, this.getWorld()))
 			this.setPosition(newPosition);
 	}
 
@@ -847,9 +850,9 @@ public class Unit extends GameEntity {
 	 * 
 	 */
 	private void moveToRandom() {
-		double X = rnd.nextInt(MAX_X_POSITION) + 0.5;
-		double Y = rnd.nextInt(MAX_Y_POSITION) + 0.5;
-		double Z = rnd.nextInt(MAX_Z_POSITION) + 0.5;
+		double X = rnd.nextInt(this.getWorld().getNbCubesX()) + 0.5;
+		double Y = rnd.nextInt(this.getWorld().getNbCubesY()) + 0.5;
+		double Z = rnd.nextInt(this.getWorld().getNbCubesZ()) + 0.5;
 		this.moveTo(new Vector3d(X, Y, Z));
 	}
 
@@ -897,7 +900,7 @@ public class Unit extends GameEntity {
 	 *          The adjacentDestination to check.
 	 * @return 	True if the adjacentDestination is the centre of a valid
 	 *         	neighbouring position. 
-	 *         	TODO:doc isvalidadjacentDest
+	 *         	TODO:doc isValidAdjacentDestination
 	 * 
 	 */
 	private boolean isValidAdjacentDestination(Vector3d adjacentDestination) {
@@ -984,7 +987,7 @@ public class Unit extends GameEntity {
 	 */
 	@Raw
 	private void setFinalDestination(Vector3d finalDestination) throws IllegalArgumentException {
-		if (!isValidPosition(finalDestination))
+		if (!isValidPosition(finalDestination, this.getWorld()))
 			throw new IllegalArgumentException();
 		this.finalDestination = finalDestination;
 	}
@@ -1749,7 +1752,7 @@ public class Unit extends GameEntity {
 	}
 
 
-	/**
+	/** TODO: terminate Unit
 	 * Terminate this Unit.
 	 *
 	 * @post 	This Unit is terminated. 

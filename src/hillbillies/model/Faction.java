@@ -4,6 +4,8 @@ import java.util.*;
 
 import be.kuleuven.cs.som.annotate.*;
 
+import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
+
 /**
  * A class of Factions
  * 
@@ -41,17 +43,20 @@ public class Faction {
 
 	/**
 	 * Check whether the given World is a valid World for
-	 * any Faction. TODO: isValidWorld
-	 *  
-	 * @param  World
-	 *         The World to check.
-	 * @return 
-	 *       | result == true
-	*/
-	public static boolean isValidWorld(World world) {
-		return false;
+	 * any Faction.
+	 */
+	public boolean isValidWorld(World world) {
+		if (this.getNbUnits() == 0){
+			return true;
+		}
+		else if (world.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
-
+	
 	/**
 	 * Set the World of this Faction to the given World.
 	 * 
@@ -78,21 +83,6 @@ public class Faction {
 	 */
 	private World world;
 	
-	/** TO BE ADDED TO THE CLASS INVARIANTS
-	 * @invar   Each Faction must have proper Units.
-	 *        | hasProperUnits()
-	 */
-
-	/**
-	 * Initialize this new Faction as a non-terminated Faction with 
-	 * no Units yet.
-	 * 
-	 * @post   This new Faction has no Units yet.
-	 *       | new.getNbUnits() == 0
-	 */
-	@Raw
-	public Faction() {
-	}
 
 	/**
 	 * Check whether this Faction has the given Unit as one of its

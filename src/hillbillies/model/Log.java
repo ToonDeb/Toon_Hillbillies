@@ -15,7 +15,7 @@ import javax.vecmath.Vector3d;
  * @author  Toon Deburchgrave
  * @version 1.0
  */
-public class Log extends GameObject{
+public class Log extends GameItem{
 	
 	/** 
 	 * initialize the Log.

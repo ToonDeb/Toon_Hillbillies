@@ -15,7 +15,7 @@ import javax.vecmath.Vector3d;
  * @author  Toon Deburchgrave
  * @version 1.0
  */
-public class Boulder extends GameObject {
+public class Boulder extends GameItem {
 	
 	/** 
 	 * initialize the Boulder. 

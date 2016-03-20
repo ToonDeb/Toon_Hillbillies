@@ -1,11 +1,17 @@
 package hillbillies.model;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
+
+import javax.vecmath.Vector3d;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
+
+import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
+
 
 /**
  * A class of Worlds
@@ -25,6 +31,10 @@ import hillbillies.util.ConnectedToBorder;
  * @invar   Each World must have proper Units.
  *        | hasProperUnits()
  *
+ * @invar   Each World must have proper Factions.
+ *        | hasProperFactions()
+ *        
+ *        
  * @author  Toon Deburchgrave
  * @version 1.0
  */
@@ -54,6 +64,10 @@ public class World {
 	 *       
  	 * @post   This new World has no Units yet.
 	 *       | new.getNbUnits() == 0
+	 *       
+ 	 * @post   This new World has no Factions yet.
+	 *       | new.getNbFactions() == 0
+	 *       
 	 */
 	public World(int[][][] terrainType, TerrainChangeListener modelListener)
 			throws IllegalArgumentException {
@@ -143,7 +157,7 @@ public class World {
 	 * any World.
 	*/
 	public static boolean isValidTerrainType(int[][][] terrainType) {
-		return false;
+		return true;
 	}
 	
 	/**
@@ -168,6 +182,42 @@ public class World {
 	}
 	
 	/**
+	 * TODO: documentatie isPassableTerrain
+	 * @param position
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public boolean isPassableTerrain(int[] position)throws IllegalArgumentException{
+		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
+		if (! GameObject.isValidPosition(vectorPosition, this))
+			throw new IllegalArgumentException("not a valid position");
+		
+		if((this.getCubeType(position[0], position[1], position[2])==0)||
+		 	(this.getCubeType(position[0], position[1], position[2])==3)){
+			return true;
+		}
+		return false;	
+	}
+	
+	/**
+	 * TODO: documentatie canStandHere
+	 * @param position
+	 * @return
+	 */
+	public boolean canStandHere(int[] position){
+		if (position[2] == 0){
+			return true;
+		}
+		
+		int[] belowPosition = new int[3];
+		belowPosition[0] = position[0];
+		belowPosition[1] = position[1];
+		
+		belowPosition[2] = position[2]-1;
+		return(!this.isPassableTerrain(belowPosition));
+	}
+	
+	/**
 	 * Variable registering the terrainTypes of this World.
 	 */
 	private int[][][] terrainType;
@@ -188,7 +238,7 @@ public class World {
 		return this.getTerrainType()[x][y][z];
 	}
 	
-	@Raw
+	@Raw //TODO: notifyTerrainChanged?
 	public void setCubeType(int x, int y, int z, int value){
 		terrainType[x][y][z] = value;
 		this.getTerrainChangeListener().notifyTerrainChanged(x, y, z);
@@ -214,14 +264,14 @@ public class World {
 	 * @param  log
 	 *         The log to check.
 	 * @return True if and only if the given log is effective
-	 *         and that log is a valid log for a World.
+	 *         and that log is a valid log for this World.
 	 *       | result ==
 	 *       |   (log != null) &&
 	 *       |   Log.isValidWorld(this)
 	 */
 	@Raw
 	public boolean canHaveAsLog(Log log) {
-		return (log != null) && (Log.isValidWorld(this));
+		return (log != null) && (log.isValidWorld(this));
 	}
 
 	/**
@@ -328,14 +378,14 @@ public class World {
 	 * @param  boulder
 	 *         The Boulder to check.
 	 * @return True if and only if the given Boulder is effective
-	 *         and that Boulder is a valid Boulder for a World.
+	 *         and that Boulder is a valid Boulder for this World.
 	 *       | result ==
 	 *       |   (boulder != null) &&
 	 *       |   Boulder.isValidWorld(this)
 	 */
 	@Raw
 	public boolean canHaveAsBoulder(Boulder boulder) {
-		return (boulder != null) && (Boulder.isValidWorld(this));
+		return (boulder != null) && (boulder.isValidWorld(this));
 	}
 
 	/**
@@ -449,7 +499,7 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsUnit(Unit unit) {
-		return (unit != null) && (Unit.isValidWorld(this));
+		return (unit != null) && (unit.isValidWorld(this));
 	}
 
 	/**
@@ -534,22 +584,7 @@ public class World {
 	 *       |     (! unit.isTerminated()) )
 	 */
 	private final Set<Unit> units = new HashSet<Unit>();
-	
-	/** TO BE ADDED TO THE CLASS INVARIANTS
-	 * @invar   Each World must have proper Factions.
-	 *        | hasProperFactions()
-	 */
 
-	/**
-	 * Initialize this new World as a non-terminated World with 
-	 * no Factions yet.
-	 * 
-	 * @post   This new World has no Factions yet.
-	 *       | new.getNbFactions() == 0
-	 */
-	@Raw
-	public World() {
-	}
 
 	/**
 	 * Check whether this World has the given Faction as one of its
@@ -578,7 +613,7 @@ public class World {
 	 */
 	@Raw
 	public boolean canHaveAsFaction(Faction faction) {
-		return (faction != null) && (Faction.isValidWorld(this));
+		return (faction != null) && (faction.isValidWorld(this));
 	}
 
 	/**
@@ -613,7 +648,39 @@ public class World {
 	public int getNbFactions() {
 		return factions.size();
 	}
-
+	
+	/**
+	 * Return the number of Factions with one or more unit.
+	 */
+	public int getNbActiveFactions(){
+		int i = 0;
+		
+		for(Faction faction: factions){
+			if (faction.getNbUnits() > 0){
+				i += 1;
+			}
+		}
+		
+		return i;
+	}
+	
+	/** TODO: documentatie getSmallestFaction
+	 * Returns the smallest active faction
+	 * @return
+	 */
+	public Faction getSmallestFaction(){
+		Faction smallestSoFar = null;
+		int NbUnitsSmallest = 0;
+		for(Faction faction: factions){
+			if(faction.getNbUnits() < NbUnitsSmallest){
+				smallestSoFar = faction;
+				NbUnitsSmallest = faction.getNbUnits();
+			}
+		}
+		return smallestSoFar;
+	}
+	
+	
 	/**
 	 * Add the given Faction to the set of Factions of this World.
 	 * 
@@ -663,5 +730,46 @@ public class World {
 	 *       |     (! faction.isTerminated()) )
 	 */
 	private final Set<Faction> factions = new HashSet<Faction>();
+	
+	Random random = new Random();
+	
+	/**
+	 * TODO: spawnUnit documentatie
+	 * @param enableDefaultBehavior
+	 */
+	public void spawnUnit(boolean enableDefaultBehavior){
+		int strength = random.nextInt(76) + 25;
+		int agility = random.nextInt(76) + 25;
+		int toughness = random.nextInt(76) + 25;
+		int minimumWeight = (strength + agility)/2;
+		int weight = random.nextInt(100-minimumWeight) + minimumWeight;
+		
+		int[] position = new int[3];
+		position[0] = random.nextInt(this.getNbCubesX()+1);
+		position[1] = random.nextInt(this.getNbCubesY()+1);
+		position[2] = random.nextInt(this.getNbCubesZ()+1);
+		
+		while(!(this.isPassableTerrain(position) && this.canStandHere(position))){
+			position[0] = random.nextInt(this.getNbCubesX()+1);
+			position[1] = random.nextInt(this.getNbCubesY()+1);
+			position[2] = random.nextInt(this.getNbCubesZ()+1);
+		}
+		
+		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness);
+		unit.setWorld(this);
+		this.addUnit(unit);
+		Faction faction = null;
+		if(this.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
+			faction = new Faction(this);
+			this.addFaction(faction);	
+		}
+		else{
+			faction = this.getSmallestFaction();
+		}
+		
+		unit.setFaction(faction);
+		faction.addUnit(unit);
+		
+	}
 	
 }
