@@ -76,6 +76,10 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
  * @invar  The Faction of each Unit must be a valid Faction for any
  *         Unit.
  *       | isValidFaction(getFaction())
+ *       
+ * @invar  The Experience of each Unit must be a valid Experience for any
+ *         Unit.
+ *       | isValidExperience(getExperience())
  * @version 0.1
  */
 public class Unit extends GameObject {
@@ -151,6 +155,9 @@ public class Unit extends GameObject {
 	 * @post 	The hitpoints of this new Unit is equal to the calculated hitpoints,
 	 * 		 	depending on weight and toughness. 
 	 *       	| new.getHP() == 200*(weight/100)*(toughness/100)
+	 *       
+	 * @post	The experience of this new Unit is equal to 0.
+	 * 			| new.getExperience() == 0
 	 *
 	 * @param 	name
 	 *        	The name for this new unit.
@@ -412,6 +419,7 @@ public class Unit extends GameObject {
 		this.setWalkTimer(this.getWalkTimer() - time);
 		
 		if (this.getWalkTimer() < 0) {
+			this.increaseExperience(1);
 			this.setPosition(this.getAdjacentDestination());
 			if (this.destinationIsReached(this.getPosition(), this.getFinalDestination())) {
 				this.setStatus(UnitStatus.IDLE);
@@ -783,7 +791,7 @@ public class Unit extends GameObject {
 
 	}
 
-	/**
+	/**TODO: dodge valid terrain
 	 * 
 	 * The Unit moves instantaniously to a random position bordering its current
 	 * position This new position is a valid position in the gameworld
@@ -808,14 +816,16 @@ public class Unit extends GameObject {
 
 		while ((!isValidPosition(newPosition, this.getWorld())) && (counter < 10000)) {
 			// Returns a double between -1 and +1
-			double xJump = 2 * rnd.nextDouble() - 1;
-			double yJump = 2 * rnd.nextDouble() - 1;
+			double xJump = 2 * random.nextDouble() - 1;
+			double yJump = 2 * random.nextDouble() - 1;
 
 			newPosition.set(thisX + xJump, thisY + yJump, thisZ);
 			counter++;
 		}
 		if (isValidPosition(newPosition, this.getWorld()))
 			this.setPosition(newPosition);
+		
+		this.increaseExperience(20);
 	}
 
 	/**
@@ -850,9 +860,9 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	private void moveToRandom() {
-		double X = rnd.nextInt(this.getWorld().getNbCubesX()) + 0.5;
-		double Y = rnd.nextInt(this.getWorld().getNbCubesY()) + 0.5;
-		double Z = rnd.nextInt(this.getWorld().getNbCubesZ()) + 0.5;
+		double X = random.nextInt(this.getWorld().getNbCubesX()) + 0.5;
+		double Y = random.nextInt(this.getWorld().getNbCubesY()) + 0.5;
+		double Z = random.nextInt(this.getWorld().getNbCubesZ()) + 0.5;
 		this.moveTo(new Vector3d(X, Y, Z));
 	}
 
@@ -1016,7 +1026,7 @@ public class Unit extends GameObject {
 	 *         		(this.getStrength() + this.getAgility())/2))
 	 */
 	private boolean isValidWeight(int weight) {
-		return ((1 < weight) && (weight < 200) && (weight >= (this.getStrength() + this.getAgility()) / 2));
+		return ((1 < weight) && (weight < 200));
 	}
 
 	/**
@@ -1433,6 +1443,7 @@ public class Unit extends GameObject {
 
 		double newAttackTime = this.getAttackCountDown() - time;
 		if (Util.fuzzyLessThanOrEqualTo(newAttackTime, 0)) {
+			this.increaseExperience(20);
 			this.setAttackCountDown(0);
 			this.setStatus(UnitStatus.IDLE);
 		} else
@@ -1444,7 +1455,7 @@ public class Unit extends GameObject {
 	 */
 	private double attackCountDown = 0;
 
-	Random rnd = new Random();
+	Random random = new Random();
 
 	/**
 	 * This Unit is attacked by the other Unit, and can take damage because of
@@ -1481,6 +1492,7 @@ public class Unit extends GameObject {
 		}
 
 		if (this.blockChance(other)) {
+			this.increaseExperience(20);
 			// this.setStatus(UnitStatus.IDLE);
 			return;
 		}
@@ -1501,7 +1513,7 @@ public class Unit extends GameObject {
 	 */
 	private boolean dodgeChance(Unit other) {
 		double dodgeChance = (0.2d * this.getAgility()) / other.getAgility();
-		return (Util.fuzzyLessThanOrEqualTo(rnd.nextDouble(), dodgeChance));
+		return (Util.fuzzyLessThanOrEqualTo(random.nextDouble(), dodgeChance));
 	}
 
 	/**
@@ -1517,7 +1529,7 @@ public class Unit extends GameObject {
 	private boolean blockChance(Unit other) {
 		double blockChance = (0.25d * (this.getStrength() + this.getAgility()))
 				/ (other.getStrength() + other.getAgility());
-		return (Util.fuzzyLessThanOrEqualTo(rnd.nextDouble(), blockChance));
+		return (Util.fuzzyLessThanOrEqualTo(random.nextDouble(), blockChance));
 
 	}
 
@@ -1825,7 +1837,7 @@ public class Unit extends GameObject {
 		if (!this.getDefaultBoolean())
 			throw new IllegalStateException();
 
-		double chance = rnd.nextDouble();
+		double chance = random.nextDouble();
 
 		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
 			this.work();
@@ -1938,5 +1950,83 @@ public class Unit extends GameObject {
 	 * Variable registering the Faction of this Unit.
 	 */
 	private Faction faction = null;
+	
+
+	/**
+	 * Return the Experience of this Unit.
+	 */
+	@Basic @Raw
+	public int getExperience() {
+		return this.experience;
+	}
+
+	/** TODO: isValidExperience
+	 * Check whether the given Experience is a valid Experience for
+	 * any Unit.
+	 *  
+	 * @param  Experience
+	 *         The Experience to check.
+	 * @return 
+	 *       | result == 
+	*/
+	public static boolean isValidExperience(int experience) {
+		return true;
+	}
+
+	/**
+	 * Set the Experience of this Unit to the given Experience.
+	 * 
+	 * @param  experience
+	 *         The new Experience for this Unit.
+	 * @post   The Experience of this new Unit is equal to
+	 *         the given Experience.
+	 *       | new.getExperience() == experience
+	 * @throws IllegalArgumentException
+	 *         The given Experience is not a valid Experience for any
+	 *         Unit.
+	 *       | ! isValidExperience(getExperience())
+	 */
+	@Raw
+	public void setExperience(int experience) throws IllegalArgumentException {
+		if (! isValidExperience(experience))
+			throw new IllegalArgumentException();
+		this.experience = experience;
+	}
+	
+	/**
+	 * TODO: increaseExperience documentation
+	 * @param experience
+	 * @throws IllegalArgumentException
+	 */
+	public void increaseExperience(int amount) throws IllegalArgumentException{
+		// if all atributes have the maximum value, do nothing
+		if ((this.getAgility() == 200)&&(this.getStrength()==200)&&(this.getToughness()==200))
+			return;
+		
+		int newExperience = this.getExperience() + experience;
+		while(newExperience >= 10){
+			newExperience = newExperience - 10;
+			int randomInt = random.nextInt(3);
+			if ((randomInt == 0) && isValidUnitAttribute(this.getAgility()+1)){
+				this.setAgility(this.getAgility()+1);
+			}
+			else if((randomInt == 1)&& isValidUnitAttribute(this.getStrength()+1)){
+				this.setStrength(this.getStrength()+1);
+			}
+			else if((randomInt == 2)&& isValidUnitAttribute(this.getToughness()+1)){
+				this.setToughness(this.getToughness()+1);
+			}
+			else{
+				newExperience = newExperience + 10;
+			}
+		}
+		
+		this.setExperience(newExperience);
+	}
+
+	/**
+	 * Variable registering the Experience of this Unit.
+	 */
+	private int experience = 0;
 
 }

@@ -19,7 +19,7 @@ import be.kuleuven.cs.som.annotate.Raw;
  */
 public abstract class GameItem extends GameObject{
 	
-	Random rand = new Random();
+	private Random rand = new Random();
 	
 	public GameItem(int[] position, World world){
 		super(position, world);
