@@ -27,7 +27,7 @@ public class Boulder extends GameItem {
  	 *         the given World.
  	 *       | this.setWorld(world)
 	 */
-	public Boulder(Vector3d position, World world) throws IllegalArgumentException{
+	public Boulder(int[] position, World world) throws IllegalArgumentException{
 		super(position, world);
 	}
 

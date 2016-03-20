@@ -21,7 +21,7 @@ public class Log extends GameItem{
 	 * initialize the Log.
 	 * The Log has the given Position and World
 	 */
-	public Log(Vector3d position, World world) throws IllegalArgumentException{
+	public Log(int[] position, World world) throws IllegalArgumentException{
 		super(position, world);
 		
 	}

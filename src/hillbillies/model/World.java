@@ -10,7 +10,8 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 
-import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
+import static hillbillies.model.Constants.*;
+
 
 
 /**
@@ -738,6 +739,10 @@ public class World {
 	 * @param enableDefaultBehavior
 	 */
 	public void spawnUnit(boolean enableDefaultBehavior){
+		if(this.getNbUnits()== MAX_NB_UNITS_IN_WORLD){
+			return;
+		}
+		
 		int strength = random.nextInt(76) + 25;
 		int agility = random.nextInt(76) + 25;
 		int toughness = random.nextInt(76) + 25;
@@ -754,6 +759,7 @@ public class World {
 			position[1] = random.nextInt(this.getNbCubesY()+1);
 			position[2] = random.nextInt(this.getNbCubesZ()+1);
 		}
+
 		
 		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness);
 		unit.setWorld(this);
@@ -767,9 +773,12 @@ public class World {
 			faction = this.getSmallestFaction();
 		}
 		
-		unit.setFaction(faction);
-		faction.addUnit(unit);
+		if(faction.getNbUnits() < MAX_NB_UNITS_IN_FACTION){
+			unit.setFaction(faction);
+			faction.addUnit(unit);
+		}
+		
 		
 	}
-	
+
 }
