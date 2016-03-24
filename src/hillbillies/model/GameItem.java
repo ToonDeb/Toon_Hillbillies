@@ -40,4 +40,26 @@ public abstract class GameItem extends GameObject{
 	 * Variable registering the weight of this GameItem.
 	 */
 	private final int weight;
+	
+	/**
+	 * implements takeFallDamage, from GameObject. 
+	 * GameItems don't take damage, so this does nothing.
+	 */
+	public void takeFallDamage(int fallDepth){
+		return;
+	}
+	
+	public void advanceTime(double deltaT){
+		
+		//check if GameItem is on solid ground
+		int[] belowPosition = this.getCubePositionBelow();
+		if(this.getWorld().isPassableTerrain(belowPosition)){
+			this.startFall();
+		}
+		
+		//update position while falling
+		if (this.isFalling()){
+			this.updateFall(deltaT);
+		}
+	}
 }
