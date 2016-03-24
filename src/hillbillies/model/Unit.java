@@ -395,7 +395,7 @@ public class Unit extends GameObject {
 				 || (this.getStatus() == UnitStatus.SPRINTING));
 	}
 
-	/**
+	/** TODO: updateposition documentatie
 	 * Updates the position of the unit.
 	 * 
 	 * @param 	time
@@ -430,7 +430,22 @@ public class Unit extends GameObject {
 			this.setPosition(nextPosition);
 		}
 	}
-
+	
+	/**
+	 * Reduce the hp of this unit, and  set its status to idle
+	 * 
+	 * @param 	fallDepth
+	 * 		  	The amount of z-levels the unit has fallen.
+	 * @effect 	the Units HP is reduced by 10*falldepth
+	 * 			| this.takeDamage(10*fallDepth)
+	 * @post	the status of the unit will be IDLE
+	 * 			| new.getStatus == IDLE
+	 */
+	public void takeFallDamage(int fallDepth){
+		this.setStatus(UnitStatus.IDLE);
+		this.takeDamage(fallDepth * 10);		
+	}
+	
 	/**
 	 * Return the walkTimer of this Unit.
 	 */
@@ -572,6 +587,31 @@ public class Unit extends GameObject {
 		double speed = this.getSpeed();
 		velocity.scale(speed);
 		return velocity;
+	}
+	
+	private double getBaseSpeed() {
+		return 1.5 * (this.getStrength() + this.getAgility()) / (200 * weight / 100);
+	}
+
+	/**
+	 * Return the speed of this unit.
+	 */
+	public double getSpeed() {
+		UnitStatus status = this.getStatus();
+
+		double vbase = this.getBaseSpeed();
+		double v;
+		
+		if (this.getOrigin()[2] - this.getAdjacentDestination().z + 0.5 < 0)
+			v = 0.5 * vbase;
+		else if (this.getOrigin()[2] - this.getAdjacentDestination().z + 0.5 > 0)
+			v = 1.2 * vbase;
+		else
+			v = vbase;
+
+		if (status == UnitStatus.SPRINTING)
+			return 2 * v;
+		return v;
 	}
 
 	/**
@@ -865,33 +905,7 @@ public class Unit extends GameObject {
 		double Z = random.nextInt(this.getWorld().getNbCubesZ()) + 0.5;
 		this.moveTo(new Vector3d(X, Y, Z));
 	}
-
-	/**
-	 * Return the base speed of this unit.
-	 */
-	private double getBaseSpeed() {
-		return 1.5 * (this.getStrength() + this.getAgility()) / (200 * weight / 100);
-	}
-
-	/**
-	 * Return the speed of this unit.
-	 */
-	public double getSpeed() {
-
-		double vbase = this.getBaseSpeed();
-		double v;
-		UnitStatus status = this.getStatus();
-		if (this.getOrigin()[2] - this.getAdjacentDestination().z + 0.5 < 0)
-			v = 0.5 * vbase;
-		else if (this.getOrigin()[2] - this.getAdjacentDestination().z + 0.5 > 0)
-			v = 1.2 * vbase;
-		else
-			v = vbase;
-
-		if (status == UnitStatus.SPRINTING)
-			return 2 * v;
-		return v;
-	}
+	
 
 	/**
 	 * Return the adjacentDestination of this unit.
@@ -1234,6 +1248,29 @@ public class Unit extends GameObject {
 		assert isValidHP(hp);
 		this.hp = hp;
 	}
+	
+	/** TODO: documentatie
+	 * Reduce the hp of this unit with the given amount. 
+	 * If the hp reaches zero, terminate the unit.
+	 * 
+	 * @param 	amount
+	 * 			the amount by which the hp needs to be reduced
+	 * @post	
+	 * 			| if newHP > 0
+	 * 			|	then new.getHP = this.getHP - amount
+	 * @effect	terminate the unit if hp reaches zero
+	 * 			| if newHP <= 0
+	 * 			|	then this.terminate
+	 */
+	public void takeDamage(int amount){
+		int newHP = this.getHP() - amount;
+		if (newHP <= 0){
+			this.terminate();
+		}
+		else{
+			this.setHP(newHP);
+		}
+	}
 
 	/**
 	 * Variable registering the hitpoints of this Unit.
@@ -1548,6 +1585,7 @@ public class Unit extends GameObject {
 	public void rest() {
 		assert (this.getStatus() != UnitStatus.ATTACKING);
 		assert (this.getStatus() != UnitStatus.DEFENDING);
+		assert (!this.isFalling());
 		this.setRestTime(0);
 		this.setStatus(UnitStatus.REST);
 	}
@@ -1700,39 +1738,40 @@ public class Unit extends GameObject {
 	private UnitStatus status;
 
 	public void advanceTime(double deltaT) {
-		if (this.getStatus() == UnitStatus.DEFENDING) {
+		
+		// Check if unit stands on solid ground
+		int[] belowPosition = this.getCubePositionBelow();
+		if(this.getWorld().isPassableTerrain(belowPosition)){
+			this.startFall();
+			this.setStatus(UnitStatus.FALLING);
+		}
+		
+		// check all status
+		if (this.isFalling()){
+			this.updateFall(deltaT);
+		}
+		else if (this.getStatus() == UnitStatus.DEFENDING) {
 			this.setStatus(UnitStatus.IDLE);
 		}
-		if (this.getStatus() == UnitStatus.ATTACKING) {
+		else if (this.getStatus() == UnitStatus.ATTACKING) {
 			this.advanceAttackTime(deltaT);
 		}
-		if ((this.getStatus() == UnitStatus.REST) || (status == UnitStatus.RESTING)) {
+		else if ((this.getStatus() == UnitStatus.REST) || (status == UnitStatus.RESTING)) {
 			this.advanceRest(deltaT);
 		}
-		if (this.getStatus() == UnitStatus.WORKING) {
+		else if (this.getStatus() == UnitStatus.WORKING) {
 			this.advanceWorkTime(deltaT);
 		}
-		if (this.getStatus() == UnitStatus.WALKING) {
+		else if (this.getStatus() == UnitStatus.WALKING) {
 			this.updatePosition(deltaT);
 		}
-		if (this.getStatus() == UnitStatus.SPRINTING) {
-			stamina = this.getStamina();
-			if (stamina > 0) {
-				this.sprintTime = this.sprintTime + deltaT;
-				if (Util.fuzzyGreaterThanOrEqualTo(this.sprintTime, 0.1)) {
-					while (this.sprintTime > 0.1) {
-						this.sprintTime = this.sprintTime - 0.1;
-						this.setStamina(this.getStamina() - 1);
-					}
-				}
-				this.updatePosition(deltaT);
-			} else {
-				this.setStatus(UnitStatus.WALKING);
-				this.updatePosition(deltaT);
-			}
+		else if (this.getStatus() == UnitStatus.SPRINTING) {
+			updateSprint(deltaT);
 		}
 
-		if (Util.fuzzyGreaterThanOrEqualTo(this.rest3MinTime, 3 * 60) && (this.getStatus() != UnitStatus.DEFENDING)) {
+		if (Util.fuzzyGreaterThanOrEqualTo(this.rest3MinTime, 3 * 60) 
+				&& (this.getStatus() != UnitStatus.DEFENDING) 
+				&& (!this.isFalling())) {
 			this.rest3MinTime = 0;
 			this.rest();
 		} else {
@@ -1743,6 +1782,29 @@ public class Unit extends GameObject {
 			this.defaultBehaviour();
 		}
 
+	}
+
+	/**
+	 * Check if the unit can still sprint
+	 * 
+	 * @param 	deltaT
+	 * 			The time 
+	 */
+	private void updateSprint(double deltaT) {
+		stamina = this.getStamina();
+		if (stamina > 0) {
+			this.sprintTime = this.sprintTime + deltaT;
+			if (Util.fuzzyGreaterThanOrEqualTo(this.sprintTime, 0.1)) {
+				while (this.sprintTime > 0.1) {
+					this.sprintTime = this.sprintTime - 0.1;
+					this.setStamina(this.getStamina() - 1);
+				}
+			}
+			this.updatePosition(deltaT);
+		} else {
+			this.setStatus(UnitStatus.WALKING);
+			this.updatePosition(deltaT);
+		}
 	}
 
 	private double rest3MinTime;
