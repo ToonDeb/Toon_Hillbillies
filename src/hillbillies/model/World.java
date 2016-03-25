@@ -1,6 +1,8 @@
 package hillbillies.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -82,7 +84,7 @@ public class World {
 		for(int x=0; x<this.getNbCubesX(); x++){
 			for(int y=0; y<this.getNbCubesY(); y++){
 				for(int z=0; z<this.getNbCubesZ();z++){
-					if ((this.getCubeType(x, y, z) == 0)||(this.getCubeType(x, y, z) == 3)){
+					if ((this.getCubeType(x, y, z) == AIR)||(this.getCubeType(x, y, z) == WORKSHOP)){
 						this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 					}
 				}
@@ -193,8 +195,8 @@ public class World {
 		if (! GameObject.isValidPosition(vectorPosition, this))
 			throw new IllegalArgumentException("not a valid position");
 		
-		if((this.getCubeType(position[0], position[1], position[2])==0)||
-		 	(this.getCubeType(position[0], position[1], position[2])==3)){
+		if((this.getCubeType(position[0], position[1], position[2])==AIR)||
+		 	(this.getCubeType(position[0], position[1], position[2])==WORKSHOP)){
 			return true;
 		}
 		return false;	
@@ -239,10 +241,33 @@ public class World {
 		return this.getTerrainType()[x][y][z];
 	}
 	
-	@Raw //TODO: notifyTerrainChanged?
+	@Raw //TODO: notifyTerrainChanged, 
 	public void setCubeType(int x, int y, int z, int value){
-		terrainType[x][y][z] = value;
+		this.getTerrainType()[x][y][z] = value;
 		this.getTerrainChangeListener().notifyTerrainChanged(x, y, z);
+		
+		if(value == AIR){
+			List<int[]> changedTerrain = this.getConnectedToBorder().changeSolidToPassable(x, y, z);
+			for(int[] changedPosition: changedTerrain){
+				int otherX = changedPosition[0];
+				int otherY = changedPosition[1];
+				int otherZ = changedPosition[2];
+				int type = this.getCubeType(otherX, otherY, otherZ);
+				this.getTerrainType()[otherX][otherY][otherZ] = 0;
+				this.getTerrainChangeListener().notifyTerrainChanged(otherX, otherY, otherZ);
+				
+				if((type == ROCK)&&(random.nextDouble()<=0.25)){
+					Boulder boulder = new Boulder(changedPosition,this);
+					this.addBoulder(boulder);
+				}
+				
+				if((type == TREE)&&(random.nextDouble()<= 0.25)){
+					Log log = new Log(changedPosition, this);
+					this.addLog(log);
+				}
+				
+			}
+		}
 	}
 
 	/**
@@ -780,5 +805,64 @@ public class World {
 		
 		
 	}
+	
+	/**
+	 * Returns the log at the given position, if there is one. returns null otherwise.
+	 * 
+	 * @param 	position
+	 * 			| the position at which the log should be
+	 * @return	the log at the given position, otherwise null
+	 * 			| result = log : log.getCubePosition == position
+	 */
+	public Log logAtPosition(int[] position){
+		for(Log log: this.logs){
+			if(Arrays.equals(log.getCubePosition(), position)){
+				return log;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns the boulder at the given position, if there is one. returns null otherwise.
+	 * 
+	 * @param 	position
+	 * 			| the position at which the boulder should be
+	 * @return	the boulder at the given position, otherwise null
+	 * 			| result = boulder : boulder.getCubePosition == position
+	 */
+	public Boulder boulderAtPosition(int[] position){
+		for(Boulder boulder: this.boulders){
+			if(Arrays.equals(boulder.getCubePosition(), position)){
+				return boulder;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns the GameItem at the given position, if there is one. returns null otherwise.
+	 * 
+	 * @param 	position
+	 * 			| the position at which the GameItem should be
+	 * @return	the gameItem at the given position, otherwise null
+	 * 			| result = GameItem : GameItem.getCubePosition == position
+	 */
+	public GameItem gameItemAtPosition(int[] position){
+		for(Boulder boulder: this.boulders){
+			if(Arrays.equals(boulder.getCubePosition(), position)){
+				return boulder;
+			}
+		}
+		
+		for(Log log: this.logs){
+			if(Arrays.equals(log.getCubePosition(), position)){
+				return log;
+			}
+		}
+		
+		return null;
+	}
+	
 
 }

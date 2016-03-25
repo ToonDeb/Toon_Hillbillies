@@ -62,4 +62,31 @@ public abstract class GameItem extends GameObject{
 			this.updateFall(deltaT);
 		}
 	}
+	
+	/** TODO: terminate gameitem
+	 * Terminate this GameItem.
+	 *
+	 * @post   This GameItem  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this GameItem
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this person is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 }
