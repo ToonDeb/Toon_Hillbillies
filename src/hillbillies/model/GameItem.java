@@ -63,16 +63,18 @@ public abstract class GameItem extends GameObject{
 		}
 	}
 	
-	/** TODO: terminate gameitem
+	/** TODO: terminate gameitem test
 	 * Terminate this GameItem.
-	 *
-	 * @post   This GameItem  is terminated.
-	 *       | new.isTerminated()
-	 * @post   ...
-	 *       | ...
 	 */
 	 public void terminate() {
 		 this.isTerminated = true;
+		 if (this.getClass() == Log.class){
+			 this.getWorld().removeLog((Log)this);
+		 }
+		 else{
+			 this.getWorld().removeBoulder((Boulder)this);
+		 }
+		 this.setWorld(null);
 	 }
 	 
 	 /**

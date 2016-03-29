@@ -171,11 +171,42 @@ public abstract class GameObject {
 	
 	private boolean isFalling;
 	
+	/**
+	 * Returns the coordinates of the cube beneath this gameobject
+	 * 
+	 * @return 	the cube coordinates of the cube below
+	 * 			| belowPosition = this.getCubePosition
+	 * 			| belowPosition[2] = belowPosition[2]-1
+	 * 			| return belowPosition
+	 */
 	public int[] getCubePositionBelow(){
 		int[] cubePosition = this.getCubePosition();
 		int[] belowPosition = cubePosition;
 		belowPosition[2] = belowPosition[2] - 1;
 		return belowPosition;
+	}
+	
+	/**
+	 * return true if the given position is less then 2 cubes away 
+	 * 		from the current position
+	 * 
+	 * @param 	target
+	 * 			the position to test
+	 * @return	| if (|this.position[0] - target[0]| > 1) OR
+	 * 			| 		(|this.position[1] - target[1]| > 1) OR
+	 * 			| 		(|this.position[2] - target[2]| > 1)
+	 * 			| 	then return false
+	 * 			| else 
+	 * 			|	return true
+	 */
+	public boolean isNeighboringCube(int[] target){
+		int[] position = this.getCubePosition();
+		if ((Math.abs(position[0] - target[0]) > 1) ||
+				(Math.abs(position[1] - target[1]) > 1) ||
+				(Math.abs(position[2] - target[2]) > 1))
+			return false;
+		else
+			return true;
 	}
 
 

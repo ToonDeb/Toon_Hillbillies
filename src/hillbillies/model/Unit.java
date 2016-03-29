@@ -1341,12 +1341,31 @@ public class Unit extends GameObject {
 	 * @throws 	IllegalArgumentException
 	 *          The given workTime is not a valid workTime for any Unit.
 	 *          | ! isValidWorkTime(getWorkTime())
+	 * @param	x, y and z
+	 * 			The cube-coordinates of the targetted cube.
+	 * @post	the workTarget is set to the given coordinates
+	 * 			| new.getWorkTarget == (x, y, z)
+	 * @post	the workTime is set
+	 * 			| new.getWorkTime == 500/this.getStrength
+	 * @post	the status is set to Working
+	 * 			| new.getStatus == WORKING
 	 */
-	public void work() throws IllegalArgumentException {
-		this.setWorkTime(500.0d / strength);
+	public void workAt(int x, int y, int z) throws IllegalArgumentException {
+		int[] workTarget = new int[3];
+		workTarget[0] = x;
+		workTarget[1] = y;
+		workTarget[2] = z;
+		if (! this.isNeighboringCube(workTarget))
+			throw new IllegalArgumentException("not a neighbouring cube");
+		
+		this.setWorkTime(500.0d / this.getStrength());
 		this.setStatus(UnitStatus.WORKING);
+		this.setWorkTarget(workTarget);
 	}
 	
+	/**
+	 * TODO: finishWork documentatie
+	 */
 	public void finishWork(){
 		
 		this.increaseExperience(10);
@@ -1526,6 +1545,9 @@ public class Unit extends GameObject {
 	 *          The time to be subtracted from worktime
 	 * @throws 	IllegalArgumentException
 	 *          The given time is not a valid time for any Unit.
+	 * @effect	If the workTime is smaller then or equal to 0, do finishWork
+	 * 			| if (this.worktime - time <= 0)
+	 * 			| 	then this.finishWork();
 	 */
 	private void advanceWorkTime(double time) throws IllegalArgumentException {
 		if (!isValidTime(time))
@@ -1535,6 +1557,7 @@ public class Unit extends GameObject {
 		if (Util.fuzzyLessThanOrEqualTo(newWorkTime, 0)) {
 			this.setWorkTime(0);
 			this.setStatus(UnitStatus.IDLE);
+			this.finishWork();
 		} else
 			this.setWorkTime(newWorkTime);
 	}
@@ -2018,6 +2041,7 @@ public class Unit extends GameObject {
 
 
 	/** TODO: terminate Unit
+	 *  TODO: drop item
 	 * Terminate this Unit.
 	 *
 	 * @post 	This Unit is terminated. 
@@ -2077,7 +2101,7 @@ public class Unit extends GameObject {
 	 *          | ! this.getDefaultBoolean()
 	 * @effect 	1/3 of the times this method is called, the unit will work 
 	 * 			| if (RandomNumberBetween0And1 <= 1/3) 
-	 * 			|		then this.work()
+	 * 			|		then this.workAt(this.getCubePosition)
 	 * @effect 	1/3 of the time this method is called, the unit will rest 
 	 * 			| if (1/3 < RandomNumberBetween0And1 <= 2/3) 
 	 * 			| 		then this.rest()
@@ -2093,7 +2117,8 @@ public class Unit extends GameObject {
 		double chance = random.nextDouble();
 
 		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
-			this.work();
+			this.workAt(this.getCubePosition()[0], 
+					this.getCubePosition()[1], this.getCubePosition()[2]);
 			return;
 		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.666666d)) {
 			this.rest();
