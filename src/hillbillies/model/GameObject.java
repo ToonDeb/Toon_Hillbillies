@@ -4,6 +4,10 @@ package hillbillies.model;
 //import static hillbillies.model.Constants.MAX_Y_POSITION;
 //import static hillbillies.model.Constants.MAX_Z_POSITION;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_WORLD;
+import static hillbillies.model.Constants.AIR;
+import static hillbillies.model.Constants.TREE;
+import static hillbillies.model.Constants.ROCK;
+import static hillbillies.model.Constants.WORKSHOP;
 
 import javax.vecmath.*;
 
@@ -65,6 +69,21 @@ public abstract class GameObject {
 		return position != null && (position.x >= 0) && (position.x < world.getNbCubesX()) 
 			&& (position.y >= 0) && (position.y < world.getNbCubesY())
 				&& (position.z >= 0) && (position.z < world.getNbCubesZ());
+	}
+	
+	/**
+	 * Set the position of this GameObject to the center of the cube, specified
+	 * by the given cubePosition
+	 * 
+	 * @param cubePosition
+	 * 		  the cube of the new location
+	 * @post  the cubeposition of the GameObject is equal to the given cubeposition
+	 * 		  | new.getCubePosition == cubePosition
+	 */
+	public void setAtPosition(int[] cubePosition){
+		Vector3d position = new Vector3d(
+				cubePosition[0]+0.5, cubePosition[1]+0.5, cubePosition[2]+0.5);
+		this.setPosition(position);
 	}
 
 	/**
@@ -152,11 +171,42 @@ public abstract class GameObject {
 	
 	private boolean isFalling;
 	
+	/**
+	 * Returns the coordinates of the cube beneath this gameobject
+	 * 
+	 * @return 	the cube coordinates of the cube below
+	 * 			| belowPosition = this.getCubePosition
+	 * 			| belowPosition[2] = belowPosition[2]-1
+	 * 			| return belowPosition
+	 */
 	public int[] getCubePositionBelow(){
 		int[] cubePosition = this.getCubePosition();
 		int[] belowPosition = cubePosition;
 		belowPosition[2] = belowPosition[2] - 1;
 		return belowPosition;
+	}
+	
+	/**
+	 * return true if the given position is less then 2 cubes away 
+	 * 		from the current position
+	 * 
+	 * @param 	target
+	 * 			the position to test
+	 * @return	| if (|this.position[0] - target[0]| > 1) OR
+	 * 			| 		(|this.position[1] - target[1]| > 1) OR
+	 * 			| 		(|this.position[2] - target[2]| > 1)
+	 * 			| 	then return false
+	 * 			| else 
+	 * 			|	return true
+	 */
+	public boolean isNeighboringCube(int[] target){
+		int[] position = this.getCubePosition();
+		if ((Math.abs(position[0] - target[0]) > 1) ||
+				(Math.abs(position[1] - target[1]) > 1) ||
+				(Math.abs(position[2] - target[2]) > 1))
+			return false;
+		else
+			return true;
 	}
 
 

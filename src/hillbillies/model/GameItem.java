@@ -62,4 +62,33 @@ public abstract class GameItem extends GameObject{
 			this.updateFall(deltaT);
 		}
 	}
+	
+	/** TODO: terminate gameitem test
+	 * Terminate this GameItem.
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+		 if (this.getClass() == Log.class){
+			 this.getWorld().removeLog((Log)this);
+		 }
+		 else{
+			 this.getWorld().removeBoulder((Boulder)this);
+		 }
+		 this.setWorld(null);
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this GameItem
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this person is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
 }

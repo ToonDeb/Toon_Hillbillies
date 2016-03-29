@@ -19,5 +19,15 @@ public final class Constants {
 	public static final int MAX_NB_UNITS_IN_WORLD = 100;
 	
 	public static final int MAX_NB_ACTIVE_FACTIONS = 5;
+	
+	public static final int AIR = 0;
+	public static final int ROCK = 1;
+	public static final int TREE = 2;
+	public static final int WORKSHOP = 3;
+//	•0: air
+//	•1: rock
+//	•2: tree
+//	•3: workshop
+
 
 }

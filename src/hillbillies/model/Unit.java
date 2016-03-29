@@ -80,6 +80,14 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
  * @invar  The Experience of each Unit must be a valid Experience for any
  *         Unit.
  *       | isValidExperience(getExperience())
+ *       
+ * @invar  The gameItem of each Unit must be a valid gameItem for any
+ *         Unit.
+ *       | isValidGameItem(getGameItem())
+ *       
+ * @invar  The workTarget of each Unit must be a valid workTarget for any
+ *         Unit.
+ *       | isValidWorkTarget(getWorkTarget())
  * @version 0.1
  */
 public class Unit extends GameObject {
@@ -1324,18 +1332,173 @@ public class Unit extends GameObject {
 	 * Variable registering the stamina of this Unit.
 	 */
 	private int stamina;
-
+	
+	
+	
 	/**
 	 * Start the work-condition
 	 * 
 	 * @throws 	IllegalArgumentException
 	 *          The given workTime is not a valid workTime for any Unit.
 	 *          | ! isValidWorkTime(getWorkTime())
+	 * @param	x, y and z
+	 * 			The cube-coordinates of the targetted cube.
+	 * @post	the workTarget is set to the given coordinates
+	 * 			| new.getWorkTarget == (x, y, z)
+	 * @post	the workTime is set
+	 * 			| new.getWorkTime == 500/this.getStrength
+	 * @post	the status is set to Working
+	 * 			| new.getStatus == WORKING
 	 */
-	public void work() throws IllegalArgumentException {
-		this.setWorkTime(500.0d / strength);
+	public void workAt(int x, int y, int z) throws IllegalArgumentException {
+		int[] workTarget = new int[3];
+		workTarget[0] = x;
+		workTarget[1] = y;
+		workTarget[2] = z;
+		if (! this.isNeighboringCube(workTarget))
+			throw new IllegalArgumentException("not a neighbouring cube");
+		
+		this.setWorkTime(500.0d / this.getStrength());
 		this.setStatus(UnitStatus.WORKING);
+		this.setWorkTarget(workTarget);
 	}
+	
+	/**
+	 * TODO: finishWork documentatie
+	 */
+	public void finishWork(){
+		
+		this.increaseExperience(10);
+		// drop boulder/log if carrying one
+		if(this.getGameItem() != null){
+			if(this.getGameItem().getClass() == Log.class){
+				Log log = (Log)this.getGameItem();
+				log.setAtPosition(this.getWorkTarget());
+				log.setWorld(this.getWorld());
+				this.getWorld().addLog(log);
+				this.setGameItem(null);
+			}
+			else if(this.getGameItem().getClass() == Boulder.class){
+				Boulder boulder = (Boulder)this.getGameItem();
+				boulder.setAtPosition(this.getWorkTarget());
+				boulder.setWorld(this.getWorld());
+				this.getWorld().addBoulder(boulder);
+				this.setGameItem(null);
+			}
+			return;
+		}
+		
+		// target cube is workshop, and one Boulder and one Log are available
+		World world = this.getWorld();
+		Boulder boulder = world.boulderAtPosition(this.getWorkTarget());
+		Log log = world.logAtPosition(this.getWorkTarget());
+		
+		int workX = this.getWorkTarget()[0];
+		int workY = this.getWorkTarget()[1];
+		int workZ = this.getWorkTarget()[2];
+		
+		if((world.getCubeType(workX, workY, workZ)== 3) &&
+				(boulder != null) &&
+				(log != null)){
+			boulder.terminate();
+			log.terminate();
+			
+			int newWeight = this.getWeight() + 1;
+			if(this.isValidWeight(newWeight))
+				this.setWeight(newWeight);
+			int newToughness = this.getToughness() + 1;
+			if(isValidUnitAttribute(newToughness))
+				this.setToughness(newToughness);
+			
+			return;
+		}
+		
+		// if boulder is present, pick up boulder
+		if(boulder != null){
+			this.setGameItem(boulder);
+			boulder.setWorld(null);
+			world.removeBoulder(boulder);
+			
+			return;
+		}
+		
+		// if log is present, pick up log
+		if(log != null){
+			this.setGameItem(log);
+			log.setWorld(null);
+			world.removeLog(log);
+			
+			return;
+		}
+		
+		// if the target cube is a tree, destroy the tree and drop a log
+		if(world.getCubeType(workX, workY, workZ)==2){
+			world.setCubeType(workX, workY, workZ, 0);
+			Log newLog = new Log(this.getWorkTarget(), world);
+			world.addLog(newLog);
+			
+			return;
+		}
+		
+		//if the target cube is a rock, destroy the rock and drop a boulder
+		if(world.getCubeType(workX, workY, workZ)==1){
+			world.setCubeType(workX, workY, workZ, 0);
+			Boulder newBoulder = new Boulder(this.getWorkTarget(), world);
+			world.addBoulder(newBoulder);
+			
+			return;
+		}
+	}
+
+
+	/**
+	 * Return the workTarget of this Unit.
+	 */
+	@Basic @Raw
+	public int[] getWorkTarget() {
+		return this.workTarget;
+	}
+
+	/** TODO: isValidWorkTarget
+	 * Check whether the given workTarget is a valid workTarget for
+	 * any Unit.
+	 *  
+	 * @param  workTarget
+	 *         The workTarget to check.
+	 * @return 
+	 *       | result == 
+	*/
+	public static boolean isValidWorkTarget(int[] workTarget) {
+		return true;
+	}
+
+	/**
+	 * Set the workTarget of this Unit to the given workTarget.
+	 * 
+	 * @param  workTarget
+	 *         The new workTarget for this Unit.
+	 * @post   The workTarget of this new Unit is equal to
+	 *         the given workTarget.
+	 *       | new.getWorkTarget() == workTarget
+	 * @throws IllegalArgumentException
+	 *         The given workTarget is not a valid workTarget for any
+	 *         Unit.
+	 *       | ! isValidWorkTarget(getWorkTarget())
+	 */
+	@Raw
+	public void setWorkTarget(int[] workTarget) 
+			throws IllegalArgumentException {
+		if (! isValidWorkTarget(workTarget))
+			throw new IllegalArgumentException();
+		this.workTarget = workTarget;
+	}
+
+	/**
+	 * Variable registering the workTarget of this Unit.
+	 */
+	private int[] workTarget;
+	
+	
 	
 	/**
 	 * Return the workTime of this Unit.
@@ -1382,6 +1545,9 @@ public class Unit extends GameObject {
 	 *          The time to be subtracted from worktime
 	 * @throws 	IllegalArgumentException
 	 *          The given time is not a valid time for any Unit.
+	 * @effect	If the workTime is smaller then or equal to 0, do finishWork
+	 * 			| if (this.worktime - time <= 0)
+	 * 			| 	then this.finishWork();
 	 */
 	private void advanceWorkTime(double time) throws IllegalArgumentException {
 		if (!isValidTime(time))
@@ -1391,6 +1557,7 @@ public class Unit extends GameObject {
 		if (Util.fuzzyLessThanOrEqualTo(newWorkTime, 0)) {
 			this.setWorkTime(0);
 			this.setStatus(UnitStatus.IDLE);
+			this.finishWork();
 		} else
 			this.setWorkTime(newWorkTime);
 	}
@@ -1399,6 +1566,53 @@ public class Unit extends GameObject {
 	 * Variable registering the workTime of this Unit. Default value 0.
 	 */
 	private double worktime = 0;
+
+	/**
+	 * Return the gameItem of this Unit.
+	 */
+	@Basic @Raw
+	public GameItem getGameItem() {
+		return this.gameItem;
+	}
+
+	/** TODO: isvalidgameItem unit
+	 * Check whether the given gameItem is a valid gameItem for
+	 * any Unit.
+	 *  
+	 * @param  gameItem
+	 *         The gameItem to check.
+	 * @return 
+	 *       | result == 
+	*/
+	public static boolean isValidGameItem(GameItem gameItem) {
+		return true;
+	}
+
+	/**
+	 * Set the gameItem of this Unit to the given gameItem.
+	 * 
+	 * @param  gameItem
+	 *         The new gameItem for this Unit.
+	 * @post   The gameItem of this new Unit is equal to
+	 *         the given gameItem.
+	 *       | new.getGameItem() == gameItem
+	 * @throws IllegalArgumentException
+	 *         The given gameItem is not a valid gameItem for any
+	 *         Unit.
+	 *       | ! isValidGameItem(getGameItem())
+	 */
+	@Raw
+	public void setGameItem(GameItem gameItem) 
+			throws IllegalArgumentException {
+		if (! isValidGameItem(gameItem))
+			throw new IllegalArgumentException();
+		this.gameItem = gameItem;
+	}
+
+	/**
+	 * Variable registering the gameItem of this Unit.
+	 */
+	private GameItem gameItem = null;
 
 	/**
 	 * This Unit attacks the Other Unit
@@ -1827,6 +2041,7 @@ public class Unit extends GameObject {
 
 
 	/** TODO: terminate Unit
+	 *  TODO: drop item
 	 * Terminate this Unit.
 	 *
 	 * @post 	This Unit is terminated. 
@@ -1886,7 +2101,7 @@ public class Unit extends GameObject {
 	 *          | ! this.getDefaultBoolean()
 	 * @effect 	1/3 of the times this method is called, the unit will work 
 	 * 			| if (RandomNumberBetween0And1 <= 1/3) 
-	 * 			|		then this.work()
+	 * 			|		then this.workAt(this.getCubePosition)
 	 * @effect 	1/3 of the time this method is called, the unit will rest 
 	 * 			| if (1/3 < RandomNumberBetween0And1 <= 2/3) 
 	 * 			| 		then this.rest()
@@ -1902,7 +2117,8 @@ public class Unit extends GameObject {
 		double chance = random.nextDouble();
 
 		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
-			this.work();
+			this.workAt(this.getCubePosition()[0], 
+					this.getCubePosition()[1], this.getCubePosition()[2]);
 			return;
 		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.666666d)) {
 			this.rest();
