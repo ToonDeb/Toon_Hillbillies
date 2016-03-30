@@ -2,6 +2,7 @@ package hillbillies.model;
 
 import hillbillies.model.UnitStatus;
 
+import java.util.List;
 import java.util.Random;
 
 import javax.vecmath.*;
@@ -12,7 +13,9 @@ import ogp.framework.util.Util;
 //import static hillbillies.model.Constants.MAX_X_POSITION;
 //import static hillbillies.model.Constants.MAX_Y_POSITION;
 //import static hillbillies.model.Constants.MAX_Z_POSITION;
-import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
+import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
+import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
+import static hillbillies.model.Constants.NEIGHBOURINGLIST;
 
 /**
  * 
@@ -391,6 +394,29 @@ public class Unit extends GameObject {
 			zAdjDes = this.getCubePosition()[2] - 0.5;
 		return new Vector3d(xAdjDes, yAdjDes, zAdjDes);
 	}
+	
+	private void search(int[] position, int n){
+		int[] testPosition = new int[3];
+		for(int[] test: NEIGHBOURINGLIST){
+			testPosition[0] = position[0] + test[0];
+			testPosition[1] = position[1] + test[1];
+			testPosition[2] = position[2] + test[2];
+			int[] queueElement = new int[4];
+			queueElement[0] = testPosition[0];
+			queueElement[1] = testPosition[1];
+			queueElement[2] = testPosition[2];
+			queueElement[3] = n+1;
+			for(int[] testing: Queue){
+				
+			}
+			if(this.getWorld().isNeighbouringSolid(testPosition)&&
+					this.getWorld().isPassableTerrain(testPosition) &&
+					)
+		}
+	}
+	
+	private List<int[]> Queue;
+	
 	/**
 	 * Check if the Unit is moving
 	 * 

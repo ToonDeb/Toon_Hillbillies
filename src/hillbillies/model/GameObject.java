@@ -8,6 +8,8 @@ import static hillbillies.model.Constants.AIR;
 import static hillbillies.model.Constants.TREE;
 import static hillbillies.model.Constants.ROCK;
 import static hillbillies.model.Constants.WORKSHOP;
+import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
+import static hillbillies.model.Constants.NEIGHBOURINGLIST;
 
 import javax.vecmath.*;
 
