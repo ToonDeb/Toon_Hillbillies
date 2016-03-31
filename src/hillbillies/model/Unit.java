@@ -443,7 +443,6 @@ public class Unit extends GameObject {
 			if (this.destinationIsReached(this.getPosition(), this.getFinalDestination())) {
 				this.setStatus(UnitStatus.IDLE);
 			} else {
-				this.pathIndex = this.pathIndex + 1;
 				this.moveToAdjacent(this.findPath());
 			}
 		} else {
