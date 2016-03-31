@@ -321,6 +321,8 @@ public class Unit extends GameObject {
 	public void moveToAdjacent(Vector3d adjacentDestination) throws IllegalArgumentException {
 		if (!isValidAdjacentDestination(adjacentDestination))
 			throw new IllegalArgumentException("Invalid adjacentDestination!");
+		if(this.isFalling())
+			throw new IllegalStateException("can't move while falling!");
 		if(this.getStatus() != UnitStatus.SPRINTING)
 			this.setStatus(UnitStatus.WALKING);
 		if (this.getPosition() == this.getFinalDestination()) {
@@ -348,6 +350,8 @@ public class Unit extends GameObject {
 	public void moveTo(Vector3d finalDestination) throws IllegalArgumentException {
 		if (!isValidPosition(finalDestination, this.getWorld()))
 			throw new IllegalArgumentException("Invalid final destination!");
+		if (this.isFalling())
+			throw new IllegalStateException("can't move while falling");
 		this.setFinalDestination(finalDestination);
 		this.moveToAdjacent(this.findPath());
 	}
@@ -448,6 +452,7 @@ public class Unit extends GameObject {
 	}
 	
 	public Vector3d findPath(){
+		
 		pathIndex = pathIndex + 1;
 		if(path==null){
 			AStarPathFinder pathFinder = new AStarPathFinder(this.getWorld());
@@ -461,7 +466,7 @@ public class Unit extends GameObject {
 			this.path = pathFinder.findPath(this, sx, sy, sz, tx, ty, tz);
 			this.pathIndex = 0;
 		}
-		
+		System.out.println(pathIndex);
 		Vector3d nextPosition = new Vector3d(path.getX(pathIndex)+0.5, path.getY(pathIndex)+0.5, path.getZ(pathIndex)+0.5);
 		return nextPosition;
 		
@@ -648,6 +653,8 @@ public class Unit extends GameObject {
 	 */
 	public double getSpeed() {
 		UnitStatus status = this.getStatus();
+		if(!this.isMoving())
+			return 0;
 
 		double vbase = this.getBaseSpeed();
 		double v;
@@ -722,16 +729,22 @@ public class Unit extends GameObject {
 	/**
 	 * Set the status of the unit from SPRINTING to IDLE
 	 * 
-	 * @pre 	The unit is sprinting. 
-	 * 			| this.canSprint()
 	 * @effect 	The status of this unit is set to WALKING
 	 *         	| this.setStatus(UnitStatus.WALKING)
 	 * 
 	 */
 	public void stopSprint() {
-		assert this.canSprint();
 		this.setStatus(UnitStatus.WALKING);
 
+	}
+	
+	/**
+	 * Return true if this unit is sprinting
+	 * @return 	The sprint-status of this unit
+	 * 			| result == (this.getStatus() == UnitStatus.SPRINTING)
+	 */
+	public boolean isSprinting(){
+		return (this.getStatus() == UnitStatus.SPRINTING);
 	}
 
 	/**
@@ -798,7 +811,7 @@ public class Unit extends GameObject {
 	@Raw
 	public void setName(String name) throws IllegalArgumentException {
 		if (! isValidName(name))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("wrong name!");
 		this.name = name;
 	}
 
@@ -806,8 +819,6 @@ public class Unit extends GameObject {
 	 * Variable registering the name of this unit.
 	 */
 	private String name;
-	
-	
 	
 
 	/**
@@ -939,7 +950,9 @@ public class Unit extends GameObject {
 	 */
 	private boolean canAttack(Unit other) throws IllegalArgumentException {
 		if (other == null)
-			throw new IllegalArgumentException("Non effective unit");
+			throw new NullPointerException("can't attack null");
+		if (other.isFalling())
+			return false;
 		return (this.getCubePosition()[2] == other.getCubePosition()[2])
 				&& (Math.abs(this.getCubePosition()[0] - other.getCubePosition()[0]) < 2)
 				&& (Math.abs(this.getCubePosition()[1] - other.getCubePosition()[1]) < 2);
@@ -990,7 +1003,8 @@ public class Unit extends GameObject {
 			if (Math.abs(thisPos[i]-testPos[i]) > 1)
 				return false;
 		}
-		
+		if(this.getWorld()==null)
+			return true;
 		if(!this.getWorld().isNeighbouringSolid(testPos) && this.getWorld().isPassableTerrain(testPos))
 			return false;
 		return true;
@@ -1068,7 +1082,7 @@ public class Unit extends GameObject {
 	@Raw
 	private void setFinalDestination(Vector3d finalDestination) throws IllegalArgumentException {
 		if (!isValidPosition(finalDestination, this.getWorld()))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("illegal final destination");
 		this.finalDestination = finalDestination;
 	}
 
@@ -1398,14 +1412,11 @@ public class Unit extends GameObject {
 	 * @post	the status is set to Working
 	 * 			| new.getStatus == WORKING
 	 */
-	public void workAt(int x, int y, int z) throws IllegalArgumentException {
-		int[] workTarget = new int[3];
-		workTarget[0] = x;
-		workTarget[1] = y;
-		workTarget[2] = z;
+	public void workAt(int[] workTarget) throws IllegalArgumentException {
 		if (! this.isNeighboringCube(workTarget))
 			throw new IllegalArgumentException("not a neighbouring cube");
-		
+		if (this.isFalling())
+			throw new IllegalStateException("can't work while falling");
 		this.setWorkTime(500.0d / this.getStrength());
 		this.setStatus(UnitStatus.WORKING);
 		this.setWorkTarget(workTarget);
@@ -1419,14 +1430,14 @@ public class Unit extends GameObject {
 		this.increaseExperience(10);
 		// drop boulder/log if carrying one
 		if(this.getGameItem() != null){
-			if(this.getGameItem().getClass() == Log.class){
+			if(this.isCarryingLog()){
 				Log log = (Log)this.getGameItem();
 				log.setAtPosition(this.getWorkTarget());
 				log.setWorld(this.getWorld());
 				this.getWorld().addLog(log);
 				this.setGameItem(null);
 			}
-			else if(this.getGameItem().getClass() == Boulder.class){
+			else if(this.isCarryingBoulder()){
 				Boulder boulder = (Boulder)this.getGameItem();
 				boulder.setAtPosition(this.getWorkTarget());
 				boulder.setWorld(this.getWorld());
@@ -1496,6 +1507,15 @@ public class Unit extends GameObject {
 			
 			return;
 		}
+	}
+	
+	/**
+	 * Return true if this unit is working
+	 * @return
+	 * 			| result == (this.getStatus()==UnitStatus.WORKING)
+	 */
+	public boolean isWorking(){
+		return (this.getStatus()==UnitStatus.WORKING);
 	}
 
 
@@ -1661,7 +1681,32 @@ public class Unit extends GameObject {
 	 * Variable registering the gameItem of this Unit.
 	 */
 	private GameItem gameItem = null;
-
+	
+	/**
+	 * Return whether this unit is carrying a log
+	 * 
+	 * @return true if gameItem is a log
+	 * 			| (this.getGameItem == Log)
+	 */
+	public boolean isCarryingLog(){
+		if(this.getGameItem() == null)
+			return false;
+		return (this.getGameItem().getClass() == Log.class);
+	}
+	
+	/**
+	 * Return whether this unit is carrying a boulder
+	 * 
+	 * @return true if gameItem is a boulder
+	 * 			| (this.getGameItem == boulder)
+	 */
+	public boolean isCarryingBoulder(){
+		if(this.getGameItem() == null)
+			return false;
+		return (this.getGameItem().getClass() == Boulder.class);
+	}
+	
+	
 	/**
 	 * This Unit attacks the Other Unit
 	 *
@@ -1674,10 +1719,16 @@ public class Unit extends GameObject {
 	public void attack(Unit other) throws IllegalArgumentException {
 		if (!this.canAttack(other))
 			throw new IllegalArgumentException("The other Unit cannot be attacked");
+		if (this.isFalling())
+			throw new IllegalStateException("can't attack while falling!");
 		this.setAttackCountDown(1d);
 		this.face(other);
 		this.setStatus(UnitStatus.ATTACKING);
 		other.defend(this);
+	}
+	
+	public boolean isAttacking(){
+		return (this.getStatus()==UnitStatus.ATTACKING);
 	}
 
 	/**
@@ -1832,7 +1883,7 @@ public class Unit extends GameObject {
 
 	}
 
-	/**
+	/** TODO: assert kan niet, want dan moet private zijn
 	 * Initiate the rest status for this unit.
 	 *
 	 * @pre 	The Unit is not attacking 
@@ -1844,14 +1895,23 @@ public class Unit extends GameObject {
 	 * @post 	The restTime of this Unit is 0 
 	 * 			| new.getRestTime() == 0
 	 */
-	public void rest() {
+	public void rest() { 
 		assert (this.getStatus() != UnitStatus.ATTACKING);
 		assert (this.getStatus() != UnitStatus.DEFENDING);
 		assert (!this.isFalling());
 		this.setRestTime(0);
 		this.setStatus(UnitStatus.REST);
 	}
-
+	
+	/**
+	 * Return true if this unit is working
+	 * @return
+	 * 			| result == (this.getStatus()==UnitStatus.REST/RESTING)
+	 */
+	public boolean isResting(){
+		return (this.getStatus()==UnitStatus.REST)||(this.getStatus()==UnitStatus.RESTING);
+	}
+	
 	/**
 	 * Update the hp and stamina of this resting Unit.
 	 *
@@ -2165,8 +2225,7 @@ public class Unit extends GameObject {
 		double chance = random.nextDouble();
 
 		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
-			this.workAt(this.getCubePosition()[0], 
-					this.getCubePosition()[1], this.getCubePosition()[2]);
+			this.workAt(this.getCubePosition());
 			return;
 		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.666666d)) {
 			this.rest();

@@ -14,7 +14,6 @@ import hillbillies.util.ConnectedToBorder;
 
 
 import static hillbillies.model.Constants.*;
-import static hillbillies.model.Constants.NEIGHBOURINGLIST;
 
 
 
@@ -76,6 +75,8 @@ public class World {
 	 */
 	public World(int[][][] terrainType, TerrainChangeListener modelListener)
 			throws IllegalArgumentException {
+		if((terrainType == null)||(modelListener == null))
+			throw new NullPointerException();
 		this.setTerrainType(terrainType);
 		this.setTerrainChangeListener(modelListener);
 		
@@ -194,8 +195,8 @@ public class World {
 	 */
 	public boolean isPassableTerrain(int[] position)throws IllegalArgumentException{
 		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
-		if (! GameObject.isValidPosition(vectorPosition, this))
-			throw new IllegalArgumentException("not a valid position");
+		//if (! GameObject.isValidPosition(vectorPosition, this))
+		//	throw new IllegalArgumentException("not a valid position");
 		
 		if((this.getCubeType(position[0], position[1], position[2])==AIR)||
 		 	(this.getCubeType(position[0], position[1], position[2])==WORKSHOP)){
@@ -233,8 +234,11 @@ public class World {
 			neighbouringPosition[0] = position[0] + test[0];
 			neighbouringPosition[1] = position[1] + test[1];
 			neighbouringPosition[2] = position[2] + test[2];
-			if(!this.isPassableTerrain(neighbouringPosition))
-				return true;
+			Vector3d neighbouringVector = new Vector3d(neighbouringPosition[0]+ 0.5,
+					neighbouringPosition[1]+0.5, neighbouringPosition[2]+ 0.5);
+			if(GameObject.isValidPosition(neighbouringVector, this))
+				if(!this.isPassableTerrain(neighbouringPosition))
+					return true;
 		}
 		return false;
 	}
@@ -262,6 +266,11 @@ public class World {
 	
 	@Raw //TODO: notifyTerrainChanged, 
 	public void setCubeType(int x, int y, int z, int value){
+		if((value!=AIR)&&(value!=ROCK)&&(value!=TREE)&&(value!=WORKSHOP))
+			throw new IllegalArgumentException("wrong value");
+		Vector3d position = new Vector3d(x+0.5, y+0.5, z+0.5);
+		if(GameObject.isValidPosition(position, this))
+			throw new IllegalArgumentException("invalid position");
 		this.getTerrainType()[x][y][z] = value;
 		this.getTerrainChangeListener().notifyTerrainChanged(x, y, z);
 		
@@ -387,6 +396,18 @@ public class World {
 		assert this.hasAsLog(log) && (log.getWorld() == null);
 		logs.remove(log);
 	}
+	
+	/**
+	 * Return the set of all logs in this world
+	 * 
+	 */
+	public Set<Log> getLogs(){
+		Set<Log> allLogs = new HashSet<Log>();
+		for(Log log: this.logs){
+			allLogs.add(log);
+		}
+		return allLogs;
+	}
 
 	/**
 	 * Variable referencing a set collecting all the logs
@@ -500,6 +521,18 @@ public class World {
 	public void removeBoulder(Boulder boulder) {
 		assert this.hasAsBoulder(boulder) && (boulder.getWorld() == null);
 		boulders.remove(boulder);
+	}
+	
+	/**
+	 * Return the set of all boulders in this world
+	 * 
+	 */
+	public Set<Boulder> getBoulders(){
+		Set<Boulder> allBoulders = new HashSet<Boulder>();
+		for(Boulder boulder: this.boulders){
+			allBoulders.add(boulder);
+		}
+		return allBoulders;
 	}
 
 	/**
@@ -615,6 +648,13 @@ public class World {
 		assert this.hasAsUnit(unit) && (unit.getWorld() == null);
 		units.remove(unit);
 	}
+	
+	/**
+	 * Return the set of all Units in this world
+	 */
+	public Set<Unit> getUnits(){
+		return this.units;
+	}
 
 	/**
 	 * Variable referencing a set collecting all the Units
@@ -709,7 +749,18 @@ public class World {
 		return i;
 	}
 	
+	public Set<Faction> getActiveFactions(){
+		Set<Faction> activeFactions = new HashSet<Faction>();
+		for(Faction faction: this.factions){
+			if (faction.getNbUnits() > 0){
+				activeFactions.add(faction);
+			}
+		}
+		return activeFactions;
+	}
+	
 	/** TODO: documentatie getSmallestFaction
+	 * TODO: what if smallest has max units?
 	 * Returns the smallest active faction
 	 * @return
 	 */
@@ -782,9 +833,9 @@ public class World {
 	 * TODO: spawnUnit documentatie
 	 * @param enableDefaultBehavior
 	 */
-	public void spawnUnit(boolean enableDefaultBehavior){
+	public Unit spawnUnit(boolean enableDefaultBehavior){
 		if(this.getNbUnits()== MAX_NB_UNITS_IN_WORLD){
-			return;
+			throw new IllegalStateException("max units reached");
 		}
 		
 		int strength = random.nextInt(76) + 25;
@@ -799,9 +850,9 @@ public class World {
 		position[2] = random.nextInt(this.getNbCubesZ()+1);
 		
 		while(!(this.isPassableTerrain(position) && this.hasSolidBelow(position))){
-			position[0] = random.nextInt(this.getNbCubesX()+1);
-			position[1] = random.nextInt(this.getNbCubesY()+1);
-			position[2] = random.nextInt(this.getNbCubesZ()+1);
+			position[0] = random.nextInt(this.getNbCubesX());
+			position[1] = random.nextInt(this.getNbCubesY());
+			position[2] = random.nextInt(this.getNbCubesZ());
 		}
 
 		
@@ -821,7 +872,7 @@ public class World {
 			unit.setFaction(faction);
 			faction.addUnit(unit);
 		}
-		
+		return unit;
 		
 	}
 	
@@ -883,5 +934,16 @@ public class World {
 		return null;
 	}
 	
+	public void advanceTime(double dt){
+		for(Boulder boulder: boulders){
+			boulder.advanceTime(dt);
+		}
+		for(Log log: logs){
+			log.advanceTime(dt);
+		}
+		for(Unit unit: units){
+			unit.advanceTime(dt);
+		}
+	}
 
 }
