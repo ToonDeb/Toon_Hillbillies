@@ -4,7 +4,6 @@ import hillbillies.model.UnitStatus;
 import hillbillies.model.pathfinding.AStarPathFinder;
 import hillbillies.model.pathfinding.Path;
 
-import java.util.List;
 import java.util.Random;
 
 import javax.vecmath.*;
@@ -16,8 +15,6 @@ import ogp.framework.util.Util;
 //import static hillbillies.model.Constants.MAX_Y_POSITION;
 //import static hillbillies.model.Constants.MAX_Z_POSITION;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
-import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
-import static hillbillies.model.Constants.NEIGHBOURINGLIST;
 
 /**
  * 
@@ -993,6 +990,9 @@ public class Unit extends GameObject {
 			if (Math.abs(thisPos[i]-testPos[i]) > 1)
 				return false;
 		}
+		
+		if(!this.getWorld().isNeighbouringSolid(testPos) && this.getWorld().isPassableTerrain(testPos))
+			return false;
 		return true;
 		/*return isValidPosition(adjacentDestination) &&
 		((!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
