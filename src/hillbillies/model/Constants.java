@@ -28,6 +28,25 @@ public final class Constants {
 //	•1: rock
 //	•2: tree
 //	•3: workshop
+	
+	public static final int MAXSEARCHDEPTH = 100;
+	
+	// does not contain {0,0,0}
+	public static final int[][] NEIGHBOURINGLIST = {
+			{-1,-1,-1},{0,-1,-1},{1,-1,-1},
+			{-1,0,-1},{0,0,-1},{1,0,-1},
+			{-1,1,-1},{0,1,-1},{1,1,-1},
+			{-1,-1,0},{0,-1,0},{1,-1,0},
+			{0,-1,0},{1,-1,0},{-1,0,0},
+			{1,0,0},{-1,1,0},
+			{0,1,0},{1,1,0},{-1,-1,1},
+			{0,-1,1},{1,-1,1},{-1,0,1},
+			{0,0,1},{1,0,1},{-1,1,1},
+			{0,1,1},{1,1,1}};
+			
+	public static final int[][] DIRECTLYNEIGHBOURINGLIST = {
+			{-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1}}; 
+
 
 
 }

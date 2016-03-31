@@ -12,7 +12,9 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 
+
 import static hillbillies.model.Constants.*;
+import static hillbillies.model.Constants.NEIGHBOURINGLIST;
 
 
 
@@ -203,11 +205,9 @@ public class World {
 	}
 	
 	/**
-	 * TODO: documentatie canStandHere
-	 * @param position
-	 * @return
+	 * Returns true if the cube below the given position is solid.
 	 */
-	public boolean canStandHere(int[] position){
+	public boolean hasSolidBelow(int[] position){
 		if (position[2] == 0){
 			return true;
 		}
@@ -215,9 +215,28 @@ public class World {
 		int[] belowPosition = new int[3];
 		belowPosition[0] = position[0];
 		belowPosition[1] = position[1];
-		
 		belowPosition[2] = position[2]-1;
 		return(!this.isPassableTerrain(belowPosition));
+	}
+	
+	/**
+	 * Returns true if the given position is neighbouring a solid cube
+	 * @param 	position
+	 * 			the position to check.
+	 */
+	public boolean isNeighbouringSolid(int[] position){
+		if(this.hasSolidBelow(position)){
+			return true;
+		}
+		for(int[] test: DIRECTLYNEIGHBOURINGLIST){
+			int[] neighbouringPosition = new int[3];
+			neighbouringPosition[0] = position[0] + test[0];
+			neighbouringPosition[1] = position[1] + test[1];
+			neighbouringPosition[2] = position[2] + test[2];
+			if(!this.isPassableTerrain(neighbouringPosition))
+				return true;
+		}
+		return false;
 	}
 	
 	/**
@@ -779,7 +798,7 @@ public class World {
 		position[1] = random.nextInt(this.getNbCubesY()+1);
 		position[2] = random.nextInt(this.getNbCubesZ()+1);
 		
-		while(!(this.isPassableTerrain(position) && this.canStandHere(position))){
+		while(!(this.isPassableTerrain(position) && this.hasSolidBelow(position))){
 			position[0] = random.nextInt(this.getNbCubesX()+1);
 			position[1] = random.nextInt(this.getNbCubesY()+1);
 			position[2] = random.nextInt(this.getNbCubesZ()+1);

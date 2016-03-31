@@ -1,6 +1,8 @@
 package hillbillies.model;
 
 import hillbillies.model.UnitStatus;
+import hillbillies.model.pathfinding.AStarPathFinder;
+import hillbillies.model.pathfinding.Path;
 
 import java.util.Random;
 
@@ -12,7 +14,7 @@ import ogp.framework.util.Util;
 //import static hillbillies.model.Constants.MAX_X_POSITION;
 //import static hillbillies.model.Constants.MAX_Y_POSITION;
 //import static hillbillies.model.Constants.MAX_Z_POSITION;
-import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
+import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
 
 /**
  * 
@@ -88,6 +90,7 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;;
  * @invar  The workTarget of each Unit must be a valid workTarget for any
  *         Unit.
  *       | isValidWorkTarget(getWorkTarget())
+ *       
  * @version 0.1
  */
 public class Unit extends GameObject {
@@ -349,48 +352,53 @@ public class Unit extends GameObject {
 		this.moveToAdjacent(this.findPath());
 	}
 
-	/**
-	 * Return the next step (the adjacent destination) of this unit based on its
-	 * final destination.
-	 * 
-	 * @return 	A Vector3d
-	 * 			
-	 */
-	private Vector3d findPath() {
-		double xFinalDes = this.getFinalDestination().getX();
-		double yFinalDes = this.getFinalDestination().getY();
-		double zFinalDes = this.getFinalDestination().getZ();
-		
-		double xThis = this.getPosition().getX();
-		double yThis = this.getPosition().getY();
-		double zThis = this.getPosition().getZ();
-		
-		double xAdjDes;
-		double yAdjDes;
-		double zAdjDes;
-
-		if (Util.fuzzyEquals(xThis, xFinalDes))
-			xAdjDes = this.getCubePosition()[0] + 0.5;
-		else if (xThis < xFinalDes)
-			xAdjDes = this.getCubePosition()[0] + 1.5;
-		else
-			xAdjDes = this.getCubePosition()[0] - 0.5;
-
-		if (Util.fuzzyEquals(yThis, yFinalDes))
-			yAdjDes = this.getCubePosition()[1] + 0.5;
-		else if (yThis < yFinalDes)
-			yAdjDes = this.getCubePosition()[1] + 1.5;
-		else
-			yAdjDes = this.getCubePosition()[1] - 0.5;
-
-		if (Util.fuzzyEquals(zThis, zFinalDes))
-			zAdjDes = this.getCubePosition()[2] + 0.5;
-		else if (zThis < zFinalDes)
-			zAdjDes = this.getCubePosition()[2] + 1.5;
-		else
-			zAdjDes = this.getCubePosition()[2] - 0.5;
-		return new Vector3d(xAdjDes, yAdjDes, zAdjDes);
-	}
+//	/**
+//	 * Return the next step (the adjacent destination) of this unit based on its
+//	 * final destination.
+//	 * 
+//	 * @return 	A Vector3d
+//	 * 			
+//	 */
+//	private Vector3d findPath() {
+//		double xFinalDes = this.getFinalDestination().getX();
+//		double yFinalDes = this.getFinalDestination().getY();
+//		double zFinalDes = this.getFinalDestination().getZ();
+//		
+//		double xThis = this.getPosition().getX();
+//		double yThis = this.getPosition().getY();
+//		double zThis = this.getPosition().getZ();
+//		
+//		double xAdjDes;
+//		double yAdjDes;
+//		double zAdjDes;
+//
+//		if (Util.fuzzyEquals(xThis, xFinalDes))
+//			xAdjDes = this.getCubePosition()[0] + 0.5;
+//		else if (xThis < xFinalDes)
+//			xAdjDes = this.getCubePosition()[0] + 1.5;
+//		else
+//			xAdjDes = this.getCubePosition()[0] - 0.5;
+//
+//		if (Util.fuzzyEquals(yThis, yFinalDes))
+//			yAdjDes = this.getCubePosition()[1] + 0.5;
+//		else if (yThis < yFinalDes)
+//			yAdjDes = this.getCubePosition()[1] + 1.5;
+//		else
+//			yAdjDes = this.getCubePosition()[1] - 0.5;
+//
+//		if (Util.fuzzyEquals(zThis, zFinalDes))
+//			zAdjDes = this.getCubePosition()[2] + 0.5;
+//		else if (zThis < zFinalDes)
+//			zAdjDes = this.getCubePosition()[2] + 1.5;
+//		else
+//			zAdjDes = this.getCubePosition()[2] - 0.5;
+//		return new Vector3d(xAdjDes, yAdjDes, zAdjDes);
+//	}
+	
+	
+	
+	
+	
 	/**
 	 * Check if the Unit is moving
 	 * 
@@ -438,6 +446,40 @@ public class Unit extends GameObject {
 			this.setPosition(nextPosition);
 		}
 	}
+	
+	public Vector3d findPath(){
+		pathIndex = pathIndex + 1;
+		if(path==null){
+			AStarPathFinder pathFinder = new AStarPathFinder(this.getWorld());
+			int sx = this.getCubePosition()[0];
+			int sy = this.getCubePosition()[1];
+			int sz = this.getCubePosition()[2];
+			
+			int tx = (int) this.getFinalDestination().getX();
+			int ty = (int) this.getFinalDestination().getY();
+			int tz = (int) this.getFinalDestination().getZ();
+			this.path = pathFinder.findPath(this, sx, sy, sz, tx, ty, tz);
+			this.pathIndex = 0;
+		}
+		
+		Vector3d nextPosition = new Vector3d(path.getX(pathIndex)+0.5, path.getY(pathIndex)+0.5, path.getZ(pathIndex)+0.5);
+		return nextPosition;
+		
+	}
+	
+	public void resetPath(){
+		this.path = null;
+	}
+
+	/**
+	 * Variable registering the path of this Unit.
+	 */
+	private Path path;
+	
+	/**
+	 * Variable registering the index of the path of this Unit.
+	 */
+	private int pathIndex;
 	
 	/**
 	 * Reduce the hp of this unit, and  set its status to idle
@@ -764,6 +806,9 @@ public class Unit extends GameObject {
 	 * Variable registering the name of this unit.
 	 */
 	private String name;
+	
+	
+	
 
 	/**
 	 * Return the orientation of this unit.
@@ -945,6 +990,9 @@ public class Unit extends GameObject {
 			if (Math.abs(thisPos[i]-testPos[i]) > 1)
 				return false;
 		}
+		
+		if(!this.getWorld().isNeighbouringSolid(testPos) && this.getWorld().isPassableTerrain(testPos))
+			return false;
 		return true;
 		/*return isValidPosition(adjacentDestination) &&
 		((!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
