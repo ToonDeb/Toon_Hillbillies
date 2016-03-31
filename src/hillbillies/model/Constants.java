@@ -24,6 +24,12 @@ public final class Constants {
 	public static final int ROCK = 1;
 	public static final int TREE = 2;
 	public static final int WORKSHOP = 3;
+//	•0: air
+//	•1: rock
+//	•2: tree
+//	•3: workshop
+	
+	public static final int MAXSEARCHDEPTH = 100;
 	
 	// does not contain {0,0,0}
 	public static final int[][] NEIGHBOURINGLIST = {
@@ -40,10 +46,7 @@ public final class Constants {
 			
 	public static final int[][] DIRECTLYNEIGHBOURINGLIST = {
 			{-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1},{0,0,1}}; 
-//	•0: air
-//	•1: rock
-//	•2: tree
-//	•3: workshop
+
 
 
 }

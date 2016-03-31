@@ -12,8 +12,8 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 
+
 import static hillbillies.model.Constants.*;
-import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
 import static hillbillies.model.Constants.NEIGHBOURINGLIST;
 
 
