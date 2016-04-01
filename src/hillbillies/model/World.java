@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
 import javax.vecmath.Vector3d;
 
 import be.kuleuven.cs.som.annotate.*;
@@ -87,6 +88,9 @@ public class World {
 		for(int x=0; x<this.getNbCubesX(); x++){
 			for(int y=0; y<this.getNbCubesY(); y++){
 				for(int z=0; z<this.getNbCubesZ();z++){
+					System.out.print(x);
+					System.out.print(y);
+					System.out.println(z);
 					if ((this.getCubeType(x, y, z) == AIR)||(this.getCubeType(x, y, z) == WORKSHOP)){
 						this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 					}
@@ -194,15 +198,29 @@ public class World {
 	 * @throws IllegalArgumentException
 	 */
 	public boolean isPassableTerrain(int[] position)throws IllegalArgumentException{
-		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
-		//if (! GameObject.isValidPosition(vectorPosition, this))
-		//	throw new IllegalArgumentException("not a valid position");
+		if (! this.isValidWorldPosition(position))
+			return false;
 		
 		if((this.getCubeType(position[0], position[1], position[2])==AIR)||
 		 	(this.getCubeType(position[0], position[1], position[2])==WORKSHOP)){
 			return true;
 		}
 		return false;	
+	}
+	
+	/**
+	 * Check if the given position is within this world
+	 * @param 	position
+	 * 			the position to check
+	 * @return	return true if position falls within the borders of this world
+	 */
+	public boolean isValidWorldPosition(int[] position){
+		if((this.getNbCubesX()-1 >= position[0])&&(0 <= position[0])&&
+				(this.getNbCubesY()-1 >= position[1])&&(0 <= position[1]) &&
+				(this.getNbCubesZ()-1 >= position[2])&&(0 <= position[2]))
+			return true;
+		else
+			return false;
 	}
 	
 	/**
@@ -249,7 +267,7 @@ public class World {
 	private int[][][] terrainType;
 	
 	public int getNbCubesX(){
-		return this.getTerrainType()[0][0].length;
+		return this.getTerrainType().length;
 	}
 	
 	public int getNbCubesY(){
@@ -257,14 +275,15 @@ public class World {
 	}
 	
 	public int getNbCubesZ(){
-		return this.getTerrainType().length;
+		return this.getTerrainType()[0][0].length;
 	}
 	
 	public int getCubeType(int x, int y, int z){
 		return this.getTerrainType()[x][y][z];
 	}
 	
-	@Raw //TODO: notifyTerrainChanged, 
+	@Raw //TODO: notifyTerrainChanged,
+	//TODO: resetpath of units
 	public void setCubeType(int x, int y, int z, int value){
 		if((value!=AIR)&&(value!=ROCK)&&(value!=TREE)&&(value!=WORKSHOP))
 			throw new IllegalArgumentException("wrong value");

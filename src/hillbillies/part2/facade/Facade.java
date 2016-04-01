@@ -135,10 +135,9 @@ public class Facade implements IFacade{
 	@Override
 	public void moveToAdjacent(Unit unit, int dx, int dy, int dz) throws ModelException {
 		try{
-			double[] vector = {unit.getCubePosition()[0] + dx +0.5,
-					unit.getCubePosition()[1] + dy+0.5,unit.getCubePosition()[2] + dz+0.5};
-			Vector3d adjacentVector = new Vector3d(vector);
-			unit.moveTo(adjacentVector);
+			int[] vector = {unit.getCubePosition()[0] + dx,
+					unit.getCubePosition()[1] + dy,unit.getCubePosition()[2] + dz};
+			unit.moveToAdjacent(vector);
 		}
 		catch(Exception e){
 			throw new ModelException(e);
@@ -170,8 +169,12 @@ public class Facade implements IFacade{
 
 	@Override
 	public void stopSprinting(Unit unit) throws ModelException {
-		unit.stopSprint();
-		
+		try{
+			unit.stopSprint();
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	@Override
@@ -187,9 +190,7 @@ public class Facade implements IFacade{
 	@Override
 	public void moveTo(Unit unit, int[] cube) throws ModelException {
 		try{
-			Vector3d destination = new Vector3d();
-			destination.set(cube[0]+0.5, cube[1]+0.5, cube[2]+0.5);
-			unit.moveTo(destination);
+			unit.moveTo(cube);
 		}
 		catch(Exception e){
 			throw new ModelException(e);

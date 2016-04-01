@@ -4,6 +4,7 @@ import hillbillies.model.UnitStatus;
 import hillbillies.model.pathfinding.AStarPathFinder;
 import hillbillies.model.pathfinding.Path;
 
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.vecmath.*;
@@ -90,6 +91,10 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * @invar  The workTarget of each Unit must be a valid workTarget for any
  *         Unit.
  *       | isValidWorkTarget(getWorkTarget())
+ *       
+ * @invar  The pathIndex of each Unit must be a valid pathIndex for any
+ *         Unit.
+ *       | isValidPathIndex(getPathIndex())
  *       
  * @version 0.1
  */
@@ -226,10 +231,8 @@ public class Unit extends GameObject {
 
 		this.setStatus(UnitStatus.IDLE);
 		
-		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
-		//Vector3d pos = new Vector3d(position);
-		this.setAdjacentDestination(vectorPosition);
-		this.setFinalDestination(vectorPosition);
+		this.setAdjacentDestination(position);
+		this.setFinalDestination(position);
 
 		this.setOrigin(this.getCubePosition());
 
@@ -318,21 +321,27 @@ public class Unit extends GameObject {
 	 *          adjacentDestination
 	 *          | ! isValidAdjacentDestination(adjacentDestination)
 	 */
-	public void moveToAdjacent(Vector3d adjacentDestination) throws IllegalArgumentException {
+	public void moveToAdjacent(int[] adjacentDestination) throws IllegalArgumentException {
 		if (!isValidAdjacentDestination(adjacentDestination))
 			throw new IllegalArgumentException("Invalid adjacentDestination!");
 		if(this.isFalling())
 			throw new IllegalStateException("can't move while falling!");
-		if(this.getStatus() != UnitStatus.SPRINTING)
+		
+		if(!this.isSprinting())
 			this.setStatus(UnitStatus.WALKING);
-		if (this.getPosition() == this.getFinalDestination()) {
+		
+		if (Arrays.equals(this.getCubePosition(), this.getFinalDestination())) {
 			this.setAdjacentDestination(adjacentDestination);
 			this.setFinalDestination(adjacentDestination);
-		} else
+			
+		} 
+		else
 			this.setAdjacentDestination(adjacentDestination);
+		
+		this.initiateWalkTimer(adjacentDestination);
 	}
 
-	/**
+	/** TODO: update documentatie unit
 	 * Sets the units status to walking, and the units adjacentDestination to
 	 * adjacentDestination.
 	 * 
@@ -347,8 +356,8 @@ public class Unit extends GameObject {
 	 *          The given finalDestination is not a valid finalDestination
 	 *          | ! isValidFinalDestination(finalDestination)
 	 */
-	public void moveTo(Vector3d finalDestination) throws IllegalArgumentException {
-		if (!isValidPosition(finalDestination, this.getWorld()))
+	public void moveTo(int[] finalDestination) throws IllegalArgumentException {
+		if (!this.getWorld().isValidWorldPosition(finalDestination))
 			throw new IllegalArgumentException("Invalid final destination!");
 		if (this.isFalling())
 			throw new IllegalStateException("can't move while falling");
@@ -399,10 +408,6 @@ public class Unit extends GameObject {
 //		return new Vector3d(xAdjDes, yAdjDes, zAdjDes);
 //	}
 	
-	
-	
-	
-	
 	/**
 	 * Check if the Unit is moving
 	 * 
@@ -436,22 +441,29 @@ public class Unit extends GameObject {
 		Vector3d nextPosition = this.getVelocity();
 		nextPosition.scaleAdd(time, this.getPosition());
 		
-		this.setWalkTimer(this.getWalkTimer() - time);
+		double newWalkTimer = this.getWalkTimer() - time;
 		
-		if (this.getWalkTimer() < 0) {
+		if (newWalkTimer < 0) {
+			this.setWalkTimer(0);
 			this.increaseExperience(1);
-			this.setPosition(this.getAdjacentDestination());
-			if (this.destinationIsReached(this.getPosition(), this.getFinalDestination())) {
+			this.setAtPosition(this.getAdjacentDestination());
+			
+			if (Arrays.equals(this.getCubePosition(), this.getFinalDestination()))
 				this.setStatus(UnitStatus.IDLE);
-			} else {
+			else
 				this.moveToAdjacent(this.findPath());
-			}
-		} else {
+		} 
+		else{
 			this.setPosition(nextPosition);
+			this.setWalkTimer(newWalkTimer);
 		}
 	}
 	
-	public Vector3d findPath(){
+	/**
+	 * TODO: findPath documentation
+	 * @return
+	 */
+	public int[] findPath(){
 		
 		pathIndex = pathIndex + 1;
 		if(path==null){
@@ -460,20 +472,19 @@ public class Unit extends GameObject {
 			int sy = this.getCubePosition()[1];
 			int sz = this.getCubePosition()[2];
 			
-			int tx = (int) this.getFinalDestination().getX();
-			int ty = (int) this.getFinalDestination().getY();
-			int tz = (int) this.getFinalDestination().getZ();
+			int tx = this.getFinalDestination()[0];
+			int ty = this.getFinalDestination()[1];
+			int tz = this.getFinalDestination()[2];
 			this.path = pathFinder.findPath(this, sx, sy, sz, tx, ty, tz);
-			this.pathIndex = 0;
+			this.setPathIndex(0);
 		}
-		System.out.println(pathIndex);
-		Vector3d nextPosition = new Vector3d(path.getX(pathIndex)+0.5, path.getY(pathIndex)+0.5, path.getZ(pathIndex)+0.5);
-		return nextPosition;
-		
+		System.out.println(this.getPathIndex());
+		return path.getStepInt(this.getPathIndex());
 	}
 	
 	public void resetPath(){
 		this.path = null;
+		this.setPathIndex(0);
 	}
 
 	/**
@@ -482,12 +493,55 @@ public class Unit extends GameObject {
 	private Path path;
 	
 	/**
-	 * Variable registering the index of the path of this Unit.
+	 * Return the pathIndex of this Unit.
+	 */
+	@Basic @Raw
+	public int getPathIndex() {
+		return this.pathIndex;
+	}
+
+	/**
+	 * Check whether the given pathIndex is a valid pathIndex for
+	 * any Unit.
+	 *  
+	 * @param  pathIndex
+	 *         The pathIndex to check.
+	 * @return 
+	 *       | result == (pathIndex >= 0)
+	*/
+	public static boolean isValidPathIndex(int pathIndex) {
+		return (pathIndex >= 0);
+	}
+
+	/**
+	 * Set the pathIndex of this Unit to the given pathIndex.
+	 * 
+	 * @param  pathIndex
+	 *         The new pathIndex for this Unit.
+	 * @post   The pathIndex of this new Unit is equal to
+	 *         the given pathIndex.
+	 *       | new.getPathIndex() == pathIndex
+	 * @throws IllegalArgumentException
+	 *         The given pathIndex is not a valid pathIndex for any
+	 *         Unit.
+	 *       | ! isValidPathIndex(getPathIndex())
+	 */
+	@Raw
+	public void setPathIndex(int pathIndex) 
+			throws IllegalArgumentException {
+		if (! isValidPathIndex(pathIndex))
+			throw new IllegalArgumentException();
+		this.pathIndex = pathIndex;
+	}
+
+	/**
+	 * Variable registering the pathIndex of this Unit.
 	 */
 	private int pathIndex;
 	
 	/**
 	 * Reduce the hp of this unit, and  set its status to idle
+	 * implementation of the takeFallDamage method in GameObject
 	 * 
 	 * @param 	fallDepth
 	 * 		  	The amount of z-levels the unit has fallen.
@@ -516,10 +570,10 @@ public class Unit extends GameObject {
 	 * 
 	 * @param	walkTimer
 	 *        	The walkTimer to check.
-	 * @return 	| result == true
+	 * @return 	| result == (walkTimer >= 0)
 	 */
 	private static boolean isValidWalkTimer(double walkTimer) {
-		return true;
+		return (walkTimer >= 0);
 	}
 
 	/**
@@ -536,7 +590,7 @@ public class Unit extends GameObject {
 	@Raw
 	private void setWalkTimer(double walkTimer) throws IllegalArgumentException {
 		if (!isValidWalkTimer(walkTimer))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("not a valid walktimer");
 		this.walkTimer = walkTimer;
 	}
 
@@ -559,10 +613,12 @@ public class Unit extends GameObject {
 	 * 
 	 * @param 	origin
 	 *          The origin to check.
-	 * @return 	| result == (isValidPosition(origin))
+	 * @return 	| result == (world.isValidWorldPosition(origin))
 	 */
 	private boolean isValidOrigin(int[] origin) {
-		return isValidPosition(new Vector3d(origin[0], origin[1], origin[2]), this.getWorld());
+		if (this.getWorld() == null)
+				return true;
+		return this.getWorld().isValidWorldPosition(origin);
 	}
 
 	/**
@@ -578,8 +634,9 @@ public class Unit extends GameObject {
 	 */
 	@Raw
 	private void setOrigin(int[] origin) throws IllegalArgumentException {
-		if (!isValidOrigin(origin))
-			throw new IllegalArgumentException();
+		if (this.getWorld() != null)
+			if (!isValidOrigin(origin))
+				throw new IllegalArgumentException("not a valid origin");
 		this.origin = origin;
 	}
 
@@ -588,13 +645,13 @@ public class Unit extends GameObject {
 	 */
 	private int[] origin = { 0, 0, 0 };
 
-	/**
+/*	*//**
 	 * Check if destination is reached of surpassed
 	 * 
 	 * @param 	newPosition
 	 * @return 	true if the destination lies between the old and the new position
 	 *
-	 */
+	 
 	private boolean destinationIsReached(Vector3d newPosition, Vector3d destination) {
 		/*
 		if ((Util.fuzzyLessThanOrEqualTo(this.getPosition().x, destination.x))
@@ -611,31 +668,24 @@ public class Unit extends GameObject {
 				&& (Util.fuzzyGreaterThanOrEqualTo(this.getPosition().z, destination.z))
 				&& (Util.fuzzyGreaterThanOrEqualTo(destination.z, newPosition.z)))
 			return true;
-		*/
+		*//*
 		if (newPosition.epsilonEquals(destination, 1E-2))
 			return true;
 		return false;
-	}
-	
+	}*/
+
 
 	/**
 	 * Return the velocity of the unit as a vector.
-	 * 
-	 * @param 	adjacentDestination
-	 *          | the adjacentDestination of the unit.
-	 * @throws 	IllegalArgumentException
-	 *          The given adjacentDestination is not a valid adjacentDestination 
-	 *          | ! isValidDestinatiopn(adjacentDestination)
 	 */
 	private Vector3d getVelocity() throws IllegalArgumentException, IllegalStateException {
 
-		Vector3d adjacentDestination = this.getAdjacentDestination();
-		if (!isValidAdjacentDestination(adjacentDestination))
-			throw new IllegalArgumentException("Invalid adjacentDestination!");
+		int[] adjacentDestination = this.getAdjacentDestination();
+		
 
-		double xDistance = adjacentDestination.x - this.getPosition().x;
-		double yDistance = adjacentDestination.y - this.getPosition().y;
-		double zDistance = adjacentDestination.z - this.getPosition().z;
+		double xDistance = adjacentDestination[0] + 0.5 - this.getPosition().x;
+		double yDistance = adjacentDestination[1] + 0.5 - this.getPosition().y;
+		double zDistance = adjacentDestination[2] + 0.5 - this.getPosition().z;
 
 		Vector3d velocity = new Vector3d(xDistance, yDistance, zDistance);
 		velocity.normalize();
@@ -644,6 +694,9 @@ public class Unit extends GameObject {
 		return velocity;
 	}
 	
+	/**
+	 * Return the base speed of this unit
+	 */
 	private double getBaseSpeed() {
 		return 1.5 * (this.getStrength() + this.getAgility()) / (200 * weight / 100);
 	}
@@ -659,9 +712,9 @@ public class Unit extends GameObject {
 		double vbase = this.getBaseSpeed();
 		double v;
 		
-		if (this.getOrigin()[2] - this.getAdjacentDestination().z + 0.5 < 0)
+		if (this.getOrigin()[2] - this.getAdjacentDestination()[2] < 0)
 			v = 0.5 * vbase;
-		else if (this.getOrigin()[2] - this.getAdjacentDestination().z + 0.5 > 0)
+		else if (this.getOrigin()[2] - this.getAdjacentDestination()[2] > 0)
 			v = 1.2 * vbase;
 		else
 			v = vbase;
@@ -674,8 +727,6 @@ public class Unit extends GameObject {
 	/**
 	 * Updates the orientation of this unit, so it faces its destination.
 	 * 
-	 * @param 	adjacentDestination
-	 *          The adjacentDestination of this unit.
 	 * @post 	The new orientation of this unit is towards the direction of its
 	 *       	velocity, projected in the xy-plane. 
 	 *       	| let 
@@ -693,7 +744,6 @@ public class Unit extends GameObject {
 
 		double newOrientation = Math.atan2(vy, vx);
 		this.setOrientation(newOrientation);
-
 	}
 
 	/**
@@ -708,7 +758,6 @@ public class Unit extends GameObject {
 	 */
 	private boolean canSprint() {
 		return (this.getStatus() == UnitStatus.WALKING) && (this.getStamina() > 0);
-
 	}
 
 	/**
@@ -721,21 +770,22 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	public void startSprint() {
-		assert this.canSprint();
+		if(! this.canSprint())
+			throw new IllegalStateException("unit can't sprint at this moment");
 		this.setStatus(UnitStatus.SPRINTING);
-
 	}
 
 	/**
-	 * Set the status of the unit from SPRINTING to IDLE
+	 * Set the status of the unit from SPRINTING to WALKING
 	 * 
 	 * @effect 	The status of this unit is set to WALKING
 	 *         	| this.setStatus(UnitStatus.WALKING)
 	 * 
 	 */
 	public void stopSprint() {
+		if (!this.isSprinting())
+			throw new IllegalStateException("unit must be sprinting to stop sprinting!");
 		this.setStatus(UnitStatus.WALKING);
-
 	}
 	
 	/**
@@ -833,14 +883,14 @@ public class Unit extends GameObject {
 	/**
 	 * Check whether the given orientation is a valid orientation for any unit.
 	 * 
-	 * @param orientation
-	 *            The orientation to check.
-	 * @return The orientation of the unit is between 0 and 2*Math.PI |
-	 *         ! orientation >= 0 && orientation < 2*Math.PI
+	 * @param 	orientation
+	 *          The orientation to check.
+	 * @return 	The orientation of the unit is between 0 and 2*Math.PI 
+	 *  		|  orientation >= 0 && orientation < 2*Math.PI
 	 * 
 	 */
 	private static boolean isValidOrientation(double orientation) {
-		return orientation >= 0 && orientation < 2 * Math.PI;
+		return (orientation >= 0) && (orientation < 2 * Math.PI);
 	}
 
 	/**
@@ -917,15 +967,20 @@ public class Unit extends GameObject {
 		double thisX = this.getPosition().x;
 		double thisY = this.getPosition().y;
 		double thisZ = this.getPosition().z;
-
-		while ((!isValidPosition(newPosition, this.getWorld())) && (counter < 10000)) {
+		
+		while (counter < 10000) {
 			// Returns a double between -1 and +1
 			double xJump = 2 * random.nextDouble() - 1;
 			double yJump = 2 * random.nextDouble() - 1;
 
 			newPosition.set(thisX + xJump, thisY + yJump, thisZ);
 			counter++;
+			// in this way, because ispassableterrain requires a valid position
+			if(isValidPosition(newPosition, this.getWorld()))
+					if(this.getWorld().isPassableTerrain(toCubePosition(newPosition)))
+						break;
 		}
+		
 		if (isValidPosition(newPosition, this.getWorld()))
 			this.setPosition(newPosition);
 		
@@ -965,11 +1020,22 @@ public class Unit extends GameObject {
 	 *         | this.moveTo({randomBetween0And51,randomBetween0And51,randomBetween0And51})
 	 * 
 	 */
-	private void moveToRandom() {
-		double X = random.nextInt(this.getWorld().getNbCubesX()) + 0.5;
-		double Y = random.nextInt(this.getWorld().getNbCubesY()) + 0.5;
-		double Z = random.nextInt(this.getWorld().getNbCubesZ()) + 0.5;
-		this.moveTo(new Vector3d(X, Y, Z));
+	private void moveToRandom(){
+		int counter = 0;
+		int[] position = {-1,-1,-1};
+		while (counter < 10000) {
+			// Returns a double between -1 and +1
+			position[0] = random.nextInt(this.getWorld().getNbCubesX());
+			position[1] = random.nextInt(this.getWorld().getNbCubesY());
+			position[2] = random.nextInt(this.getWorld().getNbCubesZ());
+
+			counter++;
+			// in this way, because ispassableterrain requires a valid position
+			if(this.getWorld().isValidWorldPosition(position));
+					if(this.getWorld().isPassableTerrain(position))
+						break;
+		}
+		this.moveTo(position);
 	}
 	
 
@@ -978,7 +1044,7 @@ public class Unit extends GameObject {
 	 */
 	@Basic
 	@Raw
-	private Vector3d getAdjacentDestination() {
+	private int[] getAdjacentDestination() {
 		return this.adjacentDestination;
 	}
 
@@ -993,19 +1059,17 @@ public class Unit extends GameObject {
 	 *         	TODO:doc isValidAdjacentDestination
 	 * 
 	 */
-	private boolean isValidAdjacentDestination(Vector3d adjacentDestination) {
-		int cubeX = (int) Math.floor(adjacentDestination.x);
-		int cubeY = (int) Math.floor(adjacentDestination.y);
-		int cubeZ = (int) Math.floor(adjacentDestination.z);
-		int[] testPos = { cubeX, cubeY, cubeZ };
-		int[] thisPos = this.getCubePosition();
-		for (int i = 0; i<3;i++){
-			if (Math.abs(thisPos[i]-testPos[i]) > 1)
-				return false;
-		}
+	private boolean isValidAdjacentDestination(int[] adjacentDestination) {
 		if(this.getWorld()==null)
 			return true;
-		if(!this.getWorld().isNeighbouringSolid(testPos) && this.getWorld().isPassableTerrain(testPos))
+		
+		int[] thisPos = this.getCubePosition();
+		for (int i = 0; i<3;i++){
+			if (Math.abs(thisPos[i]-adjacentDestination[i]) > 1)
+				return false;
+		}
+		if(!this.getWorld().isNeighbouringSolid(adjacentDestination) && 
+				(!this.getWorld().isPassableTerrain(adjacentDestination)))
 			return false;
 		return true;
 		/*return isValidPosition(adjacentDestination) &&
@@ -1038,13 +1102,21 @@ public class Unit extends GameObject {
 	 *          | ! isValidAdjacentDestination(getAdjacentDestination())
 	 */
 	@Raw
-	private void setAdjacentDestination(Vector3d adjacentDestination) throws IllegalArgumentException {
+	private void setAdjacentDestination(int[] adjacentDestination) throws IllegalArgumentException {
 		if (!isValidAdjacentDestination(adjacentDestination))
 			throw new IllegalArgumentException();
 		this.adjacentDestination = adjacentDestination;
+	}
 
+	/**
+	 * @param adjacentDestination
+	 */
+	private void initiateWalkTimer(int[] adjacentDestination) {
+		if (!isValidAdjacentDestination(adjacentDestination))
+			throw new IllegalArgumentException("invalid adjacent destination");
 		Vector3d newVector = new Vector3d(this.getPosition());
-		newVector.sub(adjacentDestination);
+		Vector3d adjacentVector = toVectorPosition(adjacentDestination);
+		newVector.sub(adjacentVector);
 		double length = newVector.length();
 		this.setWalkTimer(length / this.getSpeed());
 
@@ -1054,14 +1126,14 @@ public class Unit extends GameObject {
 	/**
 	 * Variable registering the adjacentDestination of this unit.
 	 */
-	private Vector3d adjacentDestination = null;
+	private int[] adjacentDestination = null;
 
 	/**
 	 * Return the finalDestination of this unit.
 	 */
 	@Basic
 	@Raw
-	private Vector3d getFinalDestination() {
+	private int[] getFinalDestination() {
 		return this.finalDestination;
 	}
 
@@ -1080,16 +1152,17 @@ public class Unit extends GameObject {
 	 *          | ! isValidPosition(finalDestination())
 	 */
 	@Raw
-	private void setFinalDestination(Vector3d finalDestination) throws IllegalArgumentException {
-		if (!isValidPosition(finalDestination, this.getWorld()))
-			throw new IllegalArgumentException("illegal final destination");
+	private void setFinalDestination(int[] finalDestination) throws IllegalArgumentException {
+//		if (this.getWorld() != null)
+//			if (this.getWorld().isValidWorldPosition(finalDestination))
+//				throw new IllegalArgumentException("illegal final destination");
 		this.finalDestination = finalDestination;
 	}
 
 	/**
 	 * Variable registering the finalDestination of this unit.
 	 */
-	private Vector3d finalDestination = null;
+	private int[] finalDestination = {0,0,0};
 
 	
 	/**

@@ -41,6 +41,14 @@ public class Path {
 	}
 	
 	/**
+	 * Get the step at a given index in this path, in int[] format
+	 */
+	public int[] getStepInt(int index){
+		int[] step = {this.getX(index), this.getY(index), this.getZ(index)};
+		return step;
+	}
+	
+	/**
 	 * Get the x coordinate for the step at the given index
 	 * 
 	 * @param index The index of the step whose x coordinate should be retrieved

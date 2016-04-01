@@ -294,8 +294,7 @@ public class AStarPathFinder{
 	 */
 	protected boolean isValidLocation(Unit mover, int sx, int sy, int sz, int x, int y, int z) {
 		int[] position = {x,y,z};
-		Vector3d vectorPosition = new Vector3d(x +0.5, y+0.5, z+0.5);
-		if(map.isNeighbouringSolid(position) && GameObject.isValidPosition(vectorPosition, map))
+		if(map.isNeighbouringSolid(position) && mover.getWorld().isValidWorldPosition(position))
 			return true;
 		
 		return false;
