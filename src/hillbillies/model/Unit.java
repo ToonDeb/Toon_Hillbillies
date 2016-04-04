@@ -957,11 +957,13 @@ public class Unit extends GameObject {
 		double y_this = this.getCubePosition()[1];
 		double x_other = position[0];
 		double y_other = position[1];
-
-		double this_orientation = Math.atan2(y_other - y_this, x_other - x_this);
-
-		this.setOrientation(this_orientation);
-
+		
+		if(Arrays.equals(position, this.getCubePosition()))
+			this.setOrientation(Math.PI/2);
+		else{
+			double this_orientation = Math.atan2(y_other - y_this, x_other - x_this);
+			this.setOrientation(this_orientation);
+		}
 	}
 
 	/**TODO: dodge valid terrain
