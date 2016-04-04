@@ -182,7 +182,14 @@ public class Faction {
 		assert this.hasAsUnit(unit) && (unit.getFaction() == null);
 		units.remove(unit);
 	}
-
+	
+	/**
+	 * return the set of all units belonging to this faction
+	 */
+	public Set<Unit> getUnitsOfFaction(){
+		return this.units;
+	}
+	
 	/**
 	 * Variable referencing a set collecting all the Units
 	 * of this Faction.

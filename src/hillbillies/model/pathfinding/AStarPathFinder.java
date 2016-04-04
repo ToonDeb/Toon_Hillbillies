@@ -113,7 +113,6 @@ public class AStarPathFinder{
 		int maxDepth = 0;
 		while ((maxDepth < maxSearchDistance) && (open.size() != 0)) {
 			// pull out the first node in our open list, this is determined to 
-
 			// be the most likely to be the next step based on our heuristic
 
 			Node current = getFirstInOpen();
@@ -125,7 +124,6 @@ public class AStarPathFinder{
 			addToClosed(current);
 			
 			// search through all the neighbours of the current node evaluating
-
 			// them as next steps
 
 			for (int x=-1;x<2;x++) {
@@ -145,20 +143,15 @@ public class AStarPathFinder{
 						
 						if (isValidLocation(mover,sx,sy,sz,xp,yp,zp)) {
 							// the cost to get to this node is cost the current plus the movement
-	
 							// cost to reach this node. Note that the heursitic value is only used
-	
 							// in the sorted open list
 	
 							float nextStepCost = current.cost + getMovementCost(mover, current.x, current.y, current.z, xp, yp, zp);
 							Node neighbour = nodes[xp][yp][zp];
 							//map.pathFinderVisited(xp, yp, zp); TODO: check if nog werkt
-							
 							// if the new cost we've determined for this node is lower than 
-	
 							// it has been previously makes sure the node hasn'e've
 							// determined that there might have been a better path to get to
-	
 							// this node so it needs to be re-evaluated
 	
 							if (nextStepCost < neighbour.cost) {
@@ -171,9 +164,7 @@ public class AStarPathFinder{
 							}
 							
 							// if the node hasn't already been processed and discarded then
-	
 							// reset it's cost to our current cost and add it as a next possible
-	
 							// step (i.e. to the open list)
 	
 							if (!inOpenList(neighbour) && !(inClosedList(neighbour))) {
@@ -196,9 +187,7 @@ public class AStarPathFinder{
 		}
 		
 		// At this point we've definitely found a path so we can uses the parent
-
 		// references of the nodes to find out way from the target location back
-
 		// to the start recording the nodes on the way.
 
 		Path path = new Path();
@@ -294,9 +283,10 @@ public class AStarPathFinder{
 	 */
 	protected boolean isValidLocation(Unit mover, int sx, int sy, int sz, int x, int y, int z) {
 		int[] position = {x,y,z};
-		Vector3d vectorPosition = new Vector3d(x +0.5, y+0.5, z+0.5);
-		if(map.isNeighbouringSolid(position) && GameObject.isValidPosition(vectorPosition, map))
-			return true;
+		if(mover.getWorld().isValidWorldPosition(position))
+			if(map.isPassableTerrain(position))
+				if(map.isNeighbouringSolid(position))
+					return true;
 		
 		return false;
 	}
