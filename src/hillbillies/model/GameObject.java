@@ -236,16 +236,16 @@ public abstract class GameObject {
 	public void startFall(){
 		this.isFalling = true;
 		
-		int[] belowPosition = this.getCubePositionBelow();
+		int[] belowPosition = this.getCubePosition();
 		int depth = 0;
 		
-		while(this.getWorld().isPassableTerrain(belowPosition)){
+		while(!this.getWorld().hasSolidBelow(belowPosition)){
 			belowPosition[2] -= 1;
 			depth += 1;
 		}
-		belowPosition[2] += 1;
-		depth -= 1;
+		
 		this.setFallDepth(depth);
+		System.out.println(belowPosition[0] + " " + belowPosition[1] + " " + belowPosition[2]);
 		this.setFallDestination(belowPosition);
 		this.setFallTimer(depth/3.0);
 	}

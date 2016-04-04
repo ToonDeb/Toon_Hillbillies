@@ -366,7 +366,9 @@ public class Unit extends GameObject {
 	 *          | ! isValidFinalDestination(finalDestination)
 	 */
 	public void moveTo(int[] finalDestination) throws IllegalArgumentException {
-		if (!this.getWorld().isValidWorldPosition(finalDestination))
+		if (!this.getWorld().isValidWorldPosition(finalDestination) || 
+				!this.getWorld().isNeighbouringSolid(finalDestination)||
+				!this.getWorld().isPassableTerrain(finalDestination))
 			throw new IllegalArgumentException("Invalid final destination!");
 		if (this.isFalling())
 			throw new IllegalStateException("can't move while falling");
@@ -950,13 +952,11 @@ public class Unit extends GameObject {
 	 *          the given other unit is not in a valid position
 	 *          | ! this.canAttack(other)
 	 */
-	private void face(Unit other) throws IllegalArgumentException {
-		if (!this.canAttack(other))
-			throw new IllegalArgumentException("the other unit is not on a valid position");
-		double x_this = this.getPosition().x;
-		double y_this = this.getPosition().y;
-		double x_other = other.getPosition().x;
-		double y_other = other.getPosition().y;
+	private void face(int[] position) throws IllegalArgumentException {
+		double x_this = this.getCubePosition()[0];
+		double y_this = this.getCubePosition()[1];
+		double x_other = position[0];
+		double y_other = position[1];
 
 		double this_orientation = Math.atan2(y_other - y_this, x_other - x_this);
 
@@ -1516,9 +1516,7 @@ public class Unit extends GameObject {
 		this.setStatus(UnitStatus.WORKING);
 		this.setWorkTarget(workTarget);
 		
-		this.setAdjacentDestination(workTarget);
-		this.updateOrientation();
-		this.setAdjacentDestination(this.getCubePosition());
+		this.face(workTarget);
 	}
 	
 	/**
@@ -1834,7 +1832,7 @@ public class Unit extends GameObject {
 		if (this.isFalling())
 			throw new IllegalStateException("can't attack while falling!");
 		this.setAttackCountDown(1d);
-		this.face(other);
+		this.face(other.getCubePosition());
 		this.setStatus(UnitStatus.ATTACKING);
 		other.defend(this);
 	}
@@ -1945,7 +1943,7 @@ public class Unit extends GameObject {
 			throw new IllegalArgumentException("This Unit can not be attacked by the other unit");
 
 		this.setStatus(UnitStatus.DEFENDING);
-		this.face(other);
+		this.face(other.getCubePosition());
 
 		if (this.dodgeChance(other)) {
 			this.dodge();

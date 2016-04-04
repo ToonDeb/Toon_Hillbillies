@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
 import javax.vecmath.Vector3d;
 
 import be.kuleuven.cs.som.annotate.*;
@@ -111,7 +110,7 @@ public class World {
 	 * Return the TerrainChangeListener of this World.
 	 */
 	@Basic @Raw
-	public TerrainChangeListener getTerrainChangeListener() {
+	private TerrainChangeListener getTerrainChangeListener() {
 		return this.modelListener;
 	}
 
@@ -124,7 +123,7 @@ public class World {
 	 * @return 
 	 *       | result == true 
 	*/
-	public static boolean isValidTerrainChangeListener(TerrainChangeListener modelListener) {
+	private static boolean isValidTerrainChangeListener(TerrainChangeListener modelListener) {
 		return true;
 	}
 
@@ -155,7 +154,7 @@ public class World {
 	 * Return the terrainTypes of this World.
 	 */
 	@Basic @Raw
-	public int[][][] getTerrainType() {
+	private int[][][] getTerrainType() {
 		return this.terrainType;
 	}
 	
@@ -163,7 +162,7 @@ public class World {
 	 * Check whether the given terrainTypes is a valid terrainTypes for
 	 * any World.
 	*/
-	public static boolean isValidTerrainType(int[][][] terrainType) {
+	private static boolean isValidTerrainType(int[][][] terrainType) {
 		return true;
 	}
 	
@@ -181,7 +180,7 @@ public class World {
 	 *       | ! isValidTerrainType(getTerrainType())
 	 */
 	@Raw
-	public void setTerrainType(int[][][] terrainType) 
+	private void setTerrainType(int[][][] terrainType) 
 			throws IllegalArgumentException {
 		if (! isValidTerrainType(terrainType))
 			throw new IllegalArgumentException();
