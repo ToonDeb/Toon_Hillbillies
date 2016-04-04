@@ -26,5 +26,7 @@ public enum UnitStatus {
 	
 	IDLE,
 	
-	FALLING
+	FALLING,
+	
+	DODGING
 }

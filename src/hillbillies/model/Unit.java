@@ -1827,6 +1827,8 @@ public class Unit extends GameObject {
 	 *          | ! canAttack(other)
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
+		if (other.isTerminated())
+			return;
 		if (!this.canAttack(other))
 			throw new IllegalArgumentException("The other Unit cannot be attacked");
 		if (this.isFalling())
@@ -1946,7 +1948,8 @@ public class Unit extends GameObject {
 		this.face(other.getCubePosition());
 
 		if (this.dodgeChance(other)) {
-			this.dodge();
+			this.setStatus(UnitStatus.DODGING);
+			
 			// this.setStatus(UnitStatus.IDLE); //TODO:hier, of in advanceTime?
 			return;
 		}
@@ -2184,23 +2187,23 @@ public class Unit extends GameObject {
 			this.startFall();
 			this.setStatus(UnitStatus.FALLING);
 		}
+		else if (this.getStatus() == UnitStatus.DODGING) {
+			this.dodge();
+		}
 		else if (this.getStatus() == UnitStatus.DEFENDING) {
 			this.setStatus(UnitStatus.IDLE);
 		}
-		else if (this.getStatus() == UnitStatus.ATTACKING) {
+		else if (this.isAttacking()) {
 			this.advanceAttackTime(deltaT);
 		}
-		else if ((this.getStatus() == UnitStatus.REST) || (status == UnitStatus.RESTING)) {
+		else if ((this.isResting())) {
 			this.advanceRest(deltaT);
 		}
-		else if (this.getStatus() == UnitStatus.WORKING) {
+		else if (this.isWorking()) {
 			this.advanceWorkTime(deltaT);
 		}
-		else if (this.getStatus() == UnitStatus.WALKING) {
+		else if (this.isMoving()) {
 			this.updatePosition(deltaT);
-		}
-		else if (this.getStatus() == UnitStatus.SPRINTING) {
-			updateSprint(deltaT);
 		}
 
 		if (Util.fuzzyGreaterThanOrEqualTo(this.rest3MinTime, 3 * 60) 
@@ -2273,6 +2276,7 @@ public class Unit extends GameObject {
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
 		this.setWorld(null);
+		System.out.println("i am dead");
 	}
 
 	/**
@@ -2505,7 +2509,7 @@ public class Unit extends GameObject {
 		if ((this.getAgility() == 200)&&(this.getStrength()==200)&&(this.getToughness()==200))
 			return;
 		
-		int newExperience = this.getExperience() + experience;
+		int newExperience = this.getExperience() + amount;
 		while(newExperience >= 10){
 			newExperience = newExperience - 10;
 			int randomInt = random.nextInt(3);
@@ -2522,7 +2526,6 @@ public class Unit extends GameObject {
 				newExperience = newExperience + 10;
 			}
 		}
-		
 		this.setExperience(newExperience);
 	}
 
