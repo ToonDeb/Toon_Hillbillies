@@ -204,7 +204,7 @@ public class Unit extends GameObject {
 	 * 		   	The given position is not a valid position for this Unit
 	 * 			| ! isValidOrigin(new.getCubePosition)
 	 * 
-	 * TODO: hoe zit het nu juist met unit en world?
+	 * 
 	 */
 	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness)
 			throws IllegalArgumentException {
@@ -2278,7 +2278,8 @@ public class Unit extends GameObject {
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
 		this.setWorld(null);
-		System.out.println("i am dead");
+		this.getFaction().removeUnit(this);
+		this.setFaction(null);
 	}
 
 	/**
