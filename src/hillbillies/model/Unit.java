@@ -337,6 +337,7 @@ public class Unit extends GameObject {
 		} 
 		else
 			this.setAdjacentDestination(adjacentDestination);
+		this.setOrigin(this.getCubePosition());
 		
 		this.initiateWalkTimer(adjacentDestination);
 	}
@@ -362,6 +363,7 @@ public class Unit extends GameObject {
 		if (this.isFalling())
 			throw new IllegalStateException("can't move while falling");
 		this.setFinalDestination(finalDestination);
+		this.resetPath();
 		this.moveToAdjacent(this.findPath());
 	}
 
@@ -442,7 +444,12 @@ public class Unit extends GameObject {
 		nextPosition.scaleAdd(time, this.getPosition());
 		
 		double newWalkTimer = this.getWalkTimer() - time;
-		
+		System.out.println("walktimer");
+		System.out.println(newWalkTimer);
+		System.out.println(this.getAdjacentDestination()[0]);
+		System.out.println(this.getAdjacentDestination()[1]);
+		System.out.println(this.getAdjacentDestination()[2]);
+		System.out.println(this.getPosition().toString());
 		if (newWalkTimer < 0) {
 			this.setWalkTimer(0);
 			this.increaseExperience(1);
@@ -478,7 +485,6 @@ public class Unit extends GameObject {
 			this.path = pathFinder.findPath(this, sx, sy, sz, tx, ty, tz);
 			this.setPathIndex(0);
 		}
-		System.out.println(this.getPathIndex());
 		return path.getStepInt(this.getPathIndex());
 	}
 	
@@ -721,6 +727,8 @@ public class Unit extends GameObject {
 
 		if (status == UnitStatus.SPRINTING)
 			return 2 * v;
+		System.out.println("speed");
+		System.out.println(v);
 		return v;
 	}
 
@@ -730,7 +738,7 @@ public class Unit extends GameObject {
 	 * @post 	The new orientation of this unit is towards the direction of its
 	 *       	velocity, projected in the xy-plane. 
 	 *       	| let 
-	 *       	| 	velocity = this.getVelocity(adjacentDestination) 
+	 *       	| 	velocity = this.getVelocity() 
 	 *       	| 	vy = velocity.y, vx = velocity.x, 
 	 *       	| 	newOrientation = Math.atan2(vy, vx) 
 	 *       	| in
@@ -1068,7 +1076,7 @@ public class Unit extends GameObject {
 			if (Math.abs(thisPos[i]-adjacentDestination[i]) > 1)
 				return false;
 		}
-		if(!this.getWorld().isNeighbouringSolid(adjacentDestination) && 
+		if(!this.getWorld().isNeighbouringSolid(adjacentDestination) ||
 				(!this.getWorld().isPassableTerrain(adjacentDestination)))
 			return false;
 		return true;
@@ -1117,10 +1125,12 @@ public class Unit extends GameObject {
 		Vector3d newVector = new Vector3d(this.getPosition());
 		Vector3d adjacentVector = toVectorPosition(adjacentDestination);
 		newVector.sub(adjacentVector);
+		System.out.println("newVector");
+		System.out.println(newVector.toString());
 		double length = newVector.length();
 		this.setWalkTimer(length / this.getSpeed());
 
-		this.setOrigin(this.getCubePosition());
+		
 	}
 
 	/**
@@ -1171,7 +1181,10 @@ public class Unit extends GameObject {
 	@Basic
 	@Raw
 	public int getWeight() {
-		return this.weight;
+		int weight = this.weight;
+		if(this.getGameItem() != null)
+			weight += this.getGameItem().getWeight();
+		return weight;
 	}
 
 	/**
@@ -1493,6 +1506,10 @@ public class Unit extends GameObject {
 		this.setWorkTime(500.0d / this.getStrength());
 		this.setStatus(UnitStatus.WORKING);
 		this.setWorkTarget(workTarget);
+		
+		this.setAdjacentDestination(workTarget);
+		this.updateOrientation();
+		this.setAdjacentDestination(this.getCubePosition());
 	}
 	
 	/**
@@ -2136,14 +2153,16 @@ public class Unit extends GameObject {
 		
 		// Check if unit stands on solid ground
 		int[] belowPosition = this.getCubePositionBelow();
-		if(this.getWorld().isPassableTerrain(belowPosition)){
-			this.startFall();
-			this.setStatus(UnitStatus.FALLING);
-		}
+		
 		
 		// check all status
 		if (this.isFalling()){
 			this.updateFall(deltaT);
+		}
+		else if(this.getWorld().isPassableTerrain(belowPosition)&&
+				!this.getWorld().isNeighbouringSolid(this.getCubePosition())){
+			this.startFall();
+			this.setStatus(UnitStatus.FALLING);
 		}
 		else if (this.getStatus() == UnitStatus.DEFENDING) {
 			this.setStatus(UnitStatus.IDLE);
@@ -2214,10 +2233,10 @@ public class Unit extends GameObject {
 	 * @return 	| result == ((time > 0) && (time < 0.2))
 	 */
 	public static boolean isValidTime(double time) {
-		//return true;
-		return Util.fuzzyGreaterThanOrEqualTo(time, 0) &&
-				Util.fuzzyLessThanOrEqualTo(time, 0.2)
-				&& (! Util.fuzzyEquals(time, 0)) && (! Util.fuzzyEquals(time, 0.2));
+		return true;
+//		return Util.fuzzyGreaterThanOrEqualTo(time, 0) &&
+//				Util.fuzzyLessThanOrEqualTo(time, 0.2)
+//				&& (! Util.fuzzyEquals(time, 0)) && (! Util.fuzzyEquals(time, 0.2));
 	}
 
 
@@ -2296,16 +2315,17 @@ public class Unit extends GameObject {
 			throw new IllegalStateException();
 
 		double chance = random.nextDouble();
-
-		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
-			this.workAt(this.getCubePosition());
-			return;
-		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.666666d)) {
-			this.rest();
-			return;
-		} else {
-			this.moveToRandom();
-		}
+		
+//		
+//		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
+//			this.workAt(this.getCubePosition());
+//			return;
+//		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.666666d)) {
+//			this.rest();
+//			return;
+//		} else {
+//			this.moveToRandom();
+//		}
 
 	}
 

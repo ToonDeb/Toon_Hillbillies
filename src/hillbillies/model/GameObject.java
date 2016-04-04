@@ -159,16 +159,18 @@ public abstract class GameObject {
 		if(!Unit.isValidTime(dt))
 			throw new IllegalArgumentException("invalid time!");
 		
-		double nexTime = this.getFallTimer() - dt;
+		double nextTime = this.getFallTimer() - dt;
 		
-		if (Util.fuzzyLessThanOrEqualTo(nexTime, 0)){
+		if (Util.fuzzyLessThanOrEqualTo(nextTime, 0)){
 			this.setAtPosition(this.getFallDestination());
 			this.takeFallDamage(this.fallDepth);
+			this.isFalling = false;
 		}
 		else{
 			Vector3d nextPosition = new Vector3d(0, 0, -3);
 			nextPosition.scaleAdd(dt, this.getPosition());
 			this.setPosition(nextPosition);
+			this.setFallTimer(nextTime);
 		}
 		
 	}
@@ -238,11 +240,14 @@ public abstract class GameObject {
 		int depth = 0;
 		
 		while(this.getWorld().isPassableTerrain(belowPosition)){
-			belowPosition[2] = belowPosition[2] - 1;
+			belowPosition[2] -= 1;
 			depth += 1;
 		}
+		belowPosition[2] += 1;
+		depth -= 1;
 		this.setFallDepth(depth);
 		this.setFallDestination(belowPosition);
+		this.setFallTimer(depth/3.0);
 	}
 	
 	public boolean isFalling(){

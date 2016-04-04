@@ -252,9 +252,7 @@ public class World {
 			neighbouringPosition[0] = position[0] + test[0];
 			neighbouringPosition[1] = position[1] + test[1];
 			neighbouringPosition[2] = position[2] + test[2];
-			Vector3d neighbouringVector = new Vector3d(neighbouringPosition[0]+ 0.5,
-					neighbouringPosition[1]+0.5, neighbouringPosition[2]+ 0.5);
-			if(GameObject.isValidPosition(neighbouringVector, this))
+			if(this.isValidWorldPosition(neighbouringPosition))
 				if(!this.isPassableTerrain(neighbouringPosition))
 					return true;
 		}
@@ -287,8 +285,8 @@ public class World {
 	public void setCubeType(int x, int y, int z, int value){
 		if((value!=AIR)&&(value!=ROCK)&&(value!=TREE)&&(value!=WORKSHOP))
 			throw new IllegalArgumentException("wrong value");
-		Vector3d position = new Vector3d(x+0.5, y+0.5, z+0.5);
-		if(GameObject.isValidPosition(position, this))
+		int[] position = {x, y, z};
+		if(!this.isValidWorldPosition(position))
 			throw new IllegalArgumentException("invalid position");
 		this.getTerrainType()[x][y][z] = value;
 		this.getTerrainChangeListener().notifyTerrainChanged(x, y, z);
@@ -785,7 +783,7 @@ public class World {
 	 */
 	public Faction getSmallestFaction(){
 		Faction smallestSoFar = null;
-		int NbUnitsSmallest = 0;
+		int NbUnitsSmallest = 9999;
 		for(Faction faction: factions){
 			if(faction.getNbUnits() < NbUnitsSmallest){
 				smallestSoFar = faction;
@@ -881,7 +879,7 @@ public class World {
 		Faction faction = null;
 		if(this.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
 			faction = new Faction(this);
-			this.addFaction(faction);	
+			this.addFaction(faction);
 		}
 		else{
 			faction = this.getSmallestFaction();
