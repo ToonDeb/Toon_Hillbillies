@@ -135,9 +135,7 @@ public class Facade implements IFacade{
 	@Override
 	public void moveToAdjacent(Unit unit, int dx, int dy, int dz) throws ModelException {
 		try{
-			int[] vector = {unit.getCubePosition()[0] + dx,
-					unit.getCubePosition()[1] + dy,unit.getCubePosition()[2] + dz};
-			unit.moveToAdjacent(vector);
+			unit.newMoveToAdjacent(dx, dy, dz);
 		}
 		catch(Exception e){
 			throw new ModelException(e);
@@ -290,7 +288,12 @@ public class Facade implements IFacade{
 
 	@Override
 	public void advanceTime(World world, double dt) throws ModelException {
-		world.advanceTime(dt);
+		try{
+			world.advanceTime(dt);
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	@Override

@@ -190,6 +190,10 @@ public class Path {
 			
 			return false;
 		}
+		
+		public String toString(){
+			return new String(x + " " + y + " " + z);
+		}
 	}
 }
 

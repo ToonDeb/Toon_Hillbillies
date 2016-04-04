@@ -329,7 +329,7 @@ public class Unit extends GameObject {
 		
 		if(!this.isSprinting())
 			this.setStatus(UnitStatus.WALKING);
-		
+
 		if (Arrays.equals(this.getCubePosition(), this.getFinalDestination())) {
 			this.setAdjacentDestination(adjacentDestination);
 			this.setFinalDestination(adjacentDestination);
@@ -340,6 +340,14 @@ public class Unit extends GameObject {
 		this.setOrigin(this.getCubePosition());
 		
 		this.initiateWalkTimer(adjacentDestination);
+	}
+	
+	public void newMoveToAdjacent(int dx, int dy, int dz){
+		if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
+			throw new IllegalArgumentException("more then 1 away!");
+		int[] vector = {this.getAdjacentDestination()[0] + dx,
+				this.getAdjacentDestination()[1] + dy, this.getAdjacentDestination()[2] + dz};
+		this.moveTo(vector);
 	}
 
 	/** TODO: update documentatie unit
@@ -444,12 +452,7 @@ public class Unit extends GameObject {
 		nextPosition.scaleAdd(time, this.getPosition());
 		
 		double newWalkTimer = this.getWalkTimer() - time;
-		System.out.println("walktimer");
-		System.out.println(newWalkTimer);
-		System.out.println(this.getAdjacentDestination()[0]);
-		System.out.println(this.getAdjacentDestination()[1]);
-		System.out.println(this.getAdjacentDestination()[2]);
-		System.out.println(this.getPosition().toString());
+		
 		if (newWalkTimer < 0) {
 			this.setWalkTimer(0);
 			this.increaseExperience(1);
@@ -472,9 +475,10 @@ public class Unit extends GameObject {
 	 */
 	public int[] findPath(){
 		
-		pathIndex = pathIndex + 1;
+		this.setPathIndex(this.getPathIndex()+1);
 		if(path==null){
 			AStarPathFinder pathFinder = new AStarPathFinder(this.getWorld());
+			
 			int sx = this.getCubePosition()[0];
 			int sy = this.getCubePosition()[1];
 			int sz = this.getCubePosition()[2];
@@ -483,8 +487,9 @@ public class Unit extends GameObject {
 			int ty = this.getFinalDestination()[1];
 			int tz = this.getFinalDestination()[2];
 			this.path = pathFinder.findPath(this, sx, sy, sz, tx, ty, tz);
-			this.setPathIndex(0);
+			this.setPathIndex(1);
 		}
+		
 		return path.getStepInt(this.getPathIndex());
 	}
 	
@@ -727,8 +732,6 @@ public class Unit extends GameObject {
 
 		if (status == UnitStatus.SPRINTING)
 			return 2 * v;
-		System.out.println("speed");
-		System.out.println(v);
 		return v;
 	}
 
@@ -1125,8 +1128,6 @@ public class Unit extends GameObject {
 		Vector3d newVector = new Vector3d(this.getPosition());
 		Vector3d adjacentVector = toVectorPosition(adjacentDestination);
 		newVector.sub(adjacentVector);
-		System.out.println("newVector");
-		System.out.println(newVector.toString());
 		double length = newVector.length();
 		this.setWalkTimer(length / this.getSpeed());
 

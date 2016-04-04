@@ -88,9 +88,6 @@ public class World {
 		for(int x=0; x<this.getNbCubesX(); x++){
 			for(int y=0; y<this.getNbCubesY(); y++){
 				for(int z=0; z<this.getNbCubesZ();z++){
-					System.out.print(x);
-					System.out.print(y);
-					System.out.println(z);
 					if ((this.getCubeType(x, y, z) == AIR)||(this.getCubeType(x, y, z) == WORKSHOP)){
 						this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 					}
