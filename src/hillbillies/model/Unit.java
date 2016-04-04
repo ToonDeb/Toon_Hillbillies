@@ -473,10 +473,10 @@ public class Unit extends GameObject {
 	 * TODO: findPath documentation
 	 * @return
 	 */
-	public int[] findPath(){
+	private int[] findPath(){
 		
 		this.setPathIndex(this.getPathIndex()+1);
-		if(path==null){
+		if(this.getPath()==null){
 			AStarPathFinder pathFinder = new AStarPathFinder(this.getWorld());
 			
 			int sx = this.getCubePosition()[0];
@@ -486,18 +486,26 @@ public class Unit extends GameObject {
 			int tx = this.getFinalDestination()[0];
 			int ty = this.getFinalDestination()[1];
 			int tz = this.getFinalDestination()[2];
-			this.path = pathFinder.findPath(this, sx, sy, sz, tx, ty, tz);
+			this.setPath(pathFinder.findPath(this, sx, sy, sz, tx, ty, tz));
 			this.setPathIndex(1);
 		}
 		
-		return path.getStepInt(this.getPathIndex());
+		return this.getPath().getStepInt(this.getPathIndex());
 	}
 	
-	public void resetPath(){
-		this.path = null;
+	private void resetPath(){
+		this.setPath(null);
 		this.setPathIndex(0);
 	}
-
+	
+	private Path getPath(){
+		return this.path;
+	}
+	
+	private void setPath(Path path){
+		this.path = path;
+	}
+	
 	/**
 	 * Variable registering the path of this Unit.
 	 */
@@ -507,7 +515,7 @@ public class Unit extends GameObject {
 	 * Return the pathIndex of this Unit.
 	 */
 	@Basic @Raw
-	public int getPathIndex() {
+	private int getPathIndex() {
 		return this.pathIndex;
 	}
 
@@ -520,7 +528,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == (pathIndex >= 0)
 	*/
-	public static boolean isValidPathIndex(int pathIndex) {
+	private static boolean isValidPathIndex(int pathIndex) {
 		return (pathIndex >= 0);
 	}
 
@@ -538,7 +546,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidPathIndex(getPathIndex())
 	 */
 	@Raw
-	public void setPathIndex(int pathIndex) 
+	private void setPathIndex(int pathIndex) 
 			throws IllegalArgumentException {
 		if (! isValidPathIndex(pathIndex))
 			throw new IllegalArgumentException();
@@ -1386,7 +1394,7 @@ public class Unit extends GameObject {
 	 *          The hitpoints to check.
 	 * @return 	| result == ((0 <= hp) && (hp <= this.getMaxHP))
 	 */
-	public boolean isValidHP(int hp) {
+	private boolean isValidHP(int hp) {
 		return (0 <= hp) && (hp <= this.getMaxHP());
 	}
 
@@ -1457,7 +1465,7 @@ public class Unit extends GameObject {
 	 *         	The stamina to check.
 	 * @return 	| result == ((0 <= stamina) && (stamina <= this.getMaxStamina))
 	 */
-	public boolean isValidStamina(int stamina) {
+	private boolean isValidStamina(int stamina) {
 		return ((0 <= stamina) && (stamina <= this.getMaxStamina()));
 	}
 
@@ -1516,25 +1524,12 @@ public class Unit extends GameObject {
 	/**
 	 * TODO: finishWork documentatie
 	 */
-	public void finishWork(){
+	private void finishWork(){
 		
 		this.increaseExperience(10);
 		// drop boulder/log if carrying one
 		if(this.getGameItem() != null){
-			if(this.isCarryingLog()){
-				Log log = (Log)this.getGameItem();
-				log.setAtPosition(this.getWorkTarget());
-				log.setWorld(this.getWorld());
-				this.getWorld().addLog(log);
-				this.setGameItem(null);
-			}
-			else if(this.isCarryingBoulder()){
-				Boulder boulder = (Boulder)this.getGameItem();
-				boulder.setAtPosition(this.getWorkTarget());
-				boulder.setWorld(this.getWorld());
-				this.getWorld().addBoulder(boulder);
-				this.setGameItem(null);
-			}
+			this.dropItem();
 			return;
 		}
 		
@@ -1599,6 +1594,32 @@ public class Unit extends GameObject {
 			return;
 		}
 	}
+
+	/**TODO dropitem documentatie
+	 * 
+	 */
+	private void dropItem() {
+		if(this.isCarryingLog()){
+			Log log = (Log)this.getGameItem();
+			if(this.isWorking())
+				log.setAtPosition(this.getWorkTarget());
+			else
+				log.setAtPosition(this.getCubePosition());
+			log.setWorld(this.getWorld());
+			this.getWorld().addLog(log);
+			this.setGameItem(null);
+		}
+		else if(this.isCarryingBoulder()){
+			Boulder boulder = (Boulder)this.getGameItem();
+			if(this.isWorking())
+				boulder.setAtPosition(this.getWorkTarget());
+			else
+				boulder.setAtPosition(this.getCubePosition());
+			boulder.setWorld(this.getWorld());
+			this.getWorld().addBoulder(boulder);
+			this.setGameItem(null);
+		}
+	}
 	
 	/**
 	 * Return true if this unit is working
@@ -1614,7 +1635,7 @@ public class Unit extends GameObject {
 	 * Return the workTarget of this Unit.
 	 */
 	@Basic @Raw
-	public int[] getWorkTarget() {
+	private int[] getWorkTarget() {
 		return this.workTarget;
 	}
 
@@ -1627,7 +1648,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == 
 	*/
-	public static boolean isValidWorkTarget(int[] workTarget) {
+	private static boolean isValidWorkTarget(int[] workTarget) {
 		return true;
 	}
 
@@ -1645,7 +1666,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidWorkTarget(getWorkTarget())
 	 */
 	@Raw
-	public void setWorkTarget(int[] workTarget) 
+	private void setWorkTarget(int[] workTarget) 
 			throws IllegalArgumentException {
 		if (! isValidWorkTarget(workTarget))
 			throw new IllegalArgumentException();
@@ -1730,7 +1751,7 @@ public class Unit extends GameObject {
 	 * Return the gameItem of this Unit.
 	 */
 	@Basic @Raw
-	public GameItem getGameItem() {
+	private GameItem getGameItem() {
 		return this.gameItem;
 	}
 
@@ -1743,7 +1764,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == 
 	*/
-	public static boolean isValidGameItem(GameItem gameItem) {
+	private static boolean isValidGameItem(GameItem gameItem) {
 		return true;
 	}
 
@@ -1761,7 +1782,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidGameItem(getGameItem())
 	 */
 	@Raw
-	public void setGameItem(GameItem gameItem) 
+	private void setGameItem(GameItem gameItem) 
 			throws IllegalArgumentException {
 		if (! isValidGameItem(gameItem))
 			throw new IllegalArgumentException();
@@ -2250,6 +2271,10 @@ public class Unit extends GameObject {
 	 */
 	public void terminate() {
 		this.isTerminated = true;
+		this.getWorld().removeUnit(this);
+		this.dropItem();
+		this.setStatus(UnitStatus.IDLE);
+		this.setWorld(null);
 	}
 
 	/**
