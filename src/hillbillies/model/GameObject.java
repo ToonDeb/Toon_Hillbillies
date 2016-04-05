@@ -49,9 +49,11 @@ public abstract class GameObject {
 	 */
 	public GameObject(int[] position, World world)
 			throws IllegalArgumentException {
-		if(world != null)
-			if(!world.isValidWorldPosition(position))
-				throw new IllegalArgumentException("not a valid position in this world");
+		if(world == null)
+			throw new IllegalArgumentException("World can't be null");
+	
+		if(!world.isValidWorldPosition(position)||!world.isPassableTerrain(position)||!world.isNeighbouringSolid(position))
+			throw new IllegalArgumentException("not a valid position in this world");
 		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
 		this.setPosition(vectorPosition);
 		
@@ -407,7 +409,7 @@ public abstract class GameObject {
 	 */
 	public boolean isValidWorld(World world) {
 		if (world == null){
-			return true;
+			return false;
 		}
 		if (this instanceof Unit){
 			if (world.getNbUnits() < MAX_NB_UNITS_IN_WORLD){

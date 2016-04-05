@@ -206,10 +206,17 @@ public class Unit extends GameObject {
 	 * 
 	 * 
 	 */
-	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness)
+	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness, World world, Faction faction)
 			throws IllegalArgumentException {
 		// null is given as the default world
-		super(position, null);
+		super(position, world);
+		
+		if(!faction.canHaveAsUnit(this))
+			throw new IllegalArgumentException("not a valid faction for this unit!");
+	
+		if(!world.canHaveAsUnit(this))
+			throw new IllegalArgumentException("not a valid world for this unit!");
+		
 		
 		if (!isValidStartAttribute(strength))
 			strength = 25;
@@ -235,8 +242,30 @@ public class Unit extends GameObject {
 		this.setFinalDestination(position);
 
 		this.setOrigin(this.getCubePosition());
-
+		
+		world.addUnit(this);
+		this.setFaction(faction);
+		faction.addUnit(this);
 	}
+	
+//	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness, World world, Faction faction)
+//			throws IllegalArgumentException {
+//		this(name, position, weight, strength, agility, toughness);
+//		if(!world.isValidWorldPosition(position)||!world.isPassableTerrain(position)||!world.isNeighbouringSolid(position)){
+//			throw new IllegalArgumentException("not a valid position for a new unit!");
+//		}
+//		if(!faction.canHaveAsUnit(this)){
+//			throw new IllegalArgumentException("not a valid faction for this unit!");
+//		}
+//		if(!world.canHaveAsUnit(this))
+//			throw new IllegalArgumentException("not a valid world for this unit!");
+//		
+//		this.setWorld(world);
+//		world.addUnit(this);
+//		this.setFaction(faction);
+//		faction.addUnit(this);
+//	
+//	}
 
 //	/**
 //	 * Return the position of this Unit.
