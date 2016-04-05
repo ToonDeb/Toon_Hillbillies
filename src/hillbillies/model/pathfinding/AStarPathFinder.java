@@ -4,9 +4,9 @@ package hillbillies.model.pathfinding;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javax.vecmath.Vector3d;
+//import javax.vecmath.Vector3d;
 
-import hillbillies.model.GameObject;
+//import hillbillies.model.GameObject;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 

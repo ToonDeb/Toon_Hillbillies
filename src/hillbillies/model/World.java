@@ -923,29 +923,29 @@ public class World {
 		return null;
 	}
 	
-	/**
-	 * Returns the GameItem at the given position, if there is one. returns null otherwise.
-	 * 
-	 * @param 	position
-	 * 			| the position at which the GameItem should be
-	 * @return	the gameItem at the given position, otherwise null
-	 * 			| result = GameItem : GameItem.getCubePosition == position
-	 */
-	public GameItem gameItemAtPosition(int[] position){
-		for(Boulder boulder: this.boulders){
-			if(Arrays.equals(boulder.getCubePosition(), position)){
-				return boulder;
-			}
-		}
-		
-		for(Log log: this.logs){
-			if(Arrays.equals(log.getCubePosition(), position)){
-				return log;
-			}
-		}
-		
-		return null;
-	}
+//	/**
+//	 * Returns the GameItem at the given position, if there is one. returns null otherwise.
+//	 * 
+//	 * @param 	position
+//	 * 			| the position at which the GameItem should be
+//	 * @return	the gameItem at the given position, otherwise null
+//	 * 			| result = GameItem : GameItem.getCubePosition == position
+//	 */
+//	public GameItem gameItemAtPosition(int[] position){
+//		for(Boulder boulder: this.boulders){
+//			if(Arrays.equals(boulder.getCubePosition(), position)){
+//				return boulder;
+//			}
+//		}
+//		
+//		for(Log log: this.logs){
+//			if(Arrays.equals(log.getCubePosition(), position)){
+//				return log;
+//			}
+//		}
+//		
+//		return null;
+//	}
 	
 	public void advanceTime(double dt){
 		for(Boulder boulder: boulders){
