@@ -19,7 +19,8 @@ import ogp.framework.util.ModelException;
  * @version 1.0
  */
 public class Facade implements IFacade{
-
+	
+	// never used, always spawnunit
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
