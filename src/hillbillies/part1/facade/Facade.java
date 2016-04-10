@@ -249,7 +249,10 @@ public class Facade implements IFacade {
 	@Override
 	public void moveToAdjacent(Unit unit, int dx, int dy, int dz) throws ModelException {
 		try{
-		
+		double[] vector = {unit.getCubePosition()[0] + dx +0.5,
+				unit.getCubePosition()[1] + dy+0.5,unit.getCubePosition()[2] + dz+0.5};
+		Vector3d adjacentVector = new Vector3d(vector);
+		unit.moveTo(adjacentVector);
 	} catch (IllegalArgumentException e){
 		throw new ModelException();
 	} catch (IllegalStateException e) {

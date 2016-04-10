@@ -17,8 +17,7 @@ import hillbillies.part1.internal.Part1Options;
 import hillbillies.part1.internal.map.EmptyMap;
 import ogp.framework.util.ModelException;
 
-public class GameControllerPart1 extends GameController<IHillbilliesView1>
-		implements IGameController1<IHillbilliesView1> {
+public class GameControllerPart1 extends GameController<IFacade> {
 
 	private final EmptyMap map;
 
@@ -27,11 +26,6 @@ public class GameControllerPart1 extends GameController<IHillbilliesView1>
 	public GameControllerPart1(IFacade facade, Part1Options options) {
 		super(facade, options);
 		this.map = new EmptyMap(50, 50, 50);
-	}
-
-	@Override
-	public IFacade getFacade() {
-		return (IFacade) super.getFacade();
 	}
 
 	@Override
@@ -50,9 +44,9 @@ public class GameControllerPart1 extends GameController<IHillbilliesView1>
 
 	private final WorldInfoProvider wip = new WorldInfoProviderPart1(this, this::handleError);
 
-	private final UnitInfoProvider uip = new UnitInfoProviderPart1(this, this::handleError);
+	private final UnitInfoProvider uip = new UnitInfoProviderPart1<>(this, this::handleError);
 
-	private final ActionExecutor wae = new ActionExecutorPart1(this, this::handleError);
+	private final ActionExecutor wae = new ActionExecutorPart1<>(this, this::handleError);
 
 	@Override
 	public void updateGame(double dt) {
@@ -108,17 +102,17 @@ public class GameControllerPart1 extends GameController<IHillbilliesView1>
 	private Queue<Object> selectionQueue = new LinkedList<>();
 
 	@Override
-	public void selectNextUnit() {
+	public <T> T getNextObject(Class<T> type) {
 		if (selectionQueue.isEmpty()) {
 			selectionQueue.addAll(units);
 		}
 		for (Object obj : selectionQueue) {
-			if (obj instanceof Unit) {
+			if (type.isInstance(obj)) {
 				selectionQueue.remove(obj);
-				getSelectionProvider().getSelection().select(obj, true);
-				return;
+				return type.cast(obj);
 			}
 		}
+		return null;
 	}
 
 	@Override

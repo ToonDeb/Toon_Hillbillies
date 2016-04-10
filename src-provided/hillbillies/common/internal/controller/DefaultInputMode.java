@@ -5,29 +5,29 @@ import java.util.Set;
 import hillbillies.common.internal.inputmodes.InputMode;
 import hillbillies.common.internal.providers.ActionExecutor;
 import hillbillies.common.internal.selection.Selection;
-import hillbillies.common.internal.ui.IHillbilliesView;
-import hillbillies.common.internal.ui.viewmodel.IViewModel;
+import hillbillies.common.internal.ui.HillbilliesView;
+import hillbillies.common.internal.ui.viewmodel.ViewModel;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 public class DefaultInputMode implements InputMode {
-	private final HillbilliesGameController<?> gameController;
+	private final GameController<?> gameController;
 	private Runnable deactivationHandler;
 	private Runnable activationHandler;
 
-	public DefaultInputMode(HillbilliesGameController<?> game) {
+	public DefaultInputMode(GameController<?> game) {
 		this.gameController = game;
 	}
 
-	public IHillbilliesView getView() {
+	public HillbilliesView getView() {
 		return getGameController().getView();
 	}
 
-	public IViewModel getViewModel() {
+	public ViewModel getViewModel() {
 		return getView().getViewModel();
 	}
 
-	public HillbilliesGameController<?> getGameController() {
+	public GameController<?> getGameController() {
 		return gameController;
 	}
 

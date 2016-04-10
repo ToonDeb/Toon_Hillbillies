@@ -1,10 +1,8 @@
-package hillbillies.model.test;
+package hillbillies.model;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
 
-import hillbillies.model.Unit;
-import hillbillies.model.UnitStatus;
 import ogp.framework.util.Util;
 
 import org.junit.Before;
@@ -12,30 +10,30 @@ import javax.vecmath.*;
 
 public class UnitTest {
 	
-	private Unit unit;
+	private Unit testingUnit;
 	private Unit otherUnit;
 	private Unit farUnit;
 	private Unit positionUnit;
 	
 	@Before
 	public void setUp(){
-		int[] pos = {25, 25, 25};
-		unit = new Unit("TestSubject", pos, 50, 50, 50, 50);
-		int[] other = {26,25,25};
+		Vector3d pos = new Vector3d(25.5d, 25.5d, 25.5d);
+		testingUnit = new Unit("TestSubject", pos, 50, 50, 50, 50);
+		Vector3d other = new Vector3d(26.5d,25.5d,25.5d);
 		otherUnit = new Unit("OtherSubject", other ,50,50,50,50);
-		int[] far = {1, 3, 5};
+		Vector3d far = new Vector3d(1.5d, 3.5d, 5.5d);
 		farUnit = new Unit("FarUnit", far, 50, 50, 50, 50);
-		int[] position = {40,40,40};
+		Vector3d position = new Vector3d(40.5d,40.75d,40.49d);
 		positionUnit = new Unit("PositionUnit", position, 50,50,50,50);
 	}
 	
 	@Test
 	public void testConstructor$LegalCase(){
-		int[] position = {12, 15, 2};
-		Vector3d vectorPosition = new Vector3d(12.5,15.5,2.5);
-		Unit unit = new Unit("TestSubject", position, 50, 50, 50, 50);
+		double[] position = {12d, 15d, 2d};
+		Vector3d pos = new Vector3d(position);
+		Unit unit = new Unit("TestSubject", pos, 50, 50, 50, 50);
 		
-		assertEquals(unit.getPosition(), vectorPosition);
+		assertEquals(unit.getPosition(), pos);
 		assertEquals(unit.getStrength(), 50);
 		assertEquals(unit.getAgility(), 50);
 		assertEquals(unit.getWeight(), 50);
@@ -227,7 +225,7 @@ public class UnitTest {
 	public void testGetWeight(){
 		assertEquals(testingUnit.getWeight(), 50);
 	}
-	
+	/*
 	@Test
 	public void testIsValidWeight$TrueCase(){
 		testingUnit.setAgility(50);
@@ -278,7 +276,7 @@ public class UnitTest {
 		testingUnit.setWeight(50);
 		assertEquals(testingUnit.getWeight(), 100);
 	}
-	
+	*/
 	
 	@Test
 	public void testIsValidUnitAttribute$TrueCase(){

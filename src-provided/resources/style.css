@@ -26,9 +26,5 @@
 }
 
 #worldview {
-	-fx-border-color: #6e6e6e;
-}
-
-#minimap {
-	-fx-border-color: #6e6e6e;
+	-fx-border-color: white;
 }

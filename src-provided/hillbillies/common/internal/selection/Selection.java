@@ -2,7 +2,6 @@ package hillbillies.common.internal.selection;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,7 @@ public class Selection {
 	}
 
 	public Object getAnySelected() {
-		return selection.stream().findAny().orElse(null);
+		return selection.iterator().next();
 	}
 
 	public Set<Object> getObjects() {
@@ -66,7 +65,7 @@ public class Selection {
 		return selection.size() == 1;
 	}
 
-	public <T> Optional<T> getAnySelected(Class<T> type) {
-		return getObjects(type).stream().findAny();
+	public <T> T getAnySelected(Class<T> type) {
+		return getObjects(type).iterator().next();
 	}
 }

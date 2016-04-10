@@ -9,8 +9,8 @@ import hillbillies.common.internal.providers.SelectionProvider;
 import hillbillies.common.internal.providers.UnitInfoProvider;
 import hillbillies.common.internal.selection.Selection;
 import javafx.collections.SetChangeListener;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import ogp.framework.util.internal.GenericFactory;
 
@@ -38,11 +38,11 @@ public abstract class InfoArea {
 		registerProviders();
 		onSelectionUpdated();
 	}
-
+	
 	protected ActionExecutor getActionExecutor() {
 		return ae;
 	}
-
+	
 	protected UnitInfoProvider getUnitInfoProvider() {
 		return infoProvider;
 	}
@@ -51,7 +51,7 @@ public abstract class InfoArea {
 	private InfoAreaPart<Object> currentPart;
 
 	protected abstract void registerProviders();
-
+	
 	protected <T> void registerProvider(Class<T> type, Supplier<? extends InfoAreaPart<T>> supplier) {
 		partFactory.register(type, supplier);
 	}
@@ -71,10 +71,6 @@ public abstract class InfoArea {
 			@SuppressWarnings("unchecked")
 			InfoAreaPart<T> part = (InfoAreaPart<T>) cache.get(object.getClass());
 			if (part == null) {
-				if (!infoAreaFactory.hasSupplierFor(object)) {
-					System.out.println("Don't know what info to show for clicked object " + object);
-					return null;
-				}
 				part = infoAreaFactory.create(object);
 				cache.put(object.getClass(), part);
 			}
@@ -82,32 +78,26 @@ public abstract class InfoArea {
 			return part;
 		}
 	}
-
+	
 	protected Selection getSelection() {
 		return selectionProvider.getSelection();
 	}
 
 	protected void onSelectionUpdated() {
-		if (getSelection().isSingle()) {
-			setCurrentPart(partFactory.getPartFor(getSelection().getAnySelected()));
-		} else if (getSelection().isMulti()) {
-			setCurrentPart(null);
-			getRoot().getChildren().add(new Label("(multiple selected)"));
-		} else {
-			setCurrentPart(null);
-			getRoot().getChildren().add(new Label("(no selection)"));
-		}
-	}
-
-	protected void setCurrentPart(InfoAreaPart<Object> part) {
 		root.getChildren().clear();
-		currentPart = part;
-		if (currentPart != null) {
-			root.getChildren().add(currentPart.getRoot());
+		currentPart = null;
+		if (getSelection().isSingle()) {
+			currentPart = partFactory.getPartFor(getSelection().getAnySelected());
+			if (currentPart != null)
+				root.getChildren().add(currentPart.getRoot());
+		} else if (getSelection().isMulti()) {
+			root.getChildren().add(new Label("(multiple selected)"));
+		} else {
+			root.getChildren().add(new Label("(no selection)"));
 		}
 	}
 
-	public Pane getRoot() {
+	public Node getRoot() {
 		return root;
 	}
 

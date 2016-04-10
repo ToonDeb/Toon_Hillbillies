@@ -3,28 +3,29 @@ package hillbillies.part1.internal.controller;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import hillbillies.common.internal.providers.UnitInfoProvider;
 import hillbillies.common.internal.selection.Selection;
+import hillbillies.common.internal.controller.GameController;
+import hillbillies.common.internal.providers.UnitInfoProvider;
 import hillbillies.model.Unit;
 import hillbillies.part1.facade.IFacade;
 import ogp.framework.util.ModelException;
 
-public class UnitInfoProviderPart1 implements UnitInfoProvider {
-	private final IFacade facade;
+public class UnitInfoProviderPart1<F extends IFacade> implements UnitInfoProvider {
+	private final F facade;
 	private final Consumer<ModelException> errorHandler;
-	private final IGameController1<?> game;
+	private final GameController<F> game;
 
-	public UnitInfoProviderPart1(IGameController1<?> game, Consumer<ModelException> errorHandler) {
+	public UnitInfoProviderPart1(GameController<F> game, Consumer<ModelException> errorHandler) {
 		this.game = game;
 		this.facade = game.getFacade();
 		this.errorHandler = errorHandler;
 	}
 
-	protected IFacade getFacade() {
+	protected F getFacade() {
 		return facade;
 	}
 
-	protected IGameController1<?> getGame() {
+	protected GameController<F> getGame() {
 		return game;
 	}
 
@@ -153,17 +154,17 @@ public class UnitInfoProviderPart1 implements UnitInfoProvider {
 
 	@Override
 	public double getSizeZ(Unit unit) {
-		return 1 - 1e-6; 
+		return 1 - 1e-6; // TODO
 	}
 
 	@Override
 	public double getSizeY(Unit unit) {
-		return 1 - 1e-6; 
+		return 1 - 1e-6; // TODO
 	}
 
 	@Override
 	public double getSizeX(Unit unit) {
-		return 1 - 1e-6; 
+		return 1 - 1e-6; // TODO
 	}
 
 	@Override

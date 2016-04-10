@@ -9,7 +9,7 @@ import hillbillies.common.internal.ui.viewparts.InfoAreaPart;
 import hillbillies.model.Unit;
 import javafx.beans.binding.When;
 import javafx.geometry.Insets;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 //if you get a compile error here, see readme.txt
 import javafx.scene.control.TextInputDialog;
@@ -123,7 +123,7 @@ public class UnitInfoAreaPart implements InfoAreaPart<Unit> {
 	}
 
 	@Override
-	public Parent getRoot() {
+	public Node getRoot() {
 		return root;
 	}
 
@@ -131,11 +131,6 @@ public class UnitInfoAreaPart implements InfoAreaPart<Unit> {
 	public void setObject(Unit unit) {
 		this.unit = unit;
 		updateInfo();
-	}
-	
-	@Override
-	public Unit getObject() {
-		return unit;
 	}
 
 	@Override

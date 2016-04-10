@@ -2,31 +2,19 @@ package hillbillies.part1.internal.controller;
 
 import java.util.function.Consumer;
 
-import hillbillies.common.internal.controller.AbstractSelectionMode;
-import hillbillies.common.internal.controller.BaseActionExecutor;
-import hillbillies.common.internal.controller.CubeSelectionMode;
-import hillbillies.common.internal.controller.CubeSelectionMode.Cube;
+import hillbillies.common.internal.controller.GameController;
 import hillbillies.common.internal.controller.UnitSelectionMode;
+import hillbillies.common.internal.controller.CubeSelectionMode;
 import hillbillies.common.internal.inputmodes.InputMode;
 import hillbillies.common.internal.selection.Selection;
 import hillbillies.model.Unit;
 import hillbillies.part1.facade.IFacade;
 import ogp.framework.util.ModelException;
 
-public class ActionExecutorPart1 extends BaseActionExecutor {
+public class ActionExecutorPart1<F extends IFacade> extends BaseActionExecutor<F> {
 
-	public ActionExecutorPart1(IGameController1<?> game, Consumer<ModelException> errorHandler) {
+	public ActionExecutorPart1(GameController<F> game, Consumer<ModelException> errorHandler) {
 		super(game, errorHandler);
-	}
-	
-	@Override
-	public IGameController1<?> getGame() {
-		return (IGameController1<?>) super.getGame();
-	}
-
-	@Override
-	public IFacade getFacade() {
-		return (IFacade) super.getFacade();
 	}
 
 	@Override
@@ -42,7 +30,14 @@ public class ActionExecutorPart1 extends BaseActionExecutor {
 
 	@Override
 	public void initiateMove() {
-		selectCube("Select a cube to move to", c -> moveTo(c.cubeX, c.cubeY, c.cubeZ));
+		InputMode oldMode = getGame().getCurrentInputMode();
+		CubeSelectionMode mode = new CubeSelectionMode(getGame());
+		mode.setOnSelected(() -> {
+			getGame().switchInputMode(oldMode);
+			moveTo(mode.getCubeX(), mode.getCubeY(), mode.getCubeZ());
+		});
+		getGame().getView().setStatusText("Select a cube to move to");
+		getGame().switchInputMode(mode);
 	}
 
 	protected Selection getSelection() {
@@ -51,7 +46,14 @@ public class ActionExecutorPart1 extends BaseActionExecutor {
 
 	@Override
 	public void initiateCreateUnit() {
-		selectCube("Select a cube to put the new unit on", c -> createUnit(c.cubeX, c.cubeY, c.cubeZ));
+		InputMode oldMode = getGame().getCurrentInputMode();
+		CubeSelectionMode mode = new CubeSelectionMode(getGame());
+		mode.setOnSelected(() -> {
+			getGame().switchInputMode(oldMode);
+			createUnit(mode.getCubeX(), mode.getCubeY(), mode.getCubeZ());
+		});
+		getGame().getView().setStatusText("Select a cube to put the new unit on");
+		getGame().switchInputMode(mode);
 	}
 
 	@Override
@@ -72,40 +74,23 @@ public class ActionExecutorPart1 extends BaseActionExecutor {
 
 	@Override
 	public void selectNext() {
-		getGame().selectNextUnit();
+		Unit unit = getGame().getNextObject(Unit.class);
+		getSelection().select(unit, true);
 	}
 
 	@Override
 	public void initiateAttack() {
-		selectUnit("Select a unit to attack", unit -> attack(unit));
-	}
-
-	protected void selectUnit(String info, Consumer<Unit> action) {
-		select(info, createUnitSelectionMode(), action);
-	}
-
-	protected void selectCube(String info, Consumer<Cube> action) {
-		select(info, createCubeSelectionMode(), action);
-	}
-
-	protected <T> void select(String info, AbstractSelectionMode<T> selMode, Consumer<T> action) {
-		getGame().getView().setStatusText(info);
 		InputMode oldMode = getGame().getCurrentInputMode();
+		UnitSelectionMode selMode = new UnitSelectionMode(getGame());
 		selMode.setOnSelected(unit -> {
 			getGame().switchInputMode(oldMode);
 			if (unit != null) {
-				action.accept(unit);
+				attack(unit);
 			}
 		});
+		getGame().getView().setStatusText("Select a unit to attack");
 		getGame().switchInputMode(selMode);
-	}
 
-	protected UnitSelectionMode createUnitSelectionMode() {
-		return new UnitSelectionMode(getGame());
-	}
-
-	protected CubeSelectionMode createCubeSelectionMode() {
-		return new CubeSelectionMode(getGame());
 	}
 
 	@Override
@@ -181,5 +166,5 @@ public class ActionExecutorPart1 extends BaseActionExecutor {
 			}
 		}
 	}
-	
+
 }
