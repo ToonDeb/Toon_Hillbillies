@@ -61,26 +61,26 @@ public class NewUnitTest {
 		this.world.addBoulder(boulder);
 		
 		int[] unitPosition = {0,0,1};
-		Unit testUnit = new Unit("TestUnit", unitPosition, 50,50,50,50);
+		Unit testUnit = new Unit("TestUnit", unitPosition, 50,50,50,50, this.world, this.faction1, false);
 		testUnit.setWorld(this.world);
 		this.world.addUnit(testUnit);
 		this.faction1.addUnit(testUnit);
 		testUnit.setFaction(faction1);
 		
-		Unit otherUnit = new Unit("OtherUnit", unitPosition, 50,50,50,50);
+		Unit otherUnit = new Unit("OtherUnit", unitPosition, 50,50,50,50, this.world, this.faction1, false);
 		otherUnit.setWorld(this.world);
 		this.world.addUnit(otherUnit);
 		this.faction1.addUnit(otherUnit);
 		otherUnit.setFaction(faction1);
 		
 		int[] farPosition = {2,2,1};
-		Unit farUnit = new Unit("TestUnit", farPosition, 50,50,50,50);
+		Unit farUnit = new Unit("TestUnit", farPosition, 50,50,50,50, this.world, this.faction2, false);
 		farUnit.setWorld(this.world);
 		this.world.addUnit(farUnit);
 		this.faction2.addUnit(farUnit);
 		otherUnit.setFaction(faction2);
 		
-		Unit otherFactionUnit = new Unit("OtherFactionUnit", unitPosition, 50,50,50,50);
+		Unit otherFactionUnit = new Unit("OtherFactionUnit", unitPosition, 50,50,50,50, this.world, this.faction2, false);
 		otherFactionUnit.setWorld(this.world);
 		this.world.addUnit(otherFactionUnit);
 		this.faction2.addUnit(otherFactionUnit);
@@ -91,7 +91,8 @@ public class NewUnitTest {
 	public void testConstructorLegalCase(){
 		int[] position = {0, 0, 1};
 		Vector3d vectorPosition = new Vector3d(0.5,0.5,1.5);
-		Unit unit = new Unit("TestSubject", position, 50, 50, 50, 50);
+		Unit unit = new Unit("TestSubject", position, 50, 50, 50, 50, this.world, this.faction1, false);
+
 		
 		assertEquals(unit.getPosition(), vectorPosition);
 		assertEquals(unit.getStrength(), 50);
@@ -100,6 +101,8 @@ public class NewUnitTest {
 		assertEquals(unit.getToughness(), 50);
 		assertEquals(unit.getName(), "TestSubject");
 	}
+	
+	
 	
 	
 }

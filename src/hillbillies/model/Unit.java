@@ -206,8 +206,9 @@ public class Unit extends GameObject {
 	 * 
 	 * 
 	 */
-	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness, World world, Faction faction)
-			throws IllegalArgumentException {
+	public Unit(String name, int[] position, int weight, int strength, int agility, 
+			int toughness, World world, Faction faction, boolean defaultBehaviour)
+				throws IllegalArgumentException {
 		// null is given as the default world
 		super(position, world);
 		
@@ -246,6 +247,10 @@ public class Unit extends GameObject {
 		world.addUnit(this);
 		this.setFaction(faction);
 		faction.addUnit(this);
+	
+		if (defaultBehaviour)
+			this.startDefaultBehaviour();
+		
 	}
 	
 //	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness, World world, Faction faction)

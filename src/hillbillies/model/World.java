@@ -883,9 +883,7 @@ public class World {
 		if(faction.getNbUnits() > MAX_NB_UNITS_IN_FACTION){
 			throw new IllegalStateException("No faction available!");
 		}
-		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness, this, faction);
-		if(enableDefaultBehavior)
-			unit.startDefaultBehaviour();
+		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness, this, faction, enableDefaultBehavior);
 		return unit;
 		
 	}
