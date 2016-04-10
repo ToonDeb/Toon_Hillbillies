@@ -23,15 +23,7 @@ public class Facade implements IFacade{
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
-		try{
-			Unit unit = new Unit(name, initialPosition, weight, strength, agility, toughness);
-			if(enableDefaultBehavior)
-				unit.startDefaultBehaviour();
-			return unit;
-		}
-		catch (Exception e){
-			throw new ModelException(e);
-		} 
+		return new Unit(name, initialPosition, weight, agility, strength, toughness, null, null, enableDefaultBehavior);
 	}
 
 	@Override
@@ -195,15 +187,11 @@ public class Facade implements IFacade{
 		}
 	}
 
-	@Override
-	public void work(Unit unit) throws ModelException {
-		try{
-			unit.workAt(unit.getCubePosition());
-		}
-		catch(Exception e){
-			throw new ModelException(e);
-		}
-	}
+//	@Override
+//	@Deprecated
+//	public void work(Unit unit) throws ModelException {
+//		
+//	}
 
 	@Override
 	public boolean isWorking(Unit unit) throws ModelException {

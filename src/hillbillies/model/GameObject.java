@@ -49,13 +49,16 @@ public abstract class GameObject {
 	 */
 	public GameObject(int[] position, World world)
 			throws IllegalArgumentException {
-		if(world != null)
-			if(!world.isValidWorldPosition(position))
-				throw new IllegalArgumentException("not a valid position in this world");
+		if(world == null)
+			throw new IllegalArgumentException("World can't be null");
+	
+		if(!world.isValidWorldPosition(position)||!world.isPassableTerrain(position)||!world.isNeighbouringSolid(position))
+			throw new IllegalArgumentException("not a valid position in this world");
 		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
+		this.setWorld(world);
 		this.setPosition(vectorPosition);
 		
-		this.setWorld(world);
+		
 	}
 
 
@@ -76,9 +79,9 @@ public abstract class GameObject {
 			throw new NullPointerException();
 		}
 		
-		if(world == null){
-			return true;
-		}
+//		if(world == null){
+//			return true;
+//		}
 		
 		if(world.isValidWorldPosition(toCubePosition(position)))
 				return true;
@@ -284,6 +287,8 @@ public abstract class GameObject {
 	 * 			|	return true
 	 */
 	public boolean isNeighboringCube(int[] target){
+		if(!this.getWorld().isValidWorldPosition(target))
+			return false;
 		int[] position = this.getCubePosition();
 		if ((Math.abs(position[0] - target[0]) > 1) ||
 				(Math.abs(position[1] - target[1]) > 1) ||
@@ -407,7 +412,7 @@ public abstract class GameObject {
 	 */
 	public boolean isValidWorld(World world) {
 		if (world == null){
-			return true;
+			return false;
 		}
 		if (this instanceof Unit){
 			if (world.getNbUnits() < MAX_NB_UNITS_IN_WORLD){

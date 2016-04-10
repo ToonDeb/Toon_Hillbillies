@@ -206,10 +206,18 @@ public class Unit extends GameObject {
 	 * 
 	 * 
 	 */
-	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness)
-			throws IllegalArgumentException {
+	public Unit(String name, int[] position, int weight, int strength, int agility, 
+			int toughness, World world, Faction faction, boolean defaultBehaviour)
+				throws IllegalArgumentException {
 		// null is given as the default world
-		super(position, null);
+		super(position, world);
+		
+		if(!faction.canHaveAsUnit(this))
+			throw new IllegalArgumentException("not a valid faction for this unit!");
+	
+		if(!world.canHaveAsUnit(this))
+			throw new IllegalArgumentException("not a valid world for this unit!");
+		
 		
 		if (!isValidStartAttribute(strength))
 			strength = 25;
@@ -235,8 +243,34 @@ public class Unit extends GameObject {
 		this.setFinalDestination(position);
 
 		this.setOrigin(this.getCubePosition());
-
+		
+		world.addUnit(this);
+		this.setFaction(faction);
+		faction.addUnit(this);
+	
+		if (defaultBehaviour)
+			this.startDefaultBehaviour();
+		
 	}
+	
+//	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness, World world, Faction faction)
+//			throws IllegalArgumentException {
+//		this(name, position, weight, strength, agility, toughness);
+//		if(!world.isValidWorldPosition(position)||!world.isPassableTerrain(position)||!world.isNeighbouringSolid(position)){
+//			throw new IllegalArgumentException("not a valid position for a new unit!");
+//		}
+//		if(!faction.canHaveAsUnit(this)){
+//			throw new IllegalArgumentException("not a valid faction for this unit!");
+//		}
+//		if(!world.canHaveAsUnit(this))
+//			throw new IllegalArgumentException("not a valid world for this unit!");
+//		
+//		this.setWorld(world);
+//		world.addUnit(this);
+//		this.setFaction(faction);
+//		faction.addUnit(this);
+//	
+//	}
 
 //	/**
 //	 * Return the position of this Unit.
@@ -321,7 +355,7 @@ public class Unit extends GameObject {
 	 *          adjacentDestination
 	 *          | ! isValidAdjacentDestination(adjacentDestination)
 	 */
-	public void moveToAdjacent(int[] adjacentDestination) throws IllegalArgumentException {
+	private void moveToAdjacent(int[] adjacentDestination) throws IllegalArgumentException {
 		if (!isValidAdjacentDestination(adjacentDestination))
 			throw new IllegalArgumentException("Invalid adjacentDestination!");
 		if(this.isFalling())
@@ -344,7 +378,7 @@ public class Unit extends GameObject {
 	
 	public void newMoveToAdjacent(int dx, int dy, int dz){
 		if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
-			throw new IllegalArgumentException("more then 1 away!");
+			throw new IllegalArgumentException("more than 1 away!");
 		int[] vector = {this.getAdjacentDestination()[0] + dx,
 				this.getAdjacentDestination()[1] + dy, this.getAdjacentDestination()[2] + dz};
 		this.moveTo(vector);
@@ -572,6 +606,8 @@ public class Unit extends GameObject {
 	 * 			| new.getStatus == IDLE
 	 */
 	public void takeFallDamage(int fallDepth){
+		if(!this.isFalling())
+			throw new IllegalStateException("Unit is not Falling");
 		this.setStatus(UnitStatus.IDLE);
 		this.takeDamage(fallDepth * 10);		
 	}
@@ -778,7 +814,8 @@ public class Unit extends GameObject {
 	 * 			| 		result == (this.getStamina > 0)
 	 */
 	private boolean canSprint() {
-		return (this.getStatus() == UnitStatus.WALKING) && (this.getStamina() > 0);
+		return (this.getStatus() == UnitStatus.WALKING) && 
+				(this.getStamina() > 0);
 	}
 
 	/**
@@ -979,7 +1016,7 @@ public class Unit extends GameObject {
 	 */
 	private void dodge() throws IllegalStateException {
 
-		if (!(this.getStatus() == UnitStatus.DEFENDING))
+		if (!(this.getStatus() == UnitStatus.DODGING))
 			throw new IllegalStateException("Unit is not being attacked!");
 
 		Vector3d newPosition = new Vector3d(-1, -1, -1);
@@ -1004,7 +1041,7 @@ public class Unit extends GameObject {
 		
 		if (isValidPosition(newPosition, this.getWorld()))
 			this.setPosition(newPosition);
-		
+		this.setStatus(UnitStatus.IDLE);
 		this.increaseExperience(20);
 	}
 
@@ -1028,6 +1065,8 @@ public class Unit extends GameObject {
 		if (other == null)
 			throw new NullPointerException("can't attack null");
 		if (other.isFalling())
+			return false;
+		if (other.getFaction()==this.getFaction())
 			return false;
 		return (this.getCubePosition()[2] == other.getCubePosition()[2])
 				&& (Math.abs(this.getCubePosition()[0] - other.getCubePosition()[0]) < 2)
@@ -1255,7 +1294,7 @@ public class Unit extends GameObject {
 	 *          The attribute to check.
 	 * @return 	| result == ((1 <= attribute) && (attribute < 200))
 	 */
-	public static boolean isValidUnitAttribute(int attribute) {
+	private static boolean isValidUnitAttribute(int attribute) {
 		return ((1 <= attribute) && (attribute <= 200));
 	}
 
@@ -1267,7 +1306,7 @@ public class Unit extends GameObject {
 	 *          The attribute to check
 	 * @return 	| result == ((25 <= attribute) && (attribute <= 100)
 	 */
-	public static boolean isValidStartAttribute(int attribute) {
+	private static boolean isValidStartAttribute(int attribute) {
 		return ((25 <= attribute) && (attribute <= 100));
 	}
 
@@ -1429,7 +1468,8 @@ public class Unit extends GameObject {
 	 * 			| if newHP <= 0
 	 * 			|	then this.terminate
 	 */
-	public void takeDamage(int amount){
+	private void takeDamage(int amount){
+		assert (amount>0);
 		int newHP = this.getHP() - amount;
 		if (newHP <= 0){
 			this.terminate();
@@ -1601,22 +1641,22 @@ public class Unit extends GameObject {
 	private void dropItem() {
 		if(this.isCarryingLog()){
 			Log log = (Log)this.getGameItem();
+			log.setWorld(this.getWorld());
+			this.getWorld().addLog(log);
 			if(this.isWorking())
 				log.setAtPosition(this.getWorkTarget());
 			else
 				log.setAtPosition(this.getCubePosition());
-			log.setWorld(this.getWorld());
-			this.getWorld().addLog(log);
 			this.setGameItem(null);
 		}
 		else if(this.isCarryingBoulder()){
 			Boulder boulder = (Boulder)this.getGameItem();
+			boulder.setWorld(this.getWorld());
+			this.getWorld().addBoulder(boulder);
 			if(this.isWorking())
 				boulder.setAtPosition(this.getWorkTarget());
 			else
 				boulder.setAtPosition(this.getCubePosition());
-			boulder.setWorld(this.getWorld());
-			this.getWorld().addBoulder(boulder);
 			this.setGameItem(null);
 		}
 	}
@@ -1942,14 +1982,14 @@ public class Unit extends GameObject {
 	 *          This Unit cannot be attacked by the other Unit
 	 *          | ! other.canAttack(this)
 	 */
-	public void defend(Unit other) throws IllegalArgumentException {
+	private void defend(Unit other) throws IllegalArgumentException {
 		if (!other.canAttack(this))
 			throw new IllegalArgumentException("This Unit can not be attacked by the other unit");
 
 		this.setStatus(UnitStatus.DEFENDING);
 		this.face(other.getCubePosition());
 
-		if (this.dodgeChance(other)) {
+		if (this.dodgeSuccesfull(other)) {
 			this.setStatus(UnitStatus.DODGING);
 			
 			// this.setStatus(UnitStatus.IDLE); //TODO:hier, of in advanceTime?
@@ -1961,11 +2001,8 @@ public class Unit extends GameObject {
 			// this.setStatus(UnitStatus.IDLE);
 			return;
 		}
-		int newHP = this.getHP() - other.getStrength() / 10;
-		if (newHP > 0)
-			this.setHP(newHP);
-		else
-			this.terminate(); //TODO:death
+		int damage = other.getStrength() / 10;
+		this.takeDamage(damage);
 	}
 
 	/**
@@ -1976,7 +2013,7 @@ public class Unit extends GameObject {
 	 *          The Unit attacking this Unit
 	 * @return 	| result == (RandomNumberBetween0And1 <= (0.2d*this.getAgility())/other.getAgility())
 	 */
-	private boolean dodgeChance(Unit other) {
+	private boolean dodgeSuccesfull(Unit other) {
 		double dodgeChance = (0.2d * this.getAgility()) / other.getAgility();
 		return (Util.fuzzyLessThanOrEqualTo(random.nextDouble(), dodgeChance));
 	}
@@ -2010,10 +2047,11 @@ public class Unit extends GameObject {
 	 * @post 	The restTime of this Unit is 0 
 	 * 			| new.getRestTime() == 0
 	 */
-	public void rest() { 
-		assert (this.getStatus() != UnitStatus.ATTACKING);
-		assert (this.getStatus() != UnitStatus.DEFENDING);
-		assert (!this.isFalling());
+	public void rest() {
+		if ((this.getStatus() == UnitStatus.ATTACKING)||
+				(this.getStatus() == UnitStatus.DEFENDING)||
+				(this.isFalling()))
+			throw new IllegalStateException("Can't rest now");
 		this.setRestTime(0);
 		this.setStatus(UnitStatus.REST);
 	}
@@ -2174,6 +2212,7 @@ public class Unit extends GameObject {
 	 */
 	private UnitStatus status;
 
+	
 	public void advanceTime(double deltaT) {
 		
 		// Check if unit stands on solid ground
@@ -2220,6 +2259,8 @@ public class Unit extends GameObject {
 		if ((this.getStatus() == UnitStatus.IDLE) && (this.getDefaultBoolean() == true)) {
 			this.defaultBehaviour();
 		}
+		
+		
 
 	}
 
@@ -2258,15 +2299,13 @@ public class Unit extends GameObject {
 	 * @return 	| result == ((time > 0) && (time < 0.2))
 	 */
 	public static boolean isValidTime(double time) {
-		return true;
-//		return Util.fuzzyGreaterThanOrEqualTo(time, 0) &&
-//				Util.fuzzyLessThanOrEqualTo(time, 0.2)
-//				&& (! Util.fuzzyEquals(time, 0)) && (! Util.fuzzyEquals(time, 0.2));
+		
+		return Util.fuzzyGreaterThanOrEqualTo(time, 0) &&
+				Util.fuzzyLessThanOrEqualTo(time, 0.2);
 	}
 
 
 	/** TODO: terminate Unit
-	 *  TODO: drop item
 	 * Terminate this Unit.
 	 *
 	 * @post 	This Unit is terminated. 
@@ -2277,9 +2316,9 @@ public class Unit extends GameObject {
 		this.getWorld().removeUnit(this);
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
-		this.setWorld(null);
+		//this.setWorld(null);
 		this.getFaction().removeUnit(this);
-		this.setFaction(null);
+		//this.setFaction(null);
 	}
 
 	/**
@@ -2310,7 +2349,6 @@ public class Unit extends GameObject {
 	 */
 	public void startDefaultBehaviour() {
 		this.setDefaultBoolean(true);
-		this.defaultBehaviour();
 	}
 
 	/**
@@ -2321,7 +2359,7 @@ public class Unit extends GameObject {
 	 */
 	public void stopDefaultBehaviour() {
 		this.setDefaultBoolean(false);
-		this.setStatus(UnitStatus.IDLE);
+		//this.setStatus(UnitStatus.IDLE);
 	}
 
 	/**
@@ -2431,6 +2469,8 @@ public class Unit extends GameObject {
 	 *       | result == (faction.getNbUnits <= max_NB_Units_in_Faction)
 	*/
 	public static boolean isValidFaction(Faction faction) {
+		if(faction == null)
+			return false;
 		return (faction.getNbUnits() <= MAX_NB_UNITS_IN_FACTION);
 	}
 
@@ -2448,7 +2488,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidFaction(getFaction())
 	 */
 	@Raw
-	public void setFaction(Faction faction) 
+	private void setFaction(Faction faction) 
 			throws IllegalArgumentException {
 		if (! isValidFaction(faction))
 			throw new IllegalArgumentException();
@@ -2478,7 +2518,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == 
 	*/
-	public static boolean isValidExperience(int experience) {
+	private static boolean isValidExperience(int experience) {
 		return true;
 	}
 
@@ -2496,7 +2536,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidExperience(getExperience())
 	 */
 	@Raw
-	public void setExperience(int experience) throws IllegalArgumentException {
+	private void setExperience(int experience) throws IllegalArgumentException {
 		if (! isValidExperience(experience))
 			throw new IllegalArgumentException();
 		this.experience = experience;
@@ -2507,7 +2547,7 @@ public class Unit extends GameObject {
 	 * @param experience
 	 * @throws IllegalArgumentException
 	 */
-	public void increaseExperience(int amount) throws IllegalArgumentException{
+	private void increaseExperience(int amount) throws IllegalArgumentException{
 		// if all atributes have the maximum value, do nothing
 		if ((this.getAgility() == 200)&&(this.getStrength()==200)&&(this.getToughness()==200))
 			return;
