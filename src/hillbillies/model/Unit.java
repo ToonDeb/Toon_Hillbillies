@@ -529,7 +529,7 @@ public class Unit extends GameObject {
 		return this.getPath().getStepInt(this.getPathIndex());
 	}
 	
-	private void resetPath(){
+	public void resetPath(){
 		this.setPath(null);
 		this.setPathIndex(0);
 	}
@@ -1120,8 +1120,8 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	private boolean isValidAdjacentDestination(int[] adjacentDestination) {
-		if(this.getWorld()==null)
-			return true;
+//		if(this.getWorld()==null)
+//			return true;
 		
 		int[] thisPos = this.getCubePosition();
 		for (int i = 0; i<3;i++){
@@ -2316,9 +2316,9 @@ public class Unit extends GameObject {
 		this.getWorld().removeUnit(this);
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
-		//this.setWorld(null);
+		this.setWorld(null);
 		this.getFaction().removeUnit(this);
-		//this.setFaction(null);
+		this.setFaction(null);
 	}
 
 	/**

@@ -68,6 +68,7 @@ public abstract class GameItem extends GameObject{
 	 */
 	 public void terminate() {
 		 this.isTerminated = true;
+		 
 		 if (this.getClass() == Log.class){
 			 this.getWorld().removeLog((Log)this);
 		 }
