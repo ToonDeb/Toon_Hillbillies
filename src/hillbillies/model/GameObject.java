@@ -44,19 +44,30 @@ public abstract class GameObject {
 	 * @param  position
 	 *         The position for this new GameObject.
 	 * @effect The position of this new GameObject is set to
-	 *         the given position.
-	 *       | this.setPosition(position)
+	 *         the given position
+	 *       | this.setAtPosition(position)
+	 * @throws	IllegalArgumentException
+	 * 			The given position is not a valid position for any unit, in this world.
+	 * 			| !world.isValidWorldPosition(position) ||
+	 * 			|	world.isPassableTerrain(position)
+	 * 
+	 * @param 	world
+	 * 			The world of this new GameObject.
+	 * @effect 	The world of this new GameObject is set to the given World
+	 * 			| this.setWorld(world)
+	 * @throws	NullPointerException
+	 * 			The given world may not be null
+	 * 			| world == null
 	 */
 	public GameObject(int[] position, World world)
 			throws IllegalArgumentException {
 		if(world == null)
-			throw new IllegalArgumentException("World can't be null");
+			throw new NullPointerException("World can't be null");
 	
 		if(!world.isValidWorldPosition(position)||!world.isPassableTerrain(position))
 			throw new IllegalArgumentException("not a valid position in this world");
-		Vector3d vectorPosition = new Vector3d(position[0]+0.5, position[1]+0.5, position[2]+0.5);
 		this.setWorld(world);
-		this.setPosition(vectorPosition);
+		this.setAtPosition(position);
 		
 		
 	}
@@ -117,9 +128,7 @@ public abstract class GameObject {
 	 * 		  | new.getCubePosition == cubePosition
 	 */
 	public void setAtPosition(int[] cubePosition){
-		Vector3d position = new Vector3d(
-				cubePosition[0]+0.5, cubePosition[1]+0.5, cubePosition[2]+0.5);
-		this.setPosition(position);
+		this.setPosition(toVectorPosition(cubePosition));
 	}
 
 	/**
@@ -253,6 +262,10 @@ public abstract class GameObject {
 		this.setFallTimer(depth/3.0);
 	}
 	
+	/**
+	 * return true if the gameobject is currently falling
+	 * @return
+	 */
 	public boolean isFalling(){
 		return this.isFalling;
 	}
@@ -286,7 +299,7 @@ public abstract class GameObject {
 	 * 			| else 
 	 * 			|	return true
 	 */
-	public boolean isNeighboringCube(int[] target){
+	public boolean isNeighbouringCube(int[] target){
 		if(!this.getWorld().isValidWorldPosition(target))
 			return false;
 		int[] position = this.getCubePosition();
@@ -406,7 +419,7 @@ public abstract class GameObject {
 		return this.world;
 	}
 
-	/** TODO: isValidWorld
+	/** 
 	 * Check whether the given World is a valid World for
 	 * this GameObject.
 	 */

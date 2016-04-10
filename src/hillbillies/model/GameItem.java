@@ -21,6 +21,11 @@ public abstract class GameItem extends GameObject{
 	
 	private Random rand = new Random();
 	
+	/**
+	 * initiate this gameitem, with given position and world, and a (valid) random weight
+	 * @param position
+	 * @param world
+	 */
 	public GameItem(int[] position, World world){
 		super(position, world);
 		
@@ -49,6 +54,10 @@ public abstract class GameItem extends GameObject{
 		return;
 	}
 	
+	/**
+	 * advance position if the gameitem is falling
+	 * @param deltaT
+	 */
 	public void advanceTime(double deltaT){
 		
 		//check if GameItem is on solid ground
@@ -63,7 +72,7 @@ public abstract class GameItem extends GameObject{
 		}
 	}
 	
-	/** TODO: terminate gameitem test
+	/**
 	 * Terminate this GameItem.
 	 */
 	 public void terminate() {

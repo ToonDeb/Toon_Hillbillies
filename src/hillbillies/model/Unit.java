@@ -16,6 +16,10 @@ import ogp.framework.util.Util;
 //import static hillbillies.model.Constants.MAX_Y_POSITION;
 //import static hillbillies.model.Constants.MAX_Z_POSITION;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
+import static hillbillies.model.Constants.WORKSHOP;
+import static hillbillies.model.Constants.TREE;
+import static hillbillies.model.Constants.ROCK;
+import static hillbillies.model.Constants.AIR;
 
 /**
  * 
@@ -108,22 +112,10 @@ public class Unit extends GameObject {
 	 * Initialize this new Unit with given position, strength, agility, weight
 	 * and toughness.
 	 *
-	 *
-	 * @param 	position
-	 *        	The position for this new Unit.
-	 * @effect 	The position of this new Unit is set to the given position.
-	 *         	| this.setPosition(position)
-	 * @throws 	IllegalArgumentException
-	 * 		   	The given position is not a valid position for this Unit
+	 *@effect 	The position and world of this new unit, are set by the constructor
+	 * 			of the superClass of unit: gameobject
+	 * 			| super(position, world)
 	 * 
-	 * @param 	orientation
-	 *        	The orientation for this new unit.
-	 * @post 	If the given orientation is a valid orientation for any unit, the
-	 *       	orientation of this new unit is equal to the given orientation.
-	 *       	Otherwise, the orientation of this new unit is equal to PI/2. 
-	 *       	| if (isValidOrientation(orientation)) 
-	 *       	| 		then new.getOrientation() == orientation 
-	 *       	| else new.getOrientation() == PI/2
 	 * 
 	 * @param 	strength
 	 *        	The strength for this new Unit.
@@ -174,6 +166,9 @@ public class Unit extends GameObject {
 	 *       
 	 * @post	The experience of this new Unit is equal to 0.
 	 * 			| new.getExperience() == 0
+	 * 
+	 * @post	The status of this new Unit is IDLE.
+	 * 			| new.getStatus() == UnitStatus.IDLE
 	 *
 	 * @param 	name
 	 *        	The name for this new unit.
@@ -199,16 +194,34 @@ public class Unit extends GameObject {
 	 * 	
 	 * @effect 	The origin of this new Unit is set to the cubePosition of 
 	 * 		   	the given position
-	 * 		   	| this.setOrigin(new.getCubePosition)
+	 * 		   	| this.setOrigin(position)
 	 * @throws 	IllegalArgumentException
 	 * 		   	The given position is not a valid position for this Unit
 	 * 			| ! isValidOrigin(new.getCubePosition)
 	 * 
+	 * @post	The new unit is added to the given world
+	 * 			| world.hasAsUnit(this) == true
+	 * 
+	 * @pararm	faction
+	 * 			The faction of this new unit.
+	 * @effect	The faction of this new unit is set to the given faction
+	 * 			| this.setFaction(faction)
+	 * @throws	IllegalArgumentException
+	 * 			The faction is not a valid faction for this Unit
+	 * 			| !faction.canHaveAsUnit(this)
+	 * 
+	 * @post	The new unit is added to the given faction
+	 * 			| faction.hasAsUnit(this) == true
+	 * 
+	 * @param	defaultBehaviour
+	 * 			The defaultbehaviour of this new unit
+	 * @post	The defaultboolean of this unit is equal to defaultBehaviour
+	 * 			| new.getDefaultBoolean == defaultBehaviour	
 	 * 
 	 */
 	public Unit(String name, int[] position, int weight, int strength, int agility, 
 			int toughness, World world, Faction faction, boolean defaultBehaviour)
-				throws IllegalArgumentException {
+				throws IllegalArgumentException, NullPointerException {
 		// null is given as the default world
 		super(position, world);
 		
@@ -242,7 +255,7 @@ public class Unit extends GameObject {
 		this.setAdjacentDestination(position);
 		this.setFinalDestination(position);
 
-		this.setOrigin(this.getCubePosition());
+		this.setOrigin(position);
 		
 		world.addUnit(this);
 		this.setFaction(faction);
@@ -252,89 +265,6 @@ public class Unit extends GameObject {
 			this.startDefaultBehaviour();
 		
 	}
-	
-//	public Unit(String name, int[] position, int weight, int strength, int agility, int toughness, World world, Faction faction)
-//			throws IllegalArgumentException {
-//		this(name, position, weight, strength, agility, toughness);
-//		if(!world.isValidWorldPosition(position)||!world.isPassableTerrain(position)||!world.isNeighbouringSolid(position)){
-//			throw new IllegalArgumentException("not a valid position for a new unit!");
-//		}
-//		if(!faction.canHaveAsUnit(this)){
-//			throw new IllegalArgumentException("not a valid faction for this unit!");
-//		}
-//		if(!world.canHaveAsUnit(this))
-//			throw new IllegalArgumentException("not a valid world for this unit!");
-//		
-//		this.setWorld(world);
-//		world.addUnit(this);
-//		this.setFaction(faction);
-//		faction.addUnit(this);
-//	
-//	}
-
-//	/**
-//	 * Return the position of this Unit.
-//	 */
-//	@Basic
-//	@Raw
-//	public Vector3d getPosition() {
-//		return this.position;
-//	}
-
-//	/**
-//	 * Return the position of the cube occupied by this Unit.
-//	 */
-//	public int[] getCubePosition() {
-//		int cubeX = (int) Math.floor(this.getPosition().x);
-//		int cubeY = (int) Math.floor(this.getPosition().y);
-//		int cubeZ = (int) Math.floor(this.getPosition().z);
-//		int[] cubePosition = { cubeX, cubeY, cubeZ };
-//		return cubePosition;
-//	}
-
-//	/**
-//	 * Check whether the given position is a valid position for any Unit.
-//	 *
-//	 * @param 	position
-//	 *          The position to check.
-//	 * @return 	False if the given position is not effective. 
-//	 * 		   	| if (position == null) 
-//	 * 		   	| 		then result == false 
-//	 * 		   	Otherwise, true if all three coordinates are within the boundaries of the map 
-//	 * 		   	| else if 
-//	 * 		   	| (position.x >= 0) && (position.x < 50) && 
-//	 * 		   	| (position.y >= 0) && (position.y < 50) && 
-//	 *         	| (position.z >= 0) && (position.z < 50) 
-//	 *         	| 		then result == true
-//	 */
-//	public static boolean isValidPosition(Vector3d position) {
-//		return position != null && (position.x >= 0) && (position.x < MAX_X_POSITION) 
-//				&& (position.y >= 0) && (position.y < MAX_Y_POSITION)
-//				&& (position.z >= 0) && (position.z < MAX_Z_POSITION);
-//	}
-
-//	/**
-//	 * Set the position of this Unit to the given position.
-//	 *
-//	 * @param 	position
-//	 *          The new position for this Unit.
-//	 * @post 	The position of this Unit is equal to the given position.
-//	 *       	| new.getPosition() == position
-//	 * @throws 	IllegalArgumentException
-//	 *         	The given position is not a valid position for any Unit.
-//	 *         	| ! isValidPosition(this.getPosition())
-//	 */
-//	@Raw
-//	private void setPosition(Vector3d position) throws IllegalArgumentException {
-//		if (!isValidPosition(position))
-//			throw new IllegalArgumentException("the given position is not a valid position");
-//		this.position = position;
-//	}
-
-//	/**
-//	 * Variable registering the position of this Unit.
-//	 */
-//	private Vector3d position;
 
 	/**
 	 * Sets the units status to walking, and the units adjacentDestination to
@@ -342,18 +272,27 @@ public class Unit extends GameObject {
 	 * 
 	 * @param 	adjacentDestination
 	 *          The neighbouring destination
-	 * @effect 	The units status is set to WALKING, the units adjacentDestination
-	 *         	is set to adjacentDestination
-	 *         	| this.setStatus(UnitStatus.WALKING); 
+	 * @effect 	The units status is set to WALKING, if the unit is not currently sprinting
+	 * 			| if (!this.isSprinting())
+	 * 			|	this.setStatus(UnitStatus.WALKING); 
+	 * @effect 	The units adjacentDestination is set to adjacentDestination
 	 *         	| this.setAdjacentDestination(adjacentDestination);
 	 * @effect	If the Unit is currently at its final destination, set
 	 * 			finalDestination to the given adjacentDestination
 	 * 			| if(this.getPosition == this.getFinalDestination)
 	 * 			| 		then this.setFinalDestination(adjacentDestination)
+	 * @effect	The origin of this Unit is set to its current position
+	 * 			| this.setOrigin(this.getCubePosition())
+	 * @effect	The walkTimer is initiated
+	 * 			| this.initiateWalktimer(adjacentDestination)
+	 * 
 	 * @throws 	IllegalArgumentException
 	 *          The given adjacentDestination is not a valid
 	 *          adjacentDestination
 	 *          | ! isValidAdjacentDestination(adjacentDestination)
+	 * @throws	IllegalStateException
+	 * 			The unit is currently falling
+	 * 			| this.isfalling()
 	 */
 	private void moveToAdjacent(int[] adjacentDestination) throws IllegalArgumentException {
 		if (!isValidAdjacentDestination(adjacentDestination))
@@ -376,28 +315,59 @@ public class Unit extends GameObject {
 		this.initiateWalkTimer(adjacentDestination);
 	}
 	
+	/**
+	 * Move to a neighbouring cube.
+	 * 
+	 * @param dx
+	 * 			The distance and direction(+ or -) in the x direction
+	 * @param dy
+	 * 			The distance and direction in the y direction
+	 * @param dz
+	 * 			The distance and direction in the z direction
+	 * 
+	 * @effect	The moveTo method is called, with the position of the targeted cube as argument.
+	 * 			| destination = this.getcubePosition + {dx, dy, dz}
+	 * 			| this.moveTo(destination)
+	 * @throws 	IllegalArgumentException
+	 * 			The given arguments are more than 1 away.
+	 * 			| (dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
+	 */
 	public void newMoveToAdjacent(int dx, int dy, int dz){
 		if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
 			throw new IllegalArgumentException("more than 1 away!");
-		int[] vector = {this.getAdjacentDestination()[0] + dx,
-				this.getAdjacentDestination()[1] + dy, this.getAdjacentDestination()[2] + dz};
-		this.moveTo(vector);
+		int[] destination = {this.getCubePosition()[0] + dx,
+				this.getCubePosition()[1] + dy, this.getCubePosition()[2] + dz};
+		this.moveTo(destination);
 	}
 
-	/** TODO: update documentatie unit
+	/**
 	 * Sets the units status to walking, and the units adjacentDestination to
 	 * adjacentDestination.
 	 * 
 	 * @param 	finalDestination
 	 *          The final destination for this unit.
-	 * @effect 	The units finalDestination is set to finalDestination, the unit
-	 *         	will execute moveToAdjacent, with as argument the destination
+	 * @effect 	The units finalDestination is set to finalDestination, 
+	 *         	| this.setFinalDestination(finalDestination);      	
+	 * @effect	the unit will execute moveToAdjacent, with as argument the destination
 	 *         	selected with findPath 
-	 *         	| this.setFinalDestination(finalDestination);
-	 *         	| this.moveToAdjacent(this.findPath)
+	 * 			| this.moveToAdjacent(this.findPath)
 	 * @throws 	IllegalArgumentException
 	 *          The given finalDestination is not a valid finalDestination
 	 *          | ! isValidFinalDestination(finalDestination)
+	 *          
+	 * @effect	The path of this unit is reset to null
+	 * 			| this.resetPath
+	 * 
+	 * @throws illegalArgumentException
+	 * 			The destination is not a valid position for this unit
+	 * 			| !this.getWorld().isValidWorldPosition(finalDestination) || 
+	 *			| !this.getWorld().isNeighbouringSolid(finalDestination)||
+	 *			| !this.getWorld().isPassableTerrain(finalDestination))
+	 *
+	 * @throws illegalStateException
+	 * 		   The unit is currently falling
+	 * 			|this.isFalling
+	 * 
 	 */
 	public void moveTo(int[] finalDestination) throws IllegalArgumentException {
 		if (!this.getWorld().isValidWorldPosition(finalDestination) || 
@@ -410,49 +380,6 @@ public class Unit extends GameObject {
 		this.resetPath();
 		this.moveToAdjacent(this.findPath());
 	}
-
-//	/**
-//	 * Return the next step (the adjacent destination) of this unit based on its
-//	 * final destination.
-//	 * 
-//	 * @return 	A Vector3d
-//	 * 			
-//	 */
-//	private Vector3d findPath() {
-//		double xFinalDes = this.getFinalDestination().getX();
-//		double yFinalDes = this.getFinalDestination().getY();
-//		double zFinalDes = this.getFinalDestination().getZ();
-//		
-//		double xThis = this.getPosition().getX();
-//		double yThis = this.getPosition().getY();
-//		double zThis = this.getPosition().getZ();
-//		
-//		double xAdjDes;
-//		double yAdjDes;
-//		double zAdjDes;
-//
-//		if (Util.fuzzyEquals(xThis, xFinalDes))
-//			xAdjDes = this.getCubePosition()[0] + 0.5;
-//		else if (xThis < xFinalDes)
-//			xAdjDes = this.getCubePosition()[0] + 1.5;
-//		else
-//			xAdjDes = this.getCubePosition()[0] - 0.5;
-//
-//		if (Util.fuzzyEquals(yThis, yFinalDes))
-//			yAdjDes = this.getCubePosition()[1] + 0.5;
-//		else if (yThis < yFinalDes)
-//			yAdjDes = this.getCubePosition()[1] + 1.5;
-//		else
-//			yAdjDes = this.getCubePosition()[1] - 0.5;
-//
-//		if (Util.fuzzyEquals(zThis, zFinalDes))
-//			zAdjDes = this.getCubePosition()[2] + 0.5;
-//		else if (zThis < zFinalDes)
-//			zAdjDes = this.getCubePosition()[2] + 1.5;
-//		else
-//			zAdjDes = this.getCubePosition()[2] - 0.5;
-//		return new Vector3d(xAdjDes, yAdjDes, zAdjDes);
-//	}
 	
 	/**
 	 * Check if the Unit is moving
@@ -466,18 +393,34 @@ public class Unit extends GameObject {
 				 || (this.getStatus() == UnitStatus.SPRINTING));
 	}
 
-	/** TODO: updateposition documentatie
+	/** 
 	 * Updates the position of the unit.
 	 * 
 	 * @param 	time
 	 *          The time elapsed.
-	 * @post 	The new position of this unit is where the unit would be if it went
+	 * @effect 	The new position of this unit is where the unit would be if it went
 	 *       	at its speed, towards the given adjacentDestination, during the
-	 *       	given time, if that position doesn't equal or surpass the
-	 *       	adjacentDestination.
+	 *       	given time, if the walktimer is not 0 or smaller. Else, set the position to
+	 *       	the adjacentDestination of this unit
+	 *       	| if (this.getWalkTimer - timer > 0)
+	 *       	| 	then this.setPosition(this.getVelocity.scaleAdd(time,this.getPosition()))
+	 *       	|		this.setWalkTimer(this.getWalkTimer - timer)
+	 *       	else, the set the position of this unit to the adjacentdestination, set the walktimer to
+	 *       	0 and increase the experience by one. 
+	 *       	| else this.setWalkTimer(0)
+	 *       	|		this.increaseExperience(1)
+	 *       	|		this.setAtPosition(this.getAdjacentDestination
+	 *       	if the finaldestinatino has been reached, set status to idle
+	 *       	|		if (this.getCubePosition == this.getFinalDestination)
+	 *       	|			this.setStatus(IDLE)
+	 *       	else, move to adjacent, determined by the path
+	 *       	|		else this.moveToAdjacent(this.findPath)
 	 * @throws 	IllegalArgumentException
 	 *          The given time is not a valid time 
 	 *          | ! isValidTime(time)
+	 *          
+	 * @effect	the orientation is update
+	 * 			| this.updateOrientation()
 	 */
 	private void updatePosition(double time) throws IllegalArgumentException, IllegalStateException {
 		if (!isValidTime(time))
@@ -506,12 +449,25 @@ public class Unit extends GameObject {
 	}
 	
 	/**
-	 * TODO: findPath documentation
-	 * @return
+	 * Return the next position from the path. 
+	 * If the path doesn't exist, create a new path, and give the first position
+	 * of that path
+	 * 
+	 * @effect	The pathIndex is increased by one, if path is not null
+	 * 			| if(this.getPath != null)
+	 * 			|	then this.setPathIndex(this.getPathIndex + 1)
+	 * 			Else, pathIndex is set to one
+	 * 			| else this.setPathIndex(1)
+	 * @effect	If the path of this unit is null, find a new path
+	 * 			| if(this.getPath == null)
+	 * 			| 	then pathfinder = new AStarPathFinder(this.getWorld)
+	 * 			|		this.setPath(pathFinder.findpath(this, currentPosition, finalDestination))
+	 * @return 	the position on the path, on index PathIndex
+	 * 			| return this.getPath.getStepInt(this.getPathIndex)
 	 */
 	private int[] findPath(){
 		
-		this.setPathIndex(this.getPathIndex()+1);
+		this.setPathIndex(this.getPathIndex() + 1);
 		if(this.getPath()==null){
 			AStarPathFinder pathFinder = new AStarPathFinder(this.getWorld());
 			
@@ -529,15 +485,30 @@ public class Unit extends GameObject {
 		return this.getPath().getStepInt(this.getPathIndex());
 	}
 	
+	/**
+	 * Set path to null
+	 * 
+	 * @post	the path of this unit is null
+	 * 			| new.getPath() == null	
+	 */
 	public void resetPath(){
 		this.setPath(null);
-		this.setPathIndex(0);
 	}
 	
+	/**
+	 * Return the path of this unit
+	 */
 	private Path getPath(){
 		return this.path;
 	}
 	
+	/**
+	 * Set the path of this unit
+	 * @param path
+	 * 		  The path to be set
+	 * @post  the path of this unit is the given path
+	 * 		  | new.getPath() == path
+	 */
 	private void setPath(Path path){
 		this.path = path;
 	}
@@ -623,7 +594,6 @@ public class Unit extends GameObject {
 
 	/**
 	 * Check whether the given walkTimer is a valid walkTimer for any Unit.
-	 * Every walkTimer is valid
 	 * 
 	 * @param	walkTimer
 	 *        	The walkTimer to check.
@@ -700,37 +670,7 @@ public class Unit extends GameObject {
 	/**
 	 * Variable registering the origin of this Unit.
 	 */
-	private int[] origin = { 0, 0, 0 };
-
-/*	*//**
-	 * Check if destination is reached of surpassed
-	 * 
-	 * @param 	newPosition
-	 * @return 	true if the destination lies between the old and the new position
-	 *
-	 
-	private boolean destinationIsReached(Vector3d newPosition, Vector3d destination) {
-		/*
-		if ((Util.fuzzyLessThanOrEqualTo(this.getPosition().x, destination.x))
-				&& (Util.fuzzyLessThanOrEqualTo(destination.x, newPosition.x))
-				&& (Util.fuzzyLessThanOrEqualTo(this.getPosition().y, destination.y))
-				&& (Util.fuzzyLessThanOrEqualTo(destination.y, newPosition.y))
-				&& (Util.fuzzyLessThanOrEqualTo(this.getPosition().z, destination.z))
-				&& (Util.fuzzyLessThanOrEqualTo(destination.z, newPosition.z)))
-			return true;
-		else if ((Util.fuzzyGreaterThanOrEqualTo(this.getPosition().x, destination.x))
-				&& (Util.fuzzyGreaterThanOrEqualTo(destination.x, newPosition.x))
-				&& (Util.fuzzyGreaterThanOrEqualTo(this.getPosition().y, destination.y))
-				&& (Util.fuzzyGreaterThanOrEqualTo(destination.y, newPosition.y))
-				&& (Util.fuzzyGreaterThanOrEqualTo(this.getPosition().z, destination.z))
-				&& (Util.fuzzyGreaterThanOrEqualTo(destination.z, newPosition.z)))
-			return true;
-		*//*
-		if (newPosition.epsilonEquals(destination, 1E-2))
-			return true;
-		return false;
-	}*/
-
+	private int[] origin;
 
 	/**
 	 * Return the velocity of the unit as a vector.
@@ -825,12 +765,15 @@ public class Unit extends GameObject {
 	 * 			| this.canSprint()
 	 * @effect 	The status of this unit is set to SPRINTING
 	 *         	| this.setStatus(UnitStatus.SPRINTING)
-	 * 
+	 * @throws	IllegalStateException
+	 * 			The unit cannot sprint at this moment
+	 * 			| !this.canSprint
 	 */
 	public void startSprint() {
 		if(! this.canSprint())
 			throw new IllegalStateException("unit can't sprint at this moment");
 		this.setStatus(UnitStatus.SPRINTING);
+		this.initiateWalkTimer(this.getAdjacentDestination());
 	}
 
 	/**
@@ -838,7 +781,9 @@ public class Unit extends GameObject {
 	 * 
 	 * @effect 	The status of this unit is set to WALKING
 	 *         	| this.setStatus(UnitStatus.WALKING)
-	 * 
+	 * @throws	IllegalStateException
+	 * 			the Unit is not sprinting at the moment
+	 * 			| !this.isSprinting
 	 */
 	public void stopSprint() {
 		if (!this.isSprinting())
@@ -1003,8 +948,7 @@ public class Unit extends GameObject {
 		}
 	}
 
-	/**TODO: dodge valid terrain
-	 * 
+	/**
 	 * The Unit moves instantaniously to a random position bordering its current
 	 * position This new position is a valid position in the gameworld
 	 *
@@ -1013,6 +957,11 @@ public class Unit extends GameObject {
 	 * @throws 	IllegalStateException
 	 *          The unit is not being attacked.
 	 *          | ! this.getStatus == DEFENDING
+	 * 
+	 * @effect	the experience of this unit is increased by 10
+	 * 			| this.increaseExperience(10)
+	 * @post	the Status of this unit is set to IDLE
+	 * 			| new.getStatus == IDLE
 	 */
 	private void dodge() throws IllegalStateException {
 
@@ -1050,18 +999,24 @@ public class Unit extends GameObject {
 	 *
 	 * @param 	other
 	 *          the unit being attacked
-	 * @return 	True if and only if the other unit occupies a cube that, in
+	 * @return 	If the other unit is falling, return false
+	 * 			| if (other.isFalling)
+	 * 			|	then return false
+	 * 			If the other unit and this unit are of the same faction, return false
+	 * 			| if (other.getFaction == this.getFaction)
+	 * 			|	then return false
+	 * 			True if and only if the other unit occupies a cube that, in
 	 *         	regards to the cube this unit occupies has the same z-coordinate,
 	 *         	an x-coordinate differing no more than 1 and a y-coordinate
 	 *         	differing no more than 1. 
 	 *         	| return (this.getCubePosition.z == other.getCubePosition.z) && 
-	 *         	| (abs(this.getCubePosition.x - other.getCubePosition.x) < 2) && 
-	 *         	| (abs(this.getCubePosition.y - other.getCubePosition.y) < 2)
-	 * @throws 	IllegalArgumentException
+	 *         	| 	(abs(this.getCubePosition.x - other.getCubePosition.x) < 2) && 
+	 *         	| 	(abs(this.getCubePosition.y - other.getCubePosition.y) < 2)
+	 * @throws 	NullPointerException
 	 *          The other unit is not effective 
 	 *          | other == null
 	 */
-	private boolean canAttack(Unit other) throws IllegalArgumentException {
+	private boolean canAttack(Unit other) throws NullPointerException {
 		if (other == null)
 			throw new NullPointerException("can't attack null");
 		if (other.isFalling())
@@ -1076,8 +1031,9 @@ public class Unit extends GameObject {
 	/**
 	 * set a random destination in the gameworld
 	 * 
-	 * @effect Call the moveTo method, and give 3 random integers between 0 and 50 
-	 *         | this.moveTo({randomBetween0And51,randomBetween0And51,randomBetween0And51})
+	 * @effect Call the moveTo method, and give a random, valid position in the gameworld
+	 * 			with passable terrain, and neighbouring a solid cube
+	 *         | this.moveTo(randomPosition)
 	 * 
 	 */
 	private void moveToRandom(){
@@ -1091,8 +1047,9 @@ public class Unit extends GameObject {
 
 			counter++;
 			// in this way, because ispassableterrain requires a valid position
-			if(this.getWorld().isValidWorldPosition(position));
-					if(this.getWorld().isPassableTerrain(position))
+			if(this.getWorld().isValidWorldPosition(position))
+				if(this.getWorld().isPassableTerrain(position))
+					if(this.getWorld().isNeighbouringSolid(position))
 						break;
 		}
 		this.moveTo(position);
@@ -1114,10 +1071,16 @@ public class Unit extends GameObject {
 	 * 
 	 * @param 	adjacentDestination
 	 *          The adjacentDestination to check.
-	 * @return 	True if the adjacentDestination is the centre of a valid
-	 *         	neighbouring position. 
-	 *         	TODO:doc isValidAdjacentDestination
-	 * 
+	 * @return 	false if the adjacentDestination is more then 1 cube away, in any direction
+	 *         | for (i from 0 to 3)
+	 *         | 	if(|this.getCubePosition[i]-adjacentDestination[i]| > 1)
+	 *         |		then return false
+	 *         	false if it is not neighbouring a solid, or is not passable terrain
+	 *         | if (!this.getWorld.isNeighbouringSolid(adjacentDestination))||
+	 *         |		(!this.getWorld.isPassableTerrain(adjacentDestination))
+	 *         |	then return false
+	 *         	else it's a valid adjacentdestination true
+	 *         | else return true
 	 */
 	private boolean isValidAdjacentDestination(int[] adjacentDestination) {
 //		if(this.getWorld()==null)
@@ -1132,14 +1095,6 @@ public class Unit extends GameObject {
 				(!this.getWorld().isPassableTerrain(adjacentDestination)))
 			return false;
 		return true;
-		/*return isValidPosition(adjacentDestination) &&
-		((!(Math.abs(this.getPosition().x - adjacentDestination.x)>=1))&&
-		(!(Math.abs(this.getPosition().y - adjacentDestination.y)>=1))&&
-		(!(Math.abs(this.getPosition().z - adjacentDestination.z)>=1)) || (
-		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)&&
-		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)&&
-		Util.fuzzyEquals((adjacentDestination.x % 1), 0.5)));
-	*/
 	}
 
 	/**
@@ -1151,11 +1106,6 @@ public class Unit extends GameObject {
 	 * @post 	The adjacentDestination of this new unit is equal to the given
 	 *       	adjacentDestination. 
 	 *       	| new.getAdjacentDestination() == adjacentDestination
-	 * @post	The walktimer of this unit will be the time needed to arrive
-	 * 			at the adjacentDestination
-	 * 			| new.getWalkTimer == length/this.getSpeed()
-	 * @post	The origin of this unit will be its current cubepostion
-	 * 			| new.getOrigin == this.getCubePosition
 	 * @throws 	IllegalArgumentException
 	 *          The given adjacentDestination is not a valid
 	 *          adjacentDestination for any unit.
@@ -1169,7 +1119,14 @@ public class Unit extends GameObject {
 	}
 
 	/**
+	 * the walktimer is set to the time remaining to arrive at the adjacentdestinatino
+	 * from this units current position
+	 * 
 	 * @param adjacentDestination
+	 * 		  the destination for which to set the walktimer
+	 * @post  Walktimer is equal to the length between current position and destination, divided by
+	 * 		  the speed of the unit
+	 * 		 | new.getWalkTimer == (this.getPosition - toVectorPosition(adjacentDestination))/this.getSpeed
 	 */
 	private void initiateWalkTimer(int[] adjacentDestination) {
 		if (!isValidAdjacentDestination(adjacentDestination))
@@ -1226,7 +1183,13 @@ public class Unit extends GameObject {
 
 	
 	/**
-	 * Return the weight of this Unit.
+	 * Return the weight of this Unit. If the unit is carrying an item,
+	 * add the weight of the item to its own weight.
+	 * 
+	 * @return the weight of the unit plus item
+	 * 			| if (this.getGameItem != null)
+	 * 			| 	then return this.weight + this.getGameItem.getWeight
+	 * 			| else return this.weight
 	 */
 	@Basic
 	@Raw
@@ -1455,7 +1418,7 @@ public class Unit extends GameObject {
 		this.hp = hp;
 	}
 	
-	/** TODO: documentatie
+	/**
 	 * Reduce the hp of this unit with the given amount. 
 	 * If the hp reaches zero, terminate the unit.
 	 * 
@@ -1538,19 +1501,25 @@ public class Unit extends GameObject {
 	 * Start the work-condition
 	 * 
 	 * @throws 	IllegalArgumentException
-	 *          The given workTime is not a valid workTime for any Unit.
-	 *          | ! isValidWorkTime(getWorkTime())
+	 *          The given target is not neigbhouring a cube
+	 *          | !this.isNeighbouringCube(worktarget)
+	 * @throws	IllegalStateException
+	 * 			The unit is currently falling
+	 * 			| this.isFalling         
+	 * 
 	 * @param	x, y and z
 	 * 			The cube-coordinates of the targetted cube.
 	 * @post	the workTarget is set to the given coordinates
-	 * 			| new.getWorkTarget == (x, y, z)
+	 * 			| new.getWorkTarget == workTarget
 	 * @post	the workTime is set
 	 * 			| new.getWorkTime == 500/this.getStrength
 	 * @post	the status is set to Working
 	 * 			| new.getStatus == WORKING
+	 * @effect	the orientation of this unit, is towards the worktarget
+	 * 			| this.face(worktarget)
 	 */
 	public void workAt(int[] workTarget) throws IllegalArgumentException {
-		if (! this.isNeighboringCube(workTarget))
+		if (! this.isNeighbouringCube(workTarget))
 			throw new IllegalArgumentException("not a neighbouring cube");
 		if (this.isFalling())
 			throw new IllegalStateException("can't work while falling");
@@ -1562,7 +1531,52 @@ public class Unit extends GameObject {
 	}
 	
 	/**
-	 * TODO: finishWork documentatie
+	 * Do the work task
+	 * 
+	 * @effect	increase the experience of this unit by 10
+	 * 			| this.increaseExperience(10)
+	 * @effect	if this unit is carrying an item, drop the item and exit the method
+	 * 			| if(this.getGameItem != null)
+	 * 			|	then this.dropItem
+	 * 			|		return
+	 * @effect	if this unit is not carrying an item, and the unit is currently standing on a workshop,
+	 * 			and a boulder and a log are present, increase weight and toughness of this unit.
+	 * 			| if(world.getCubeType(this.getWorkTarget) == WORKSHOP) && 
+	 * 			|	(world.BoulderAtPosition(this.getWorkTarget)!=null) &&
+	 * 			|	(world.LogAtPosition(this.getWorktTarget) != null)
+	 * 			|	then this.SetWeight(this.getWeight + 1)
+	 * 			| 		 this.setToughness(this.getToughness + 1)
+	 * 			|		 boulder.terminate
+	 * 			|		 log.terminate
+	 * 			|		 return
+	 * @effect	If this unit is not carrying an item, and there is no workshop present, and there
+	 * 			is a boulder present at the worktarget, pick up the boulder and exit the method
+	 * 			| if (world.BoulderAtPosition(this.getWorkTarget)!=null)
+	 * 			| 		then this.setGameItem(boulder)
+	 * 			|			 boulder.setWorld(null)
+	 * 			|			 this.getWorld.removeBoulder(boulder)
+	 * 			|			return
+	 * @effect	If this unit is not carrying an item, and there is no workshop present, and there
+	 * 			is a Log present at the worktarget, pick up the log and exit the method
+	 * 			| if (world.logAtPosition(this.getWorkTarget)!=null)
+	 * 			| 		then this.setGameItem(log)
+	 * 			|				log.setWorld(null)
+	 * 			|				this.getWorld.removeLog(log)
+	 * 			|				return
+	 * @effect	if the targeted cube is a tree, destroy that cube, and drop a log
+	 * 			| world = this.getWorld
+	 * 			| if (world.getCubeType(workTarget) == TREE)
+	 * 			|		then world.setCubeType(workTarget, AIR)
+	 * 			|			Log log = new Log(workTarget, world)
+	 * 			|			world.addLog(log)
+	 * 			|			return
+	 * @effect	if the targeted cube is a rock, destroy that cube, and drop a boulder
+	 * 			| world = this.getWorld
+	 * 			| if (world.getCubeType(workTarget) == ROCK)
+	 * 			|		then world.setCubeType(workTarget, AIR)
+	 * 			|			Boulder boulder = new Boulder(workTarget, world)
+	 * 			|			world.addBoulder(boulder)
+	 * 			|			return
 	 */
 	private void finishWork(){
 		
@@ -1582,7 +1596,7 @@ public class Unit extends GameObject {
 		int workY = this.getWorkTarget()[1];
 		int workZ = this.getWorkTarget()[2];
 		
-		if((world.getCubeType(workX, workY, workZ)== 3) &&
+		if((world.getCubeType(workX, workY, workZ)== WORKSHOP) &&
 				(boulder != null) &&
 				(log != null)){
 			boulder.terminate();
@@ -1617,8 +1631,8 @@ public class Unit extends GameObject {
 		}
 		
 		// if the target cube is a tree, destroy the tree and drop a log
-		if(world.getCubeType(workX, workY, workZ)==2){
-			world.setCubeType(workX, workY, workZ, 0);
+		if(world.getCubeType(workX, workY, workZ)==TREE){
+			world.setCubeType(workX, workY, workZ, AIR);
 			Log newLog = new Log(this.getWorkTarget(), world);
 			world.addLog(newLog);
 			
@@ -1626,8 +1640,8 @@ public class Unit extends GameObject {
 		}
 		
 		//if the target cube is a rock, destroy the rock and drop a boulder
-		if(world.getCubeType(workX, workY, workZ)==1){
-			world.setCubeType(workX, workY, workZ, 0);
+		if(world.getCubeType(workX, workY, workZ)==ROCK){
+			world.setCubeType(workX, workY, workZ, AIR);
 			Boulder newBoulder = new Boulder(this.getWorkTarget(), world);
 			world.addBoulder(newBoulder);
 			
@@ -1635,8 +1649,35 @@ public class Unit extends GameObject {
 		}
 	}
 
-	/**TODO dropitem documentatie
+	/**
+	 * Put the item currently being carried by this unit, back into the world
 	 * 
+	 * @effect	if this unit is carrying a log, 
+	 * 			the world of the log is the world of this unit, and that world contains the log,
+	 * 			the position of the log is the worktarget position, 
+	 * 			| if(this.isCarryingLog()){
+	 *			| 	Log log = (Log)this.getGameItem();
+	 *			| 	log.setWorld(this.getWorld());
+	 *			|	this.getWorld().addLog(log);
+	 *			|	if(this.isWorking())
+	 * 			|		log.setAtPosition(this.getWorkTarget());
+	 *			|	else
+	 *			|		log.setAtPosition(this.getCubePosition());
+	 *			|	this.setGameItem(null);
+	 * @effect 	if this unit is carrying a boulder
+	 * 			set the world of the boulder to the world of the unit, add the boulder to the world
+	 * 			and set the position of the boulder to the worktarget
+	 * 			| if(this.isCarryingBoulder()){
+	 *			|	Boulder boulder = (Boulder)this.getGameItem();
+	 *			|	boulder.setWorld(this.getWorld());
+	 * 			| 	this.getWorld().addBoulder(boulder);
+	 *			|   if(this.isWorking())
+	 *			|		boulder.setAtPosition(this.getWorkTarget());
+	 * 			|	else
+	 *			|		boulder.setAtPosition(this.getCubePosition());
+	 *			|	this.setGameItem(null);
+	 *	}
+	 *	
 	 */
 	private void dropItem() {
 		if(this.isCarryingLog()){
@@ -1679,17 +1720,19 @@ public class Unit extends GameObject {
 		return this.workTarget;
 	}
 
-	/** TODO: isValidWorkTarget
+	/** 
 	 * Check whether the given workTarget is a valid workTarget for
 	 * any Unit.
 	 *  
 	 * @param  workTarget
 	 *         The workTarget to check.
 	 * @return 
-	 *       | result == 
+	 *       | result == (this.getWorld().isValidWorldPosition(workTarget) && 
+	 *       | 				this.isNeighbouringCube(workTarget))
 	*/
-	private static boolean isValidWorkTarget(int[] workTarget) {
-		return true;
+	private boolean isValidWorkTarget(int[] workTarget) {
+		return (this.getWorld().isValidWorldPosition(workTarget) && 
+				this.isNeighbouringCube(workTarget));
 	}
 
 	/**
@@ -1765,9 +1808,12 @@ public class Unit extends GameObject {
 	 *          The time to be subtracted from worktime
 	 * @throws 	IllegalArgumentException
 	 *          The given time is not a valid time for any Unit.
-	 * @effect	If the workTime is smaller then or equal to 0, do finishWork
+	 * @effect	If the workTime is smaller then or equal to 0, do finishWork, and set status to idle
 	 * 			| if (this.worktime - time <= 0)
 	 * 			| 	then this.finishWork();
+	 * 			|		this.setStatus(IDLE)
+	 * @effect	Else, set worktime to the reduce worktime
+	 * 			| else this.setWorkTime(this.getWorkTime - time)
 	 */
 	private void advanceWorkTime(double time) throws IllegalArgumentException {
 		if (!isValidTime(time))
@@ -1775,9 +1821,9 @@ public class Unit extends GameObject {
 
 		double newWorkTime = this.getWorkTime() - time;
 		if (Util.fuzzyLessThanOrEqualTo(newWorkTime, 0)) {
-			this.setWorkTime(0);
-			this.setStatus(UnitStatus.IDLE);
 			this.finishWork();
+			this.setStatus(UnitStatus.IDLE);
+			
 		} else
 			this.setWorkTime(newWorkTime);
 	}
@@ -1795,14 +1841,14 @@ public class Unit extends GameObject {
 		return this.gameItem;
 	}
 
-	/** TODO: isvalidgameItem unit
+	/**
 	 * Check whether the given gameItem is a valid gameItem for
-	 * any Unit.
+	 * any Unit. Any gameItem is a valid item for any unit
 	 *  
 	 * @param  gameItem
 	 *         The gameItem to check.
 	 * @return 
-	 *       | result == 
+	 *       | result == true
 	*/
 	private static boolean isValidGameItem(GameItem gameItem) {
 		return true;
@@ -1822,8 +1868,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidGameItem(getGameItem())
 	 */
 	@Raw
-	private void setGameItem(GameItem gameItem) 
-			throws IllegalArgumentException {
+	private void setGameItem(GameItem gameItem) throws IllegalArgumentException {
 		if (! isValidGameItem(gameItem))
 			throw new IllegalArgumentException();
 		this.gameItem = gameItem;
@@ -1867,6 +1912,17 @@ public class Unit extends GameObject {
 	 * @throws 	IllegalArgumentException
 	 *          The Unit being attacked is not a valid Unit
 	 *          | ! canAttack(other)
+	 * @throws	illegalStateException
+	 * 			the unit is currently falling
+	 * 			| this.isFalling
+	 * @effect	Set the attackcountdown to 1 second
+	 * 			| this.setAttackCountDown(1)
+	 * @effect	set orientation to face the other unit
+	 * 			| this.face(other.getCubePosition)
+	 * @effect	set status to attacking
+	 * 			| this.setStatus(ATTACKING)
+	 * @effect	let the other unit defend
+	 * 			| other.defend(this)
 	 */
 	public void attack(Unit other) throws IllegalArgumentException {
 		if (other.isTerminated())
@@ -1881,6 +1937,9 @@ public class Unit extends GameObject {
 		other.defend(this);
 	}
 	
+	/**
+	 * Return true if this units status is ATTACKING
+	 */
 	public boolean isAttacking(){
 		return (this.getStatus()==UnitStatus.ATTACKING);
 	}
@@ -1934,9 +1993,12 @@ public class Unit extends GameObject {
 	 *          The time to be subtracted from attackcountdown
 	 * @post 	The attackCountDown of this Unit is reduced by the amount time
 	 *       	| new.getAttackCountDown() == this.getAttackCountDown() - time
-	 * @post 	If the new attackcountdown is zero, the new status is idle
+	 * @effect 	If the new attackcountdown is zero, the new status is idle,
+	 * 			experience is increased by 20
 	 *       	| if (new.getAttackCountDown <= 0) 
-	 *       	| new.getStatus() == UnitSTatus.Idle
+	 *       	| 	then this.setStatus(IDLE)
+	 *       	|		this.increaseExperience(20)
+	 * 
 	 * @throws 	IllegalArgumentException
 	 *          The given time is not a valid time for any Unit. | !
 	 *          | ! isValidTime(time)
@@ -1948,7 +2010,7 @@ public class Unit extends GameObject {
 		double newAttackTime = this.getAttackCountDown() - time;
 		if (Util.fuzzyLessThanOrEqualTo(newAttackTime, 0)) {
 			this.increaseExperience(20);
-			this.setAttackCountDown(0);
+			//this.setAttackCountDown(0);
 			this.setStatus(UnitStatus.IDLE);
 		} else
 			this.setAttackCountDown(newAttackTime);
@@ -1967,15 +2029,13 @@ public class Unit extends GameObject {
 	 *
 	 * @param 	other
 	 *          The Unit attacking this Unit.
-	 * @effect 	If dodging succeeds, move to a random tile around the unit
-	 *         	| if (this.dodgeChance(other)) TODO either this, this or this, effect 
-	 *         	| 	then this.dodge
+	 * @effect	Either the unit dodges, or the unit blocks the attack, or the unit takes damage
+	 * 			when this unit blocks an attack, the experience will increase by 20
+	 *         	| Either this.setStatus(DODGING)
+	 *         	| Or 	this.increaseExperience(20)
+	 *          | Or	this.takeDamage(other.getStrength/10)
 	 * @effect 	This Unit will face the attacking unit 
 	 * 			| this.face(other)
-	 * @post 	if dodging fails and blocking succeeds, nothing hapens and the
-	 *       	method is stopped 
-	 *       	| if (! this.dodgeChance(other)) && (! this.blockChance) 
-	 *       	| new.getHP == this.getHP - other.getStrength/10
 	 * @post 	the status of this unit is DEFENDING 
 	 * 			| new.getStatus == UnitStatus.DEFENDING
 	 * @throws 	IllegalArgumentException
@@ -1992,7 +2052,7 @@ public class Unit extends GameObject {
 		if (this.dodgeSuccesfull(other)) {
 			this.setStatus(UnitStatus.DODGING);
 			
-			// this.setStatus(UnitStatus.IDLE); //TODO:hier, of in advanceTime?
+			// this.setStatus(UnitStatus.IDLE); 
 			return;
 		}
 
@@ -2035,7 +2095,7 @@ public class Unit extends GameObject {
 
 	}
 
-	/** TODO: assert kan niet, want dan moet private zijn
+	/** 
 	 * Initiate the rest status for this unit.
 	 *
 	 * @pre 	The Unit is not attacking 
@@ -2046,9 +2106,13 @@ public class Unit extends GameObject {
 	 * 			| new.getStatus() == Unitstatus.RESTING
 	 * @post 	The restTime of this Unit is 0 
 	 * 			| new.getRestTime() == 0
+	 * @throws 	IllegalStateException
+	 * 			this unit is currently attacking,  defending or falling
+	 * 			| this.isAttacking || this.getStatus == DEFENDING || this.isFalling
+	 * 			
 	 */
 	public void rest() {
-		if ((this.getStatus() == UnitStatus.ATTACKING)||
+		if ((this.isAttacking())||
 				(this.getStatus() == UnitStatus.DEFENDING)||
 				(this.isFalling()))
 			throw new IllegalStateException("Can't rest now");
@@ -2083,7 +2147,7 @@ public class Unit extends GameObject {
 	 *       	| if (this.getMaxHP != this.getHP) && (newTime >= 0) 
 	 *       	| 		then new.getHP == this.getHP + 1 
 	 *     		|		new.getRestTime == newTime
-	 * @post 	if this unit has maximum hp, does not have maximum stamina, and the TODO: use setRest
+	 * @post 	if this unit has maximum hp, does not have maximum stamina, and the
 	 *       	time needed to heal 1 stamina has passed 
 	 *       	| if (this.getMaxHP == this.getHP) && (this.getMaxStamina != this.getStamina) 
 	 *       	| 	&& (newTime1>= 0) 
@@ -2212,7 +2276,9 @@ public class Unit extends GameObject {
 	 */
 	private UnitStatus status;
 
-	
+	/**
+	 * update all timers and properties of this unit
+	 */
 	public void advanceTime(double deltaT) {
 		
 		// Check if unit stands on solid ground
@@ -2244,7 +2310,10 @@ public class Unit extends GameObject {
 			this.advanceWorkTime(deltaT);
 		}
 		else if (this.isMoving()) {
-			this.updatePosition(deltaT);
+			if(this.isSprinting())
+				this.updateSprint(deltaT);
+			else
+				this.updatePosition(deltaT);
 		}
 
 		if (Util.fuzzyGreaterThanOrEqualTo(this.rest3MinTime, 3 * 60) 
@@ -2268,7 +2337,8 @@ public class Unit extends GameObject {
 	 * Check if the unit can still sprint
 	 * 
 	 * @param 	deltaT
-	 * 			The time 
+	 * 			The time to advance
+	 * 
 	 */
 	private void updateSprint(double deltaT) {
 		stamina = this.getStamina();
@@ -2305,11 +2375,22 @@ public class Unit extends GameObject {
 	}
 
 
-	/** TODO: terminate Unit
+	/** 
 	 * Terminate this Unit.
 	 *
 	 * @post 	This Unit is terminated. 
 	 * 			| new.isTerminated()
+	 * @post	This unit has no world
+	 * 			| new.getWorld == null
+	 * @post	This unit status is idle
+	 * 			| new.getStatus == IDLE
+	 * @post	this unit has no faction
+	 * 			| new.getFaction == null
+	 * @effect	this unit is not present in world
+	 * 			| this.getWorld.removeUnit(this)
+	 * @effect 	this unit is not present in faction
+	 * 			| this.getFaction.removeUnit(this)
+	 * 
 	 */
 	public void terminate() {
 		this.isTerminated = true;
@@ -2443,13 +2524,6 @@ public class Unit extends GameObject {
 	 */
 
 	private boolean defaultBoolean = false;
-	
-	
-	/** TO BE ADDED TO CLASS HEADING
-	 * @invar  The Faction of each Unit must be a valid Faction for any
-	 *         Unit.
-	 *       | isValidFaction(getFaction())
-	 */
 
 	/**
 	 * Return the Faction of this Unit.
@@ -2461,7 +2535,7 @@ public class Unit extends GameObject {
 
 	/**
 	 * Check whether the given Faction is a valid Faction for
-	 * any Unit. TODO: isvalidFaction unit
+	 * any Unit.
 	 *  
 	 * @param  Faction
 	 *         The Faction to check.
@@ -2509,17 +2583,17 @@ public class Unit extends GameObject {
 		return this.experience;
 	}
 
-	/** TODO: isValidExperience
+	/** 
 	 * Check whether the given Experience is a valid Experience for
 	 * any Unit.
 	 *  
 	 * @param  Experience
 	 *         The Experience to check.
 	 * @return 
-	 *       | result == 
+	 *       | result == (experience >= 0)
 	*/
 	private static boolean isValidExperience(int experience) {
-		return true;
+		return experience >= 0;
 	}
 
 	/**
