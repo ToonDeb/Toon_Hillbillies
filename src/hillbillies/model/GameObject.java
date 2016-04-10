@@ -287,6 +287,8 @@ public abstract class GameObject {
 	 * 			|	return true
 	 */
 	public boolean isNeighboringCube(int[] target){
+		if(!this.getWorld().isValidWorldPosition(target))
+			return false;
 		int[] position = this.getCubePosition();
 		if ((Math.abs(position[0] - target[0]) > 1) ||
 				(Math.abs(position[1] - target[1]) > 1) ||
@@ -409,9 +411,9 @@ public abstract class GameObject {
 	 * this GameObject.
 	 */
 	public boolean isValidWorld(World world) {
-		//if (world == null){
-		//	return false;
-		//}
+		if (world == null){
+			return false;
+		}
 		if (this instanceof Unit){
 			if (world.getNbUnits() < MAX_NB_UNITS_IN_WORLD){
 				return true;

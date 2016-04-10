@@ -227,7 +227,7 @@ public class UnitTest {
 	public void testGetWeight(){
 		assertEquals(testingUnit.getWeight(), 50);
 	}
-	/*
+	
 	@Test
 	public void testIsValidWeight$TrueCase(){
 		testingUnit.setAgility(50);
@@ -278,7 +278,7 @@ public class UnitTest {
 		testingUnit.setWeight(50);
 		assertEquals(testingUnit.getWeight(), 100);
 	}
-	*/
+	
 	
 	@Test
 	public void testIsValidUnitAttribute$TrueCase(){

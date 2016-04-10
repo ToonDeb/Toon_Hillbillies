@@ -114,15 +114,15 @@ public class Facade implements IFacade{
 		return unit.getStamina();
 	}
 
-//	@Override
-//	public void advanceTime(Unit unit, double dt) throws ModelException {
-//		try{
-//		unit.advanceTime(dt);
-//		}
-//		catch(Exception e){
-//			throw new ModelException(e);
-//		}
-//	}
+	@Override
+	public void advanceTime(Unit unit, double dt) throws ModelException {
+		try{
+		unit.advanceTime(dt);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
+	}
 
 	@Override
 	public void moveToAdjacent(Unit unit, int dx, int dy, int dz) throws ModelException {
