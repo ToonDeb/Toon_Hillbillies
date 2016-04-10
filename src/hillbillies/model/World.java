@@ -74,10 +74,11 @@ public class World {
 	 *       
 	 */
 	public World(int[][][] terrainType, TerrainChangeListener modelListener)
-			throws IllegalArgumentException {
+			throws IllegalArgumentException, NullPointerException {
 		if((terrainType == null)||(modelListener == null))
 			throw new NullPointerException();
-		this.setTerrainType(terrainType);
+		int[][][] newTerrainType = Arrays.copyOf(terrainType, terrainType.length);
+		this.setTerrainType(newTerrainType);
 		this.setTerrainChangeListener(modelListener);
 		
 		this.setConnectedToBorder(
@@ -277,8 +278,7 @@ public class World {
 		return this.getTerrainType()[x][y][z];
 	}
 	
-	@Raw //TODO: notifyTerrainChanged,
-	//TODO: resetpath of units
+	@Raw 
 	public void setCubeType(int x, int y, int z, int value){
 		if((value!=AIR)&&(value!=ROCK)&&(value!=TREE)&&(value!=WORKSHOP))
 			throw new IllegalArgumentException("wrong value");
@@ -310,6 +310,10 @@ public class World {
 				
 			}
 		}
+		
+		for(Unit unit: this.getUnits()){
+			unit.resetPath();
+		}
 	}
 
 	/**
@@ -335,7 +339,7 @@ public class World {
 	 *         and that log is a valid log for this World.
 	 *       | result ==
 	 *       |   (log != null) &&
-	 *       |   Log.isValidWorld(this)
+	 *       |   (Log.isValidWorld(this))
 	 */
 	@Raw
 	public boolean canHaveAsLog(Log log) {
@@ -354,7 +358,7 @@ public class World {
 	 *       |     then canHaveAsLog(log) &&
 	 *       |          (log.getWorld() == this)
 	 */
-	public boolean hasProperLogs() {
+	private boolean hasProperLogs() {
 		for (Log log : logs) {
 			if (!canHaveAsLog(log))
 				return false;
@@ -386,8 +390,12 @@ public class World {
 	 * @post   This World has the given log as one of its logs.
 	 *       | new.hasAsLog(log)
 	 */
-	public void addLog(@Raw Log log) {
-		assert (log != null) && (log.getWorld() == this);
+	public void addLog(@Raw Log log) 
+			throws IllegalArgumentException, NullPointerException{
+		if (log == null)
+			throw new NullPointerException("log can't be null");
+		if ((log.getWorld() != this)||(!this.canHaveAsLog(log)))
+			throw new IllegalArgumentException("invalid log");
 		logs.add(log);
 	}
 
@@ -406,8 +414,10 @@ public class World {
 	 *       | ! new.hasAsLog(log)
 	 */
 	@Raw
-	public void removeLog(Log log) {
-		assert this.hasAsLog(log) && (log.getWorld() == null);
+	public void removeLog(Log log) throws IllegalArgumentException{
+		if( !this.hasAsLog(log))
+			throw new IllegalArgumentException("can't remove log!");
+		
 		logs.remove(log);
 	}
 	
@@ -512,8 +522,11 @@ public class World {
 	 * @post   This World has the given Boulder as one of its Boulders.
 	 *       | new.hasAsBoulder(boulder)
 	 */
-	public void addBoulder(@Raw Boulder boulder) {
-		assert (boulder != null) && (boulder.getWorld() == this);
+	public void addBoulder(@Raw Boulder boulder) throws IllegalArgumentException, NullPointerException {
+		if (boulder == null)
+			throw new NullPointerException("log can't be null");
+		if ((boulder.getWorld() != this)||(!this.canHaveAsBoulder(boulder)))
+			throw new IllegalArgumentException("invalid log");
 		boulders.add(boulder);
 	}
 
@@ -526,14 +539,14 @@ public class World {
 	 *         its Boulders, and the given Boulder does not
 	 *         reference any World.
 	 *       | this.hasAsBoulder(boulder) &&
-	 *       | (boulder.getWorld() == null)
 	 * @post   This World no longer has the given Boulder as
 	 *         one of its Boulders.
 	 *       | ! new.hasAsBoulder(boulder)
 	 */
 	@Raw
-	public void removeBoulder(Boulder boulder) {
-		assert this.hasAsBoulder(boulder) && (boulder.getWorld() == null);
+	public void removeBoulder(Boulder boulder) throws IllegalArgumentException{
+		if( !this.hasAsBoulder(boulder))
+			throw new IllegalArgumentException("can't remove boulder!");
 		boulders.remove(boulder);
 	}
 	
@@ -639,7 +652,10 @@ public class World {
 	 *       | new.hasAsUnit(unit)
 	 */
 	public void addUnit(@Raw Unit unit) {
-		assert (unit != null) && (unit.getWorld() == this);
+		if(unit == null)
+			throw new NullPointerException("can't add null as unit");
+		if(unit.getWorld()!= this)
+			throw new IllegalArgumentException("unit has other world");
 		units.add(unit);
 	}
 
