@@ -8,7 +8,7 @@ import hillbillies.model.Boulder;
 import hillbillies.model.Faction;
 import hillbillies.model.Log;
 import hillbillies.model.Unit;
-import hillbillies.model.UnitStatus;
+//import hillbillies.model.UnitStatus;
 import hillbillies.model.World;
 import hillbillies.part2.listener.TerrainChangeListener;
 import ogp.framework.util.ModelException;

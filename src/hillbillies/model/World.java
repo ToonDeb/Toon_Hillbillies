@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import javax.vecmath.Vector3d;
+//import javax.vecmath.Vector3d;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
@@ -97,10 +97,17 @@ public class World {
 		
 	}
 	
+	/**
+	 * return the connectedToBorder of this world
+	 */
 	public ConnectedToBorder getConnectedToBorder(){
 		return this.connectedToBorder;
 	}
 	
+	/**
+	 * set the connectedToBorder of this world
+	 * @param connectedToBorder
+	 */
 	private void setConnectedToBorder(ConnectedToBorder connectedToBorder){
 		this.connectedToBorder = connectedToBorder;
 	}
@@ -189,7 +196,8 @@ public class World {
 	}
 	
 	/**
-	 * TODO: documentatie isPassableTerrain
+	 * returns true if the terrain at position is AIR or WORKSHOP
+	 * 
 	 * @param position
 	 * @return
 	 * @throws IllegalArgumentException
@@ -262,24 +270,48 @@ public class World {
 	 */
 	private int[][][] terrainType;
 	
+	/**
+	 * return the number of cubes in the x dimension of this world
+	 */
 	public int getNbCubesX(){
 		return this.getTerrainType().length;
 	}
 	
+	/**
+	 * return the number of cubes in the y dimension of this world
+	 */
 	public int getNbCubesY(){
 		return this.getTerrainType()[0].length;
 	}
 	
+	/**
+	 * return the number of cubes in the z dimension of this world
+	 */
 	public int getNbCubesZ(){
 		return this.getTerrainType()[0][0].length;
 	}
 	
+	/**
+	 * return the cubeType at the position
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
 	public int getCubeType(int x, int y, int z){
 		return this.getTerrainType()[x][y][z];
 	}
 	
+	/**
+	 * Set the cubeType at the given position to the given value
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param value
+	 */
 	@Raw 
-	public void setCubeType(int x, int y, int z, int value){
+	public void setCubeType(int x, int y, int z, int value) 
+			throws IllegalArgumentException{
 		if((value!=AIR)&&(value!=ROCK)&&(value!=TREE)&&(value!=WORKSHOP))
 			throw new IllegalArgumentException("wrong value");
 		int[] position = {x, y, z};
@@ -789,8 +821,7 @@ public class World {
 		return activeFactions;
 	}
 	
-	/** TODO: documentatie getSmallestFaction
-	 * TODO: what if smallest has max units?
+	/** 
 	 * Returns the smallest active faction
 	 * @return
 	 */
@@ -860,7 +891,8 @@ public class World {
 	Random random = new Random();
 	
 	/**
-	 * TODO: spawnUnit documentatie
+	 * add a new unit to this world, with random (valid) attributes and position.
+	 * the defaultbehaviour of this new unit is set to enabledefaultbehaviour
 	 * @param enableDefaultBehavior
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
@@ -885,9 +917,6 @@ public class World {
 			position[2] = random.nextInt(this.getNbCubesZ());
 		}
 
-		
-		
-		
 		Faction faction = null;
 		if(this.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
 			faction = new Faction(this);
@@ -963,6 +992,10 @@ public class World {
 //		return null;
 //	}
 	
+	/**
+	 * advance the time for all the gameobjects currently in this world
+	 * @param dt
+	 */
 	public void advanceTime(double dt){
 		for(Boulder boulder: boulders){
 			boulder.advanceTime(dt);

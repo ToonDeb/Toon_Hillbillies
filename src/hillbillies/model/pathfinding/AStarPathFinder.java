@@ -22,6 +22,8 @@ import static hillbillies.model.Constants.MAXSEARCHDEPTH;
  * source: http://www.cokeandcode.com/main/tutorials/path-finding/
  * 
  * @author Kevin Glass
+ * 
+ * adapted for personal use by Toon Deburchgrave
  */
 public class AStarPathFinder{
 	/** The set of nodes that have been searched through */
