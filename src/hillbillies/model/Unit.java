@@ -224,10 +224,10 @@ public class Unit extends GameObject {
 				throws IllegalArgumentException, NullPointerException {
 		// null is given as the default world
 		super(position, world);
-		
+	
 		if(!faction.canHaveAsUnit(this))
 			throw new IllegalArgumentException("not a valid faction for this unit!");
-	
+		
 		if(!world.canHaveAsUnit(this))
 			throw new IllegalArgumentException("not a valid world for this unit!");
 		

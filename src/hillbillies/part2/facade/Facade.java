@@ -10,6 +10,7 @@ import hillbillies.model.Log;
 import hillbillies.model.Unit;
 //import hillbillies.model.UnitStatus;
 import hillbillies.model.World;
+import hillbillies.part2.listener.DefaultTerrainChangeListener;
 import hillbillies.part2.listener.TerrainChangeListener;
 import ogp.framework.util.ModelException;
 
@@ -23,7 +24,10 @@ public class Facade implements IFacade{
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
-		return new Unit(name, initialPosition, weight, agility, strength, toughness, null, null, enableDefaultBehavior);
+		int[][][] terrain = {{{0}}};
+		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
+		World world = new World(terrain, defaultListener);
+		return new Unit(name, initialPosition, weight, agility, strength, toughness, world, null, enableDefaultBehavior);
 	}
 
 	@Override

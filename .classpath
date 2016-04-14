@@ -18,6 +18,7 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/Toon_Hillbillies/lib/java3d-1_5-spec.zip!/java3d-1_5-spec"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/antlr-4.5.3-complete.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
