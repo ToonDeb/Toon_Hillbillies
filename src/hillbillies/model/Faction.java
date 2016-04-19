@@ -12,11 +12,17 @@ import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
  * @invar  The World of each Faction must be a valid World for any
  *         Faction.
  *       | isValidWorld(getWorld())
+ *       
+ * @invar  The Scheduler of each Faction must be a valid Scheduler for any
+ *         Faction.	
+ *       | isValidScheduler(getScheduler())
  *
  * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class Faction {
+
+	
 
 	/**
 	 * Initialize this new Faction with given World.
@@ -26,10 +32,17 @@ public class Faction {
 	 * @effect The World of this new Faction is set to
 	 *         the given World.
 	 *       | this.setWorld(world)
+	 *       
+ 	 * @param  scheduler
+	 *         The Scheduler for this new Faction.
+	 * @effect The Scheduler of this new Faction is set to
+	 *         the given Scheduler.
+	 *       | this.setScheduler(scheduler)
 	 */
 	public Faction(World world)
 			throws IllegalArgumentException {
 		this.setWorld(world);
+		this.setScheduler(scheduler);
 	}
 
 
@@ -203,5 +216,52 @@ public class Faction {
 	 *       |     (! unit.isTerminated()) )
 	 */
 	private final Set<Unit> units = new HashSet<Unit>();
+	
+
+	/**
+	 * Return the Scheduler of this Faction.
+	 */
+	@Basic @Raw
+	public Scheduler getScheduler() {
+		return this.scheduler;
+	}
+
+	/**
+	 * Check whether the given Scheduler is a valid Scheduler for
+	 * any Faction.
+	 *  
+	 * @param  scheduler
+	 *         The Scheduler to check.
+	 * @return 
+	 *       | result == (scheduler != null)
+	*/
+	public static boolean isValidScheduler(Scheduler scheduler) {
+		return (scheduler != null);
+	}
+
+	/**
+	 * Set the Scheduler of this Faction to the given Scheduler.
+	 * 
+	 * @param  scheduler
+	 *         The new Scheduler for this Faction.
+	 * @post   The Scheduler of this new Faction is equal to
+	 *         the given Scheduler.
+	 *       | new.getScheduler() == scheduler
+	 * @throws IllegalArgumentException
+	 *         The given Scheduler is not a valid Scheduler for any
+	 *         Faction.
+	 *       | ! isValidScheduler(getScheduler())
+	 */
+	@Raw
+	public void setScheduler(Scheduler scheduler) throws IllegalArgumentException {
+		if (! isValidScheduler(scheduler))
+			throw new IllegalArgumentException();
+		this.scheduler = scheduler;
+	}
+
+	/**
+	 * Variable registering the Scheduler of this Faction.
+	 */
+	private Scheduler scheduler;
 
 }

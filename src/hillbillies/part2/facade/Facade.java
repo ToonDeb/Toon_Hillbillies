@@ -291,7 +291,7 @@ public class Facade implements IFacade{
 	@Override
 	public int getCubeType(World world, int x, int y, int z) throws ModelException {
 		try{
-			return world.getCubeType(x, y, z);
+			return world.getCubeType(x, y, z).getNumber();
 		}
 		catch(Exception e){
 			throw new ModelException(e);

@@ -1596,7 +1596,7 @@ public class Unit extends GameObject {
 		int workY = this.getWorkTarget()[1];
 		int workZ = this.getWorkTarget()[2];
 		
-		if((world.getCubeType(workX, workY, workZ)== WORKSHOP) &&
+		if((world.getCubeType(workX, workY, workZ)== CubeType.WORKSHOP) &&
 				(boulder != null) &&
 				(log != null)){
 			boulder.terminate();
@@ -1631,7 +1631,7 @@ public class Unit extends GameObject {
 		}
 		
 		// if the target cube is a tree, destroy the tree and drop a log
-		if(world.getCubeType(workX, workY, workZ)==TREE){
+		if(world.getCubeType(workX, workY, workZ)==CubeType.TREE){
 			world.setCubeType(workX, workY, workZ, AIR);
 			Log newLog = new Log(this.getWorkTarget(), world);
 			world.addLog(newLog);
@@ -1640,7 +1640,7 @@ public class Unit extends GameObject {
 		}
 		
 		//if the target cube is a rock, destroy the rock and drop a boulder
-		if(world.getCubeType(workX, workY, workZ)==ROCK){
+		if(world.getCubeType(workX, workY, workZ)==CubeType.ROCK){
 			world.setCubeType(workX, workY, workZ, AIR);
 			Boulder newBoulder = new Boulder(this.getWorkTarget(), world);
 			world.addBoulder(newBoulder);

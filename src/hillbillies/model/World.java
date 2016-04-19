@@ -11,10 +11,13 @@ import java.util.Set;
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
+import hillbillies.model.CubeType;
 
 
-import static hillbillies.model.Constants.*;
-
+import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
+import static hillbillies.model.Constants.MAX_NB_UNITS_IN_WORLD;
+import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
+import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
 
 
 /**
@@ -88,7 +91,7 @@ public class World {
 		for(int x=0; x<this.getNbCubesX(); x++){
 			for(int y=0; y<this.getNbCubesY(); y++){
 				for(int z=0; z<this.getNbCubesZ();z++){
-					if ((this.getCubeType(x, y, z) == AIR)||(this.getCubeType(x, y, z) == WORKSHOP)){
+					if (this.getCubeType(x, y, z).isPassable()){
 						this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 					}
 				}
@@ -206,8 +209,7 @@ public class World {
 		if (! this.isValidWorldPosition(position))
 			return false;
 		
-		if((this.getCubeType(position[0], position[1], position[2])==AIR)||
-		 	(this.getCubeType(position[0], position[1], position[2])==WORKSHOP)){
+		if(this.getCubeType(position[0], position[1], position[2]).isPassable()){
 			return true;
 		}
 		return false;	
@@ -298,8 +300,9 @@ public class World {
 	 * @param z
 	 * @return
 	 */
-	public int getCubeType(int x, int y, int z){
-		return this.getTerrainType()[x][y][z];
+	public CubeType getCubeType(int x, int y, int z){
+		int typeInt = this.getTerrainType()[x][y][z];
+		return CubeType.getCubeType(typeInt);
 	}
 	
 	/**
@@ -312,7 +315,8 @@ public class World {
 	@Raw 
 	public void setCubeType(int x, int y, int z, int value) 
 			throws IllegalArgumentException{
-		if((value!=AIR)&&(value!=ROCK)&&(value!=TREE)&&(value!=WORKSHOP))
+		CubeType cubeType = CubeType.getCubeType(value);
+		if(cubeType == null)
 			throw new IllegalArgumentException("wrong value");
 		int[] position = {x, y, z};
 		if(!this.isValidWorldPosition(position))
@@ -320,22 +324,22 @@ public class World {
 		this.getTerrainType()[x][y][z] = value;
 		this.getTerrainChangeListener().notifyTerrainChanged(x, y, z);
 		
-		if(value == AIR){
+		if(cubeType == CubeType.AIR){
 			List<int[]> changedTerrain = this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 			for(int[] changedPosition: changedTerrain){
 				int otherX = changedPosition[0];
 				int otherY = changedPosition[1];
 				int otherZ = changedPosition[2];
-				int type = this.getCubeType(otherX, otherY, otherZ);
+				CubeType type = this.getCubeType(otherX, otherY, otherZ);
 				this.getTerrainType()[otherX][otherY][otherZ] = 0;
 				this.getTerrainChangeListener().notifyTerrainChanged(otherX, otherY, otherZ);
 				
-				if((type == ROCK)&&(random.nextDouble()<=0.25)){
+				if((type == CubeType.ROCK)&&(random.nextDouble()<=0.25)){
 					Boulder boulder = new Boulder(changedPosition,this);
 					this.addBoulder(boulder);
 				}
 				
-				if((type == TREE)&&(random.nextDouble()<= 0.25)){
+				if((type == CubeType.TREE)&&(random.nextDouble()<= 0.25)){
 					Log log = new Log(changedPosition, this);
 					this.addLog(log);
 				}
