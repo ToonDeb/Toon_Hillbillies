@@ -11,7 +11,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class HerePosition extends MyExpression{
+public class HerePosition extends UnitPosition{
 	
 	public HerePosition(SourceLocation sourceLocation){
 		super(sourceLocation);
