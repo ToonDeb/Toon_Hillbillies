@@ -1011,5 +1011,12 @@ public class World {
 			unit.advanceTime(dt);
 		}
 	}
-
+	
+	/**
+	 * TODO: getworkshopposition
+	 * een willekeurige workshop in de wereld
+	 */
+	public int[] getWorkshopLocation(){
+		return null;
+	}
 }
