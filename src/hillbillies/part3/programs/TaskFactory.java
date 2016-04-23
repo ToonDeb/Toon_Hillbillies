@@ -110,7 +110,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createReadVariable(String variableName, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
+		// TODO createReadVariable, op variablename de expression kunnen zoeken
 		return null;
 	}
 

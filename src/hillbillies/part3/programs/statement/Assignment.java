@@ -26,6 +26,8 @@ public class Assignment extends MyStatement {
 	public String getVariableName(){
 		return this.variableName;
 	}
+	
+	//TODO: manier om de expression terug op te roepen uit de variablename.
 
 	private final MyExpression expression;
 	private final String variableName;
