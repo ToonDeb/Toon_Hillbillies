@@ -1880,6 +1880,19 @@ public class Unit extends GameObject {
 	private GameItem gameItem = null;
 	
 	/**
+	 * Return whether this unit is carrying an item
+	 * 
+	 * @return true if gameItem is not null
+	 * 			| result == (this.getGameItem() != null)
+	 */
+	public boolean isCarryingItem(){
+		if(this.getGameItem() == null)
+			return false;
+		else
+			return true;
+	}
+	
+	/**
 	 * Return whether this unit is carrying a log
 	 * 
 	 * @return true if gameItem is a log

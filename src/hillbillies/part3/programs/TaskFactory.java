@@ -1,9 +1,22 @@
 package hillbillies.part3.programs;
 
+import java.awt.Frame;
 import java.util.List;
 
 import hillbillies.model.Task;
 import hillbillies.part3.programs.expression.MyExpression;
+import hillbillies.part3.programs.expression.logic.FalseExpression;
+import hillbillies.part3.programs.expression.logic.TrueExpression;
+import hillbillies.part3.programs.expression.position.BoulderPosition;
+import hillbillies.part3.programs.expression.position.HerePosition;
+import hillbillies.part3.programs.expression.position.LiteralPosition;
+import hillbillies.part3.programs.expression.position.LogPosition;
+import hillbillies.part3.programs.expression.position.NextToPosition;
+import hillbillies.part3.programs.expression.position.WorkshopPosition;
+import hillbillies.part3.programs.expression.unit.AnyUnit;
+import hillbillies.part3.programs.expression.unit.Enemy;
+import hillbillies.part3.programs.expression.unit.Friend;
+import hillbillies.part3.programs.expression.unit.ThisUnit;
 import hillbillies.part3.programs.statement.*;
 
 
@@ -200,8 +213,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createHerePosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new HerePosition(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -209,8 +221,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createLogPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LogPosition(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -218,8 +229,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createBoulderPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new BoulderPosition(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -227,8 +237,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createWorkshopPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new WorkshopPosition(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -236,7 +245,6 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createSelectedPosition(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -245,8 +253,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createNextToPosition(MyExpression position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NextToPosition(position, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -254,8 +261,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createLiteralPosition(int x, int y, int z, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new LiteralPosition(x, y, z, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -263,8 +269,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createThis(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ThisUnit(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -272,8 +277,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createFriend(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new Friend(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -281,8 +285,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createEnemy(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new Enemy(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -290,8 +293,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createAny(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AnyUnit(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -299,8 +301,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createTrue(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new TrueExpression(sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -308,8 +309,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createFalse(SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FalseExpression(sourceLocation);
 	}
 
 }

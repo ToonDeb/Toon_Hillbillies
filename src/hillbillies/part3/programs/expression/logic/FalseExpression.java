@@ -1,6 +1,9 @@
-package hillbillies.part3.programs.expression;
+package hillbillies.part3.programs.expression.logic;
 
+import hillbillies.model.Unit;
+import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -8,7 +11,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class FalseExpression extends MyExpression {
+public class FalseExpression extends BooleanExpression {
 
 	/**
 	 * @param sourceLocation
@@ -18,7 +21,7 @@ public class FalseExpression extends MyExpression {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public boolean get(){
+	public boolean get(World world, Unit unit){
 		return false;
 	}
 
