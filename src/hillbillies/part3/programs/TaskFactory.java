@@ -5,7 +5,16 @@ import java.util.List;
 
 import hillbillies.model.Task;
 import hillbillies.part3.programs.expression.MyExpression;
+import hillbillies.part3.programs.expression.logic.AndExpression;
 import hillbillies.part3.programs.expression.logic.FalseExpression;
+import hillbillies.part3.programs.expression.logic.IsAlive;
+import hillbillies.part3.programs.expression.logic.IsCarryingItem;
+import hillbillies.part3.programs.expression.logic.IsEnemy;
+import hillbillies.part3.programs.expression.logic.IsFriend;
+import hillbillies.part3.programs.expression.logic.IsPassable;
+import hillbillies.part3.programs.expression.logic.IsSolid;
+import hillbillies.part3.programs.expression.logic.NotExpression;
+import hillbillies.part3.programs.expression.logic.OrExpression;
 import hillbillies.part3.programs.expression.logic.TrueExpression;
 import hillbillies.part3.programs.expression.position.BoulderPosition;
 import hillbillies.part3.programs.expression.position.HerePosition;
@@ -132,8 +141,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createIsSolid(MyExpression position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IsSolid(position, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -141,8 +149,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createIsPassable(MyExpression position, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IsPassable(position, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -150,8 +157,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createIsFriend(MyExpression unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IsFriend(unit, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -159,8 +165,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createIsEnemy(MyExpression unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IsEnemy(unit, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -168,8 +173,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createIsAlive(MyExpression unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IsAlive(unit, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -177,8 +181,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createCarriesItem(MyExpression unit, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new IsCarryingItem(unit, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -186,8 +189,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createNot(MyExpression expression, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new NotExpression(expression, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -195,8 +197,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createAnd(MyExpression left, MyExpression right, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new AndExpression(left, right, sourceLocation);
 	}
 
 	/* (non-Javadoc)
@@ -204,8 +205,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createOr(MyExpression left, MyExpression right, SourceLocation sourceLocation) {
-		// TODO Auto-generated method stub
-		return null;
+		return new OrExpression(left, right, sourceLocation);
 	}
 
 	/* (non-Javadoc)
