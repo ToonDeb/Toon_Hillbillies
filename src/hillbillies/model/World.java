@@ -1,5 +1,6 @@
 package hillbillies.model;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +76,11 @@ public class World {
  	 * @post   This new World has no Factions yet.
 	 *       | new.getNbFactions() == 0
 	 *       
+	 * @post 	The locations of the workshops in this world are stored
+	 * 			in workschopLocations
+	 * 		 | this.getCubeType(new.workshopLocations[x]) == WORKSHOP
+	 * 		 | for every x, x < new.workshopLocations.length
+	 *       
 	 */
 	public World(int[][][] terrainType, TerrainChangeListener modelListener)
 			throws IllegalArgumentException, NullPointerException {
@@ -88,15 +94,21 @@ public class World {
 				new ConnectedToBorder(
 						this.getNbCubesX(), this.getNbCubesY(), this.getNbCubesZ()));
 		
+		List<int[]> workshopLocations = new ArrayList<int[]>();
 		for(int x=0; x<this.getNbCubesX(); x++){
 			for(int y=0; y<this.getNbCubesY(); y++){
 				for(int z=0; z<this.getNbCubesZ();z++){
 					if (this.getCubeType(x, y, z).isPassable()){
 						this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 					}
+					if(this.getCubeType(x, y, z) == CubeType.WORKSHOP){
+						int[] position = {x, y, z};
+						workshopLocations.add(position);
+					}
 				}
 			}
 		}
+		this.workshopLocations = (int[][]) workshopLocations.toArray();
 		
 	}
 	
@@ -1013,10 +1025,35 @@ public class World {
 	}
 	
 	/**
-	 * TODO: getworkshopposition
-	 * een willekeurige workshop in de wereld
+	 * return a random workshop in this world
+	 * 
+	 * @return The location of a workshop in this world
 	 */
 	public int[] getWorkshopLocation(){
-		return null;
+		int random = new Random().nextInt(this.workshopLocations.length);
+		return this.workshopLocations[random];
 	}
-}
+	
+//	/**
+//	 * 
+//	 */
+//	public void searchWorkshopLocations(){
+//		List<int[]> workshopLocations = new ArrayList<int[]>();
+//		for(int x = 0; x < this.getNbCubesX(); x++){
+//			for (int y = 0; y < this.getNbCubesY(); y++){
+//				for (int z = 0; z < this.getNbCubesZ(); z++){
+//					if(this.getCubeType(x, y, z) == CubeType.WORKSHOP){
+//						int[] position = {x, y, z};
+//						workshopLocations.add(position);
+//					}
+//				}
+//			}
+//		}
+//		
+//	}
+	
+	/**
+	 * A variable containing the location of every workshop in this world.
+	 */
+	public int[][] workshopLocations;
+}	

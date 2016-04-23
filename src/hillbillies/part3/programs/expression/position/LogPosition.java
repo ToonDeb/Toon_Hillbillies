@@ -1,10 +1,11 @@
-package hillbillies.part3.programs.expression;
+package hillbillies.part3.programs.expression.position;
 
 import java.util.Random;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Log;
+import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 
@@ -15,13 +16,13 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class LogPosition extends WorldPosition {
+public class LogPosition extends Position {
 	
 	public LogPosition(SourceLocation sourceLocation){
 		super(sourceLocation);
 	}
 	
-	public int[] getPosition(World world){
+	public int[] getPosition(World world, Unit unit){
 		Set<Log> logs = world.getLogs();
 		int random = new Random().nextInt(logs.size());
 		int i = 0;

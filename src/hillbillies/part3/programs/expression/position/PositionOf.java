@@ -1,8 +1,9 @@
-package hillbillies.part3.programs.expression;
+package hillbillies.part3.programs.expression.position;
 
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.UNIT;
 
 /**
  * A class of ...
@@ -10,21 +11,20 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class PositionOf extends MyExpression {
+public class PositionOf extends Position {
 
 	/**
 	 * @param sourceLocation
 	 */
-	public PositionOf(UNIT unit, SourceLocation sourceLocation) {
+	public PositionOf(UNIT unitExpression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		this.unit = unit;
+		unit = unitExpression;
 	}
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.UnitPosition#getPosition(hillbillies.model.Unit)
 	 */
 	public int[] getPosition(World world, Unit thisUnit) {
-		// TODO Auto-generated method stub
 		return unit.getUnit(world, thisUnit).getCubePosition();
 	}
 	
