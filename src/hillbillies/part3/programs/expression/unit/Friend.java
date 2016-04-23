@@ -1,6 +1,6 @@
-package hillbillies.part3.programs.expression;
+package hillbillies.part3.programs.expression.unit;
 
-import java.util.Set;
+import java.util.Random;
 
 import hillbillies.model.Faction;
 import hillbillies.model.Unit;
@@ -29,9 +29,19 @@ public class Friend extends UNIT {
 	@Override
 	public Unit getUnit(World world, Unit unit) {
 		Faction friendlyFaction = unit.getFaction();
+//		int random = new Random().nextInt(friendlyFaction.getNbUnits());
+//		for (Unit friendlyUnit: friendlyFaction.getUnitsOfFaction()){
+//			if(friendlyUnit != unit)
+//				return friendlyUnit;
+//		}
+		
+		int random = new Random().nextInt(friendlyFaction.getNbUnits());
+		int i = -1;
 		for (Unit friendlyUnit: friendlyFaction.getUnitsOfFaction()){
-			if(friendlyUnit != unit)
+			i += 1;
+			if (i == random){
 				return friendlyUnit;
+			}
 		}
 		return null;
 	}
