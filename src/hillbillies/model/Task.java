@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
-import hillbillies.part3.programs.S;
+import hillbillies.part3.programs.statement.MyStatement;
 
 /**
  * A class of ...
@@ -49,7 +49,7 @@ public class Task {
  	 *         the given priority.
  	 *       | this.setPriority(priority)
 	 */
-	public Task(String name, int priority, S statement) throws IllegalArgumentException {
+	public Task(String name, int priority, MyStatement statement) throws IllegalArgumentException {
 		if (! canHaveAsName(name))
 			throw new IllegalArgumentException();
 		this.name = name;
@@ -137,7 +137,7 @@ public class Task {
 	 * Return the Statement of this Task.
 	 */
 	@Basic @Raw
-	public S getStatement() {
+	public MyStatement getStatement() {
 		return this.statement;
 	}
 
@@ -150,7 +150,7 @@ public class Task {
 	 * @return 
 	 *       | result == (statement != null)
 	*/
-	public static boolean isValidStatement(S statement) {
+	public static boolean isValidStatement(MyStatement statement) {
 		return (statement != null);
 	}
 
@@ -168,7 +168,7 @@ public class Task {
 	 *       | ! isValidStatement(getStatement())
 	 */
 	@Raw
-	public void setStatement(S statement) 
+	public void setStatement(MyStatement statement) 
 			throws IllegalArgumentException {
 		if (! isValidStatement(statement))
 			throw new IllegalArgumentException();
@@ -178,6 +178,6 @@ public class Task {
 	/**
 	 * Variable registering the Statement of this Task.
 	 */
-	private S statement;
+	private MyStatement statement;
 	
 }
