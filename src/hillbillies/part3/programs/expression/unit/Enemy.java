@@ -14,7 +14,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class Enemy extends UNIT {
+public class Enemy extends UnitExpression {
 
 	/**
 	 * @param sourceLocation

@@ -1,5 +1,6 @@
 package hillbillies.part3.programs.expression;
 
+import hillbillies.model.Task;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
@@ -18,8 +19,8 @@ public class ReadVariable extends MyExpression {
 		name = variableName;
 	}
 	
-	public MyExpression getExpression(){
-		return ;
+	public MyExpression getExpression(Task task){
+		return task.getExpression(name);
 	}
 	
 	private static String name;

@@ -10,7 +10,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class ThisUnit extends UNIT {
+public class ThisUnit extends UnitExpression {
 
 	/**
 	 * @param sourceLocation
@@ -20,7 +20,7 @@ public class ThisUnit extends UNIT {
 	}
 
 	/* (non-Javadoc)
-	 * @see hillbillies.part3.programs.expression.unit.UNIT#getUnit(hillbillies.model.World, hillbillies.model.Unit)
+	 * @see hillbillies.part3.programs.expression.unit.UnitExpression#getUnit(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
 	public Unit getUnit(World world, Unit unit) {

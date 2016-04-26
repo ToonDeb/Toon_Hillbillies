@@ -22,6 +22,7 @@ import hillbillies.part3.programs.expression.position.HerePosition;
 import hillbillies.part3.programs.expression.position.LiteralPosition;
 import hillbillies.part3.programs.expression.position.LogPosition;
 import hillbillies.part3.programs.expression.position.NextToPosition;
+import hillbillies.part3.programs.expression.position.PositionOf;
 import hillbillies.part3.programs.expression.position.WorkshopPosition;
 import hillbillies.part3.programs.expression.unit.AnyUnit;
 import hillbillies.part3.programs.expression.unit.Enemy;
@@ -315,6 +316,14 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	@Override
 	public MyExpression createFalse(SourceLocation sourceLocation) {
 		return new FalseExpression(sourceLocation);
+	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.ITaskFactory#createPositionOf(java.lang.Object, hillbillies.part3.programs.SourceLocation)
+	 */
+	@Override
+	public MyExpression createPositionOf(MyExpression unit, SourceLocation sourceLocation) {
+		return new PositionOf(unit, sourceLocation);
 	}
 
 }

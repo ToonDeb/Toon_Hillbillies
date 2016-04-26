@@ -4,7 +4,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.unit.UNIT;
+import hillbillies.part3.programs.expression.unit.UnitExpression;
 
 /**
  * A class of ...
@@ -21,7 +21,7 @@ public class IsCarryingItem extends BooleanExpression {
 	 */
 	public IsCarryingItem(MyExpression expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		unitExpression = (UNIT)expression;
+		unitExpression = (UnitExpression)expression;
 	}
 
 	/* (non-Javadoc)
@@ -32,6 +32,6 @@ public class IsCarryingItem extends BooleanExpression {
 		return unitExpression.getUnit(world, unit).isCarryingItem();
 	}
 	
-	private static UNIT unitExpression;
+	private static UnitExpression unitExpression;
 
 }

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.part3.programs.expression.MyExpression;
 import hillbillies.part3.programs.statement.MyStatement;
 
 /**
@@ -179,5 +180,10 @@ public class Task {
 	 * Variable registering the Statement of this Task.
 	 */
 	private MyStatement statement;
+	
+	//TODO: getExpression van task, uit lijst?
+	public MyExpression getExpression(String variableName){
+		return null;
+	}
 	
 }

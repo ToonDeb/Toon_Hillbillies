@@ -13,7 +13,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class Friend extends UNIT {
+public class Friend extends UnitExpression {
 
 	/**
 	 * @param unit

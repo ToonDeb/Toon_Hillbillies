@@ -11,9 +11,9 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-public abstract class UNIT extends MyExpression {
+public abstract class UnitExpression extends MyExpression {
 	
-	public UNIT(SourceLocation sourceLocation){
+	public UnitExpression(SourceLocation sourceLocation){
 		super(sourceLocation);
 	}
 	
