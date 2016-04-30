@@ -12,7 +12,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class WorkshopPosition extends Position {
+public class WorkshopPosition extends PositionExpression {
 	
 	/**
 	 * @param sourceLocation
@@ -23,5 +23,14 @@ public class WorkshopPosition extends Position {
 
 	public int[] getPosition(World world, Unit unit){
 		return world.getWorkshopLocation();
+	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "WorkshopPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

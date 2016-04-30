@@ -12,7 +12,7 @@ import hillbillies.part3.programs.expression.unit.UnitExpression;
  * @author  ...
  * @version 1.0
  */
-public class PositionOf extends Position {
+public class PositionOf extends PositionExpression {
 
 	/**
 	 * @param sourceLocation
@@ -30,5 +30,14 @@ public class PositionOf extends Position {
 	}
 	
 	private static UnitExpression unit;
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "PositionOf: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
+	}
 
 }

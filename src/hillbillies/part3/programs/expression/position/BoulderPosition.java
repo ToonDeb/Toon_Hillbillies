@@ -16,7 +16,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class BoulderPosition extends Position {
+public class BoulderPosition extends PositionExpression {
 	
 	public BoulderPosition(SourceLocation sourceLocation){
 		super(sourceLocation);
@@ -33,6 +33,15 @@ public class BoulderPosition extends Position {
 		}
 		//will never happen
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "BoulderPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 
 }

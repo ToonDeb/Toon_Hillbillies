@@ -12,7 +12,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class HerePosition extends Position{
+public class HerePosition extends PositionExpression{
 	
 	public HerePosition(SourceLocation sourceLocation){
 		super(sourceLocation);
@@ -22,4 +22,15 @@ public class HerePosition extends Position{
 	public int[] getPosition(World world, Unit unit){
 		return unit.getCubePosition();
 	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "HerePosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
+	}
+	
+	
 }

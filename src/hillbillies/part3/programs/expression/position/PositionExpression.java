@@ -11,12 +11,12 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-public abstract class Position extends MyExpression {
+public abstract class PositionExpression extends MyExpression {
 
 	/**
 	 * @param sourceLocation
 	 */
-	public Position(SourceLocation sourceLocation) {
+	public PositionExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
 	}
 	

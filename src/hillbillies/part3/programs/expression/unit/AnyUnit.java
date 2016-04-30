@@ -37,4 +37,12 @@ public class AnyUnit extends UnitExpression {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "AnyUnit: " + this.getUnit(unit.getWorld(), unit).getName();
+	}
+
 }

@@ -46,6 +46,14 @@ public class Friend extends UnitExpression {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "FriendUnit: " + this.getUnit(unit.getWorld(), unit).getName();
+	}
+
 
 
 }

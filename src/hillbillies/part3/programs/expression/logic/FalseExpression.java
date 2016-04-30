@@ -25,4 +25,12 @@ public class FalseExpression extends BooleanExpression {
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString()
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "False";
+	}
+
 }

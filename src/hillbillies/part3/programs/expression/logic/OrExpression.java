@@ -35,4 +35,12 @@ public class OrExpression extends BooleanExpression {
 	
 	private static BooleanExpression left;
 	private static BooleanExpression right;
+	
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return left.toString(unit) + " Or " + right.toString(unit);
+	}
 }

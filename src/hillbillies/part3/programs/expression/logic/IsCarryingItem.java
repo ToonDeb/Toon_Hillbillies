@@ -34,4 +34,12 @@ public class IsCarryingItem extends BooleanExpression {
 	
 	private static UnitExpression unitExpression;
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString()
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "isCarryingItem: " + this.get(unit.getWorld(), unit);
+	}
+
 }

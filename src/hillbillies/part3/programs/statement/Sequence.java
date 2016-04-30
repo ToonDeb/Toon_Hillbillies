@@ -1,8 +1,12 @@
 package hillbillies.part3.programs.statement;
 
+
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import be.kuleuven.cs.som.annotate.*;
+import hillbillies.model.Unit;
+import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
@@ -72,6 +76,90 @@ public class Sequence extends MyStatement {
 
 
 	private List<MyStatement> myStatements;
+
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.statement.MyStatement#iterator(hillbillies.model.World, hillbillies.model.Unit)
+	 */
+	@Override
+	public StatementIterator iterator(World world, Unit unit) {
+		return new StatementIterator(){
+
+			@Override
+			public boolean hasNext() {
+				if(this.endReached)
+					return false;
+				if(this.currentIterator.isTerminal())
+					return true;
+				if(this.currentIterator.hasNext()){
+					return true;
+				}
+				
+				this.hasNext_index = this.index + 1;
+				this.hasNext_iterator = getMyStatementAt(hasNext_index).iterator(world, unit);
+				
+				while(this.hasNext_index <= getNbMyStatements()){
+					if (this.hasNext_iterator.isTerminal() || this.hasNext_iterator.hasNext()){
+						return true;
+					}
+					hasNext_index += 1;
+					this.hasNext_iterator = getMyStatementAt(hasNext_index).iterator(world, unit);
+				}
+				return false;
+			}
+
+			@Override
+			public MyStatement next() throws NoSuchElementException{
+				
+				if (this.currentIterator.isTerminal()){
+					index += 1;
+					if(index <= getNbMyStatements()){
+						this.currentIterator = getMyStatementAt(index).iterator(world, unit);
+					}
+					else{
+						this.endReached = true;
+					}
+					return getMyStatementAt(index-1);
+				}
+				else{
+					if(this.currentIterator.hasNext()){
+						return this.currentIterator.next();
+					}
+					else{
+						
+						this.index += 1;
+						this.currentIterator = getMyStatementAt(index).iterator(world, unit);
+						while(this.index <= getNbMyStatements()){
+							if (this.currentIterator.isTerminal() || this.currentIterator.hasNext()){
+								index += 1;
+								this.currentIterator = getMyStatementAt(index).iterator(world, unit);
+								if(index == getNbMyStatements())
+									this.endReached = true;
+								return getMyStatementAt(index);
+							}
+							index += 1;
+							this.currentIterator = getMyStatementAt(index).iterator(world, unit);
+						}
+						throw new IllegalStateException("you shouldn't be here :)");
+					}
+				}
+			}
+			
+			public boolean isTerminal(){
+				return false;
+			}
+			
+			private boolean endReached = false;
+			
+			private StatementIterator currentIterator = getMyStatementAt(1).iterator(world, unit);
+			
+			private int index = 1;
+			
+			private int hasNext_index;
+			
+			private StatementIterator hasNext_iterator;
+		};
+	}
 
 	
 }

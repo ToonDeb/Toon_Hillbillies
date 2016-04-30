@@ -31,7 +31,18 @@ public class AndExpression extends BooleanExpression {
 		return left.get(world, unit) && right.get(world, unit);
 	}
 	
+	
+	
 	private static BooleanExpression left;
 	private static BooleanExpression right;
+	
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString()
+	 */
+	@Override
+	public String toString(Unit unit) {
+		// TODO Auto-generated method stub
+		return left.toString(unit) + " and " + right.toString(unit);
+	}
 
 }

@@ -16,7 +16,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class LogPosition extends Position {
+public class LogPosition extends PositionExpression {
 	
 	public LogPosition(SourceLocation sourceLocation){
 		super(sourceLocation);
@@ -33,5 +33,14 @@ public class LogPosition extends Position {
 		}
 		//will never happen
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "LogPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

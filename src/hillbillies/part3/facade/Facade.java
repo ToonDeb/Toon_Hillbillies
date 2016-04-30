@@ -13,6 +13,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.part3.programs.ITaskFactory;
+import hillbillies.part3.programs.TaskFactory;
 import ogp.framework.util.ModelException;
 
 /**
@@ -542,8 +543,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public ITaskFactory<?, ?, Task> createTaskFactory() {
-		// TODO Auto-generated method stub
-		return null;
+		return new TaskFactory();
 	}
 
 	/* (non-Javadoc)

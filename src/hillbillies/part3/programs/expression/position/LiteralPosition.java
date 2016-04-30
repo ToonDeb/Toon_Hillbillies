@@ -12,7 +12,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class LiteralPosition extends Position {
+public class LiteralPosition extends PositionExpression {
 	
 	public LiteralPosition(int x, int y, int z, SourceLocation sourceLocation){
 		super(sourceLocation);
@@ -28,4 +28,13 @@ public class LiteralPosition extends Position {
 	}
 	
 	private final int[] position;
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "LiteralPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
+	}
 }

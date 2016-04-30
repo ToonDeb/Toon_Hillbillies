@@ -18,7 +18,6 @@ public abstract class BooleanExpression extends MyExpression {
 	 */
 	public BooleanExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public abstract boolean get(World world, Unit unit);

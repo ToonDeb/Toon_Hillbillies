@@ -4,7 +4,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.position.Position;
+import hillbillies.part3.programs.expression.position.PositionExpression;
 
 /**
  * A class of ...
@@ -19,7 +19,7 @@ public class IsPassable extends BooleanExpression {
 	 */
 	public IsPassable(MyExpression expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		position = (Position)expression;
+		position = (PositionExpression)expression;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -32,5 +32,13 @@ public class IsPassable extends BooleanExpression {
 		return world.isPassableTerrain(position.getPosition(world, unit));
 	}
 	
-	private static Position position;
+	private static PositionExpression position;
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "IsPassable: " + this.get(unit.getWorld(), unit);
+	}
 }

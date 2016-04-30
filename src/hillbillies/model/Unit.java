@@ -100,6 +100,10 @@ import static hillbillies.model.Constants.AIR;
  *         Unit.
  *       | isValidPathIndex(getPathIndex())
  *       
+ * @invar  The Task of each	 Unit must be a valid Task for any
+ *         Unit.	
+ *       | isValidTask(getTask())
+ *       
  * @version 0.1
  */
 public class Unit extends GameObject {
@@ -2664,4 +2668,51 @@ public class Unit extends GameObject {
 	 */
 	private int experience = 0;
 
+
+	/**
+	 * Return the Task of this Unit.
+	 */
+	@Basic @Raw
+	public Task getTask() {
+		return this.task;
+	}
+
+	/**
+	 * Check whether the given Task is a valid Task for
+	 * any Unit.
+	 *  
+	 * @param  Task
+	 *         The Task to check.
+	 * @return 
+	 *       | result == true
+	*/
+	public static boolean isValidTask(Task task) {
+		return true;
+	}
+
+	/**
+	 * Set the Task of this Unit to the given Task.
+	 * 
+	 * @param  task
+	 *         The new Task for this Unit.
+	 * @post   The Task of this new Unit is equal to
+	 *         the given Task.
+	 *       | new.getTask() == task
+	 * @throws IllegalArgumentException
+	 *         The given Task is not a valid Task for any
+	 *         Unit.
+	 *       | ! isValidTask(getTask())
+	 */
+	@Raw
+	public void setTask(Task task) 
+			throws IllegalArgumentException {
+		if (! isValidTask(task))
+			throw new IllegalArgumentException();
+		this.task = task;
+	}
+
+	/**
+	 * Variable registering the Task of this Unit.
+	 */
+	private Task task;
 }

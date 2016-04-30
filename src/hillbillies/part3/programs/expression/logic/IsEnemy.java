@@ -34,4 +34,12 @@ public class IsEnemy extends BooleanExpression {
 	
 	private static UnitExpression unitExpression;
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "IsEnemy: " + this.get(unit.getWorld(), unit);
+	}
+
 }

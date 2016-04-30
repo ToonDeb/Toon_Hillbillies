@@ -18,11 +18,18 @@ public class TrueExpression extends BooleanExpression {
 	 */
 	public TrueExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public boolean get(World world, Unit unit){
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "True";
 	}
 
 }

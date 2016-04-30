@@ -1,6 +1,8 @@
 package hillbillies.part3.programs.statement;
 
 import be.kuleuven.cs.som.annotate.Value;
+import hillbillies.model.Unit;
+import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
@@ -21,5 +23,7 @@ public abstract class MyStatement {
 	}
 	
 	private final SourceLocation sourceLocation;
+	
+	public abstract StatementIterator iterator(World world, Unit unit);
 
 }

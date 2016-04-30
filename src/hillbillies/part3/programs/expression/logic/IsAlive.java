@@ -32,5 +32,17 @@ public class IsAlive extends BooleanExpression {
 		return !unitExpression.getUnit(world, unit).isTerminated();
 	}
 	
+	
+	
 	private static UnitExpression unitExpression;
+
+
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString()
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "IsAlive: " + this.get(unit.getWorld(), unit);
+	}
 }

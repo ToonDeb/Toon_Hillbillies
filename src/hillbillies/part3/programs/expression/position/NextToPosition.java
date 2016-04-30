@@ -16,7 +16,7 @@ import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
  * @version 1.0
  */
 @Value
-public class NextToPosition extends Position {
+public class NextToPosition extends PositionExpression {
 	
 	public NextToPosition(MyExpression position, SourceLocation sourceLocation){
 		super(sourceLocation);
@@ -27,8 +27,8 @@ public class NextToPosition extends Position {
 
 	public int[] getPosition(World world, Unit unit) {
 		int[] firstPosition;
-		if (otherPosition instanceof Position){
-			firstPosition = ((Position)otherPosition).getPosition(world, unit);
+		if (otherPosition instanceof PositionExpression){
+			firstPosition = ((PositionExpression)otherPosition).getPosition(world, unit);
 		}
 		else{
 			throw new IllegalArgumentException("this type of expression is not possible!");
@@ -43,5 +43,14 @@ public class NextToPosition extends Position {
 				return firstPosition;
 		}
 		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		int[] position = this.getPosition(unit.getWorld(), unit);
+		return "NextToPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

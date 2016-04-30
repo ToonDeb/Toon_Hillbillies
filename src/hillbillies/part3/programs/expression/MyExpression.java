@@ -1,6 +1,7 @@
 package hillbillies.part3.programs.expression;
 
 import be.kuleuven.cs.som.annotate.Value;
+import hillbillies.model.Unit;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
@@ -15,6 +16,8 @@ public abstract class MyExpression {
 	public MyExpression(SourceLocation sourceLocation){
 		this.sourceLocation = sourceLocation;
 	}
+	
+	public abstract String toString(Unit unit);
 	
 	private final SourceLocation sourceLocation;
 }

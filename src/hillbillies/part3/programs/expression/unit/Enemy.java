@@ -55,4 +55,12 @@ public class Enemy extends UnitExpression {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "EnemyUnit: " + this.getUnit(unit.getWorld(), unit).getName();
+	}
+
 }

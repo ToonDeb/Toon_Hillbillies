@@ -1,14 +1,14 @@
 package hillbillies.model;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Iterator;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part3.programs.expression.MyExpression;
 import hillbillies.part3.programs.statement.MyStatement;
 
 /**
- * A class of ...
+ * A class of Tasks
  *
  * @invar  Each Task can have its name as name.
  *       | canHaveAsName(this.getName())
@@ -20,12 +20,14 @@ import hillbillies.part3.programs.statement.MyStatement;
  * @invar  The Statement of each Task must be a valid Statement for any
  *         Task.
  *       | isValidStatement(getStatement())
- *
- * @param  statement
- *         The Statement for this new Task.
- * @effect The Statement of this new Task is set to
- *         the given Statement.
- *       | this.setStatement(statement)
+ *       
+ * @invar  The AssignedVariables of each Task must be a valid AssignedVariables for any
+ *         Task.
+ *       | isValidAssignedVariables(getAssignedVariables())
+ *       
+ * @invar  The Unit of each Task must be a valid Unit for any
+ *         Task.
+ *       | isValidUnit(getUnit())
  *       
  * @author  ...
  * @version 1.0
@@ -49,6 +51,12 @@ public class Task {
  	 * @effect The priority of this new Task is set to
  	 *         the given priority.
  	 *       | this.setPriority(priority)
+ 	 *       
+ 	 * @param  statement
+ 	 *         The Statement for this new Task.
+ 	 * @effect The Statement of this new Task is set to
+ 	 *         the given Statement.
+ 	 *       | this.setStatement(statement)
 	 */
 	public Task(String name, int priority, MyStatement statement) throws IllegalArgumentException {
 		if (! canHaveAsName(name))
@@ -58,6 +66,8 @@ public class Task {
 		this.setPriority(priority);
 		
 		this.setStatement(statement); //mss immutable?
+		
+		this.setAssignedVariables(new HashMap<String, MyExpression>());
 	}
 	
 	/**
@@ -181,9 +191,134 @@ public class Task {
 	 */
 	private MyStatement statement;
 	
-	//TODO: getExpression van task, uit lijst?
+	/**
+	 * Returns the expression assigned to the given variableName
+	 * 
+	 * @param variableName
+	 * 		  The name of the expression to search for
+	 * @return 
+	 * 			| return this.getAssignedVariables().get(variableName)
+	 */
 	public MyExpression getExpression(String variableName){
-		return null;
+		return this.getAssignedVariables().get(variableName);
 	}
+	
+
+
+	///**
+	// * Initialize this new Task with given AssignedVariables.
+	// *
+	// * @param  assignedVariable
+	// *         The AssignedVariables for this new Task.
+	// * @effect The AssignedVariables of this new Task is set to
+	// *         the given AssignedVariables.
+	// *       | this.setAssignedVariables(assignedVariable)
+	// */
+	//public Task(HashMap<String, MyExpression> assignedVariable)
+	//		throws IllegalArgumentException {
+	//	this.setAssignedVariables(assignedVariable);
+	//}
+
+
+	/**
+	 * Return the AssignedVariables of this Task.
+	 */
+	@Basic @Raw
+	public HashMap<String, MyExpression> getAssignedVariables() {
+		return this.assignedVariable;
+	}
+
+	/** TODO: isValidAssignedVariable
+	 * Check whether the given AssignedVariables is a valid AssignedVariables for
+	 * any Task.
+	 *  
+	 * @param  AssignedVariables
+	 *         The AssignedVariables to check.
+	 * @return 
+	 *       | result == 
+	*/
+	public static boolean isValidAssignedVariables(HashMap<String, MyExpression> assignedVariable) {
+		return false;
+	}
+
+	/**
+	 * Set the AssignedVariables of this Task to the given AssignedVariables.
+	 * 
+	 * @param  assignedVariable
+	 *         The new AssignedVariables for this Task.
+	 * @post   The AssignedVariables of this new Task is equal to
+	 *         the given AssignedVariables.
+	 *       | new.getAssignedVariables() == assignedVariable
+	 * @throws IllegalArgumentException
+	 *         The given AssignedVariables is not a valid AssignedVariables for any
+	 *         Task.
+	 *       | ! isValidAssignedVariables(getAssignedVariables())
+	 */
+	@Raw
+	public void setAssignedVariables(HashMap<String, MyExpression> assignedVariable) 
+			throws IllegalArgumentException {
+		if (! isValidAssignedVariables(assignedVariable))
+			throw new IllegalArgumentException();
+		this.assignedVariable = assignedVariable;
+	}
+
+	/**
+	 * Variable registering the AssignedVariables of this Task.
+	 */
+	private HashMap<String, MyExpression> assignedVariable;
+	
+	
+	public Iterator<MyStatement> iterator(){
+		if(this.getUnit()==null)
+			throw new IllegalStateException("task is not assigned to a unit!");
+		return this.getStatement().iterator(this.unit.getWorld(), this.unit);
+	}
+
+	/**
+	 * Return the Unit of this Task.
+	 */
+	@Basic @Raw
+	public Unit getUnit() {
+		return this.unit;
+	}
+
+	/**
+	 * Check whether the given Unit is a valid Unit for
+	 * any Task.
+	 *  
+	 * @param  Unit
+	 *         The Unit to check.
+	 * @return 
+	 *       | result == true
+	*/
+	public static boolean isValidUnit(Unit unit) {
+		return true;
+	}
+
+	/**
+	 * Set the Unit of this Task to the given Unit.
+	 * 
+	 * @param  unit
+	 *         The new Unit for this Task.
+	 * @post   The Unit of this new Task is equal to
+	 *         the given Unit.
+	 *       | new.getUnit() == unit
+	 * @throws IllegalArgumentException
+	 *         The given Unit is not a valid Unit for any
+	 *         Task.
+	 *       | ! isValidUnit(getUnit())
+	 */
+	@Raw
+	public void setUnit(Unit unit) 
+			throws IllegalArgumentException {
+		if (! isValidUnit(unit))
+			throw new IllegalArgumentException();
+		this.unit = unit;
+	}
+
+	/**
+	 * Variable registering the Unit of this Task.
+	 */
+	private Unit unit;
 	
 }

@@ -31,4 +31,12 @@ public class NotExpression extends BooleanExpression {
 	
 	private static BooleanExpression booleanExpression;
 
+	/* (non-Javadoc)
+	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
+	 */
+	@Override
+	public String toString(Unit unit) {
+		return "Not: !" + this.get(unit.getWorld(), unit);
+	}
+
 }
