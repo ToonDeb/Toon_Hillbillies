@@ -12,7 +12,7 @@ import hillbillies.part3.programs.expression.position.PositionExpression;
  * @author  ...
  * @version 1.0
  */
-public class IsSolid extends MyExpression {
+public class IsSolid extends BooleanExpression {
 
 	/**
 	 * @param sourceLocation

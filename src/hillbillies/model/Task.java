@@ -238,7 +238,7 @@ public class Task {
 	 *       | result == 
 	*/
 	public static boolean isValidAssignedVariables(HashMap<String, MyExpression> assignedVariable) {
-		return false;
+		return true;
 	}
 
 	/**

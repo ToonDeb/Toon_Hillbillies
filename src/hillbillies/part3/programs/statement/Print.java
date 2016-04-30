@@ -55,7 +55,7 @@ public class Print extends MyStatement {
 			}
 			
 			public boolean isTerminal(){
-				return false;
+				return true;
 			}
 		};
 	}

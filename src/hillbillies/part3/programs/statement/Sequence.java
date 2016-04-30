@@ -1,6 +1,7 @@
 package hillbillies.part3.programs.statement;
 
 
+import java.util.Currency;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -96,21 +97,20 @@ public class Sequence extends MyStatement {
 				}
 				
 				this.hasNext_index = this.index + 1;
-				this.hasNext_iterator = getMyStatementAt(hasNext_index).iterator(world, unit);
 				
-				while(this.hasNext_index <= getNbMyStatements()){
+				while(this.hasNext_index < getNbMyStatements()){
+					this.hasNext_iterator = getMyStatementAt(hasNext_index).iterator(world, unit);
 					if (this.hasNext_iterator.isTerminal() || this.hasNext_iterator.hasNext()){
 						return true;
 					}
 					hasNext_index += 1;
-					this.hasNext_iterator = getMyStatementAt(hasNext_index).iterator(world, unit);
 				}
 				return false;
 			}
 
 			@Override
 			public MyStatement next() throws NoSuchElementException{
-				
+				System.out.println("index: " + index);
 				if (this.currentIterator.isTerminal()){
 					index += 1;
 					if(index <= getNbMyStatements()){
@@ -130,12 +130,15 @@ public class Sequence extends MyStatement {
 						this.index += 1;
 						this.currentIterator = getMyStatementAt(index).iterator(world, unit);
 						while(this.index <= getNbMyStatements()){
-							if (this.currentIterator.isTerminal() || this.currentIterator.hasNext()){
-								index += 1;
-								this.currentIterator = getMyStatementAt(index).iterator(world, unit);
+							if (this.currentIterator.isTerminal()){
 								if(index == getNbMyStatements())
 									this.endReached = true;
-								return getMyStatementAt(index);
+								this.index += 1;
+								this.currentIterator = getMyStatementAt(index).iterator(world, unit);
+								return getMyStatementAt(index-1);
+							}
+							else if(this.currentIterator.hasNext()){
+								return this.currentIterator.next();
 							}
 							index += 1;
 							this.currentIterator = getMyStatementAt(index).iterator(world, unit);

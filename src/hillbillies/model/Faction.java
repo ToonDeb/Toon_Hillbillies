@@ -42,7 +42,7 @@ public class Faction {
 	public Faction(World world)
 			throws IllegalArgumentException {
 		this.setWorld(world);
-		this.setScheduler(scheduler);
+		//this.setScheduler(scheduler);
 	}
 
 

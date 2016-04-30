@@ -23,7 +23,10 @@ public class IfThenElse extends MyStatement {
 		super(sourceLocation);
 		this.expression = expression;
 		this.then = then;
-		this.other = other;
+		if(other == null)
+			this.other = new NullStatement(sourceLocation);
+		else
+			this.other = other;
 	}
 	
 	public MyExpression getExpression(){
@@ -94,8 +97,10 @@ public class IfThenElse extends MyStatement {
 					iterator = statement.iterator(world, unit);
 				}
 				
-				if(iterator.isTerminal())
+				if(iterator.isTerminal()){
 					this.hasReturned = true;
+					return evaluate(world, unit);
+				}
 				return iterator.next();
 			}
 			
