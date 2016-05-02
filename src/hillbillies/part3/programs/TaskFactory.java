@@ -28,6 +28,9 @@ import hillbillies.part3.programs.expression.unit.Enemy;
 import hillbillies.part3.programs.expression.unit.Friend;
 import hillbillies.part3.programs.expression.unit.ThisUnit;
 import hillbillies.part3.programs.statement.*;
+import hillbillies.part3.programs.statement.action.Attack;
+import hillbillies.part3.programs.statement.action.Follow;
+import hillbillies.part3.programs.statement.action.Work;
 
 
 /**
@@ -105,7 +108,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyStatement createMoveTo(MyExpression position, SourceLocation sourceLocation) {
-		return new hillbillies.part3.programs.statement.MoveTo(position, sourceLocation);
+		return new hillbillies.part3.programs.statement.action.MoveTo(position, sourceLocation);
 	}
 
 	/* (non-Javadoc)

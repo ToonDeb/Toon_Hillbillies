@@ -5,7 +5,13 @@ import java.util.Iterator;
 
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part3.programs.expression.MyExpression;
+import hillbillies.part3.programs.internal.generated.HillbilliesTaskLangParser.AssignmentStatementContext;
+import hillbillies.part3.programs.statement.Assignment;
 import hillbillies.part3.programs.statement.MyStatement;
+import hillbillies.part3.programs.statement.NullStatement;
+import hillbillies.part3.programs.statement.Print;
+import hillbillies.part3.programs.statement.StatementIterator;
+import hillbillies.part3.programs.statement.action.Action;
 
 /**
  * A class of Tasks
@@ -28,6 +34,10 @@ import hillbillies.part3.programs.statement.MyStatement;
  * @invar  The Unit of each Task must be a valid Unit for any
  *         Task.
  *       | isValidUnit(getUnit())
+ *       
+ * @invar  The statementIterator of each Task must be a valid statementIterator for any
+ *         Task.
+ *       | isValidStatementIterator(getStatementIterator())
  *       
  * @author  ...
  * @version 1.0
@@ -67,7 +77,7 @@ public class Task {
 		
 		this.setStatement(statement); //mss immutable?
 		
-		this.setAssignedVariables(new HashMap<String, MyExpression>());
+		this.setAssignedVariables(new HashMap<String, Object>());
 	}
 	
 	/**
@@ -199,7 +209,7 @@ public class Task {
 	 * @return 
 	 * 			| return this.getAssignedVariables().get(variableName)
 	 */
-	public MyExpression getExpression(String variableName){
+	public Object getExpression(String variableName){
 		return this.getAssignedVariables().get(variableName);
 	}
 	
@@ -224,7 +234,7 @@ public class Task {
 	 * Return the AssignedVariables of this Task.
 	 */
 	@Basic @Raw
-	public HashMap<String, MyExpression> getAssignedVariables() {
+	public HashMap<String, Object> getAssignedVariables() {
 		return this.assignedVariable;
 	}
 
@@ -237,11 +247,11 @@ public class Task {
 	 * @return 
 	 *       | result == 
 	*/
-	public static boolean isValidAssignedVariables(HashMap<String, MyExpression> assignedVariable) {
+	public static boolean isValidAssignedVariables(HashMap<String, Object> assignedVariable) {
 		return true;
 	}
 
-	/**
+	/** TODO: assignedVariable zetten op de uitkomst van de expression, niet op de expression zelf
 	 * Set the AssignedVariables of this Task to the given AssignedVariables.
 	 * 
 	 * @param  assignedVariable
@@ -255,7 +265,7 @@ public class Task {
 	 *       | ! isValidAssignedVariables(getAssignedVariables())
 	 */
 	@Raw
-	public void setAssignedVariables(HashMap<String, MyExpression> assignedVariable) 
+	public void setAssignedVariables(HashMap<String, Object> assignedVariable) 
 			throws IllegalArgumentException {
 		if (! isValidAssignedVariables(assignedVariable))
 			throw new IllegalArgumentException();
@@ -265,9 +275,12 @@ public class Task {
 	/**
 	 * Variable registering the AssignedVariables of this Task.
 	 */
-	private HashMap<String, MyExpression> assignedVariable;
+	private HashMap<String, Object> assignedVariable;
 	
-	
+	/**
+	 * TODO: task iterator documententatie
+	 * @return
+	 */
 	public Iterator<MyStatement> iterator(){
 		if(this.getUnit()==null)
 			throw new IllegalStateException("task is not assigned to a unit!");
@@ -309,16 +322,152 @@ public class Task {
 	 *       | ! isValidUnit(getUnit())
 	 */
 	@Raw
-	public void setUnit(Unit unit) 
-			throws IllegalArgumentException {
+	public void setUnit(Unit unit) throws IllegalArgumentException {
 		if (! isValidUnit(unit))
 			throw new IllegalArgumentException();
 		this.unit = unit;
+		this.setStatementIterator();
 	}
 
 	/**
 	 * Variable registering the Unit of this Task.
 	 */
 	private Unit unit;
+	
+	public void removeFromSchedulers(){
+		
+	}
+
+
+///**
+// * Initialize this new Task with given statementIterator.
+// *
+// * @param  iterator
+// *         The statementIterator for this new Task.
+// * @effect The statementIterator of this new Task is set to
+// *         the given statementIterator.
+// *       | this.setStatementIterator(iterator)
+// */
+//public Task(StatementIterator iterator)
+//		throws IllegalArgumentException {
+//	this.setStatementIterator(iterator);
+//}
+
+
+	/**
+	 * Return the statementIterator of this Task.
+	 */
+	@Basic @Raw
+	public StatementIterator getStatementIterator() {
+		return this.iterator;
+	}
+
+	/**
+	 * Check whether the given statementIterator is a valid statementIterator for
+	 * any Task.
+	 *  
+	 * @param  statementIterator
+	 *         The statementIterator to check.
+	 * @return 
+	 *       | result == 
+	*/
+	public static boolean isValidStatementIterator(StatementIterator iterator) {
+		return true;
+	}
+
+	/**
+	 * Set the statementIterator of this Task to the given statementIterator.
+	 * 
+	 * @post   The statementIterator of this new Task is equal to the 
+	 * 			statemeIterator of the statement.
+	 *       | new.getStatementIterator() == this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit())
+	 * @throws IllegalStateException
+	 *         The Task is not assigned to a unit.
+	 *       | ! isValidStatementIterator(getStatementIterator())
+	 */
+	@Raw
+	public void setStatementIterator() throws IllegalArgumentException {
+		if (this.getUnit() == null)
+			throw new IllegalStateException("no assigned unit");
+		this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit());
+	}
+
+	/**
+	 * Variable registering the statementIterator of this Task.
+	 */
+	private StatementIterator iterator;
+	
+	/**
+	 * Terminate this Task.
+	 *
+	 * @post   This Task  is terminated.
+	 *       | new.isTerminated()
+	 * @post   ...
+	 *       | ...
+	 */
+	 public void terminate() {
+		 this.isTerminated = true;
+		 this.getUnit().setTask(null);
+		 this.setUnit(null);
+		 //delete from unit
+		 //delete from scheduler
+	 }
+	 
+	 /**
+	  * Return a boolean indicating whether or not this Task
+	  * is terminated.
+	  */
+	 @Basic @Raw
+	 public boolean isTerminated() {
+		 return this.isTerminated;
+	 }
+	 
+	 /**
+	  * Variable registering whether this person is terminated.
+	  */
+	 private boolean isTerminated = false;
+	 
+	
+	public void advanceTime(double deltaT){
+		double taskTime = deltaT;
+		
+		while (taskTime > 0){
+			taskTime -= 0.001;
+			if (this.getStatementIterator().hasNext()){
+				MyStatement statement = this.getStatementIterator().next();
+				if (statement instanceof NullStatement){
+					
+				}
+				else if(statement instanceof Assignment){
+					Assignment assignStatement = (Assignment)statement;
+					this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement.getExpression());
+				}
+				else if(statement instanceof Action){
+					Action actionStatement = (Action)statement;
+					actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+					this.getUnit().startAction();
+					return;
+				}
+				else if(statement instanceof Print){
+					Print printStatement = (Print)statement;
+					printStatement.execute();
+				}
+				else{
+					throw new IllegalStateException("not a valid/known instance of statment");
+				}
+			}
+			else{
+				this.terminate();
+				return;
+			}
+		}
+	}
+	
+	public void interruptAction(){
+		this.setPriority(this.getPriority()-1);
+		this.getUnit().setTask(null);
+		this.setUnit(null);
+		this.iterator = null;
+	}
 	
 }

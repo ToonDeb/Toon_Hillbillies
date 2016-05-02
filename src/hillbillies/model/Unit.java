@@ -3,8 +3,11 @@ package hillbillies.model;
 import hillbillies.model.UnitStatus;
 import hillbillies.model.pathfinding.AStarPathFinder;
 import hillbillies.model.pathfinding.Path;
+import hillbillies.part3.programs.statement.MyStatement;
+import hillbillies.part3.programs.statement.StatementIterator;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
 
 import javax.vecmath.*;
@@ -103,6 +106,10 @@ import static hillbillies.model.Constants.AIR;
  * @invar  The Task of each	 Unit must be a valid Task for any
  *         Unit.	
  *       | isValidTask(getTask())
+ *
+ * @invar  The TaskIterator of each Unit must be a valid TaskIterator for any
+ *         Unit.	
+ *       | isValidTaskIterator(getTaskIterator())
  *       
  * @version 0.1
  */
@@ -2062,7 +2069,9 @@ public class Unit extends GameObject {
 	private void defend(Unit other) throws IllegalArgumentException {
 		if (!other.canAttack(this))
 			throw new IllegalArgumentException("This Unit can not be attacked by the other unit");
-
+		
+		this.isInterrupted = true;
+		
 		this.setStatus(UnitStatus.DEFENDING);
 		this.face(other.getCubePosition());
 
@@ -2298,6 +2307,10 @@ public class Unit extends GameObject {
 	 */
 	public void advanceTime(double deltaT) {
 		
+		if(this.getTask() != null && this.hasFinishedAction() && !this.isInterrupted){
+			this.getTask().advanceTime(deltaT);
+		}
+		
 		// Check if unit stands on solid ground
 		int[] belowPosition = this.getCubePositionBelow();
 		
@@ -2309,6 +2322,7 @@ public class Unit extends GameObject {
 		else if(this.getWorld().isPassableTerrain(belowPosition)&&
 				!this.getWorld().isNeighbouringSolid(this.getCubePosition())){
 			this.startFall();
+			this.isInterrupted = true;
 			this.setStatus(UnitStatus.FALLING);
 		}
 		else if (this.getStatus() == UnitStatus.DODGING) {
@@ -2338,13 +2352,18 @@ public class Unit extends GameObject {
 				&& (!this.isFalling())) {
 			this.rest3MinTime = 0;
 			this.rest();
-		} else {
+			this.isInterrupted = true;
+		} 
+		else {
 			this.rest3MinTime = this.rest3MinTime + deltaT;
 		}
 
 		if ((this.getStatus() == UnitStatus.IDLE) && (this.getDefaultBoolean() == true)) {
 			this.defaultBehaviour();
 		}
+		
+		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted)
+			this.isInterrupted = false;
 		
 		
 
@@ -2715,4 +2734,24 @@ public class Unit extends GameObject {
 	 * Variable registering the Task of this Unit.
 	 */
 	private Task task;
+
+	public void startAction(){
+		this.hasFinishedAction = false;
+	}
+	
+	/**
+	 * return hasFinishedAction
+	 * @return
+	 * 			| this.hasFinishedAction
+	 */
+	public boolean hasFinishedAction(){
+		return this.hasFinishedAction;
+	}
+	/**
+	 * variable registering whether the action of the task has finished.
+	 */
+	private boolean hasFinishedAction = true;
+	
+	private boolean isInterrupted = false;
+	
 }

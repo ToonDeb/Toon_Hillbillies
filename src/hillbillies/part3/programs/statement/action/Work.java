@@ -1,4 +1,4 @@
-package hillbillies.part3.programs.statement;
+package hillbillies.part3.programs.statement.action;
 
 import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;

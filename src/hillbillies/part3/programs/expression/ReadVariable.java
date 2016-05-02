@@ -21,7 +21,7 @@ public class ReadVariable extends MyExpression {
 	}
 	
 	public MyExpression getExpression(Task task){
-		return task.getExpression(name);
+		return (MyExpression)task.getExpression(name);
 	}
 	
 	private static String name;
