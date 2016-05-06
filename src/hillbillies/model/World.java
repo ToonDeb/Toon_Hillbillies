@@ -94,7 +94,7 @@ public class World {
 				new ConnectedToBorder(
 						this.getNbCubesX(), this.getNbCubesY(), this.getNbCubesZ()));
 		
-		ArrayList<ArrayList<Integer>> workshopLocations = new ArrayList<ArrayList<Integer>>();
+		ArrayList<int[]> workshopLocations = new ArrayList<int[]>();
 		for(int x=0; x<this.getNbCubesX(); x++){
 			for(int y=0; y<this.getNbCubesY(); y++){
 				for(int z=0; z<this.getNbCubesZ();z++){
@@ -102,16 +102,14 @@ public class World {
 						this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 					}
 					if(this.getCubeType(x, y, z) == CubeType.WORKSHOP){
-						ArrayList<Integer> position = new ArrayList<Integer>();
-						position.add(x);
-						position.add(y);
-						position.add(z);
+						int[] position = {x,y,z};
 						workshopLocations.add(position);
 					}
 				}
 			}
 		}
-		this.workshopLocations = workshopLocations.stream().map(u -> u.toArray()).toArray(int[][]::new);
+		int list[][] = new int[workshopLocations.size()][3];
+		this.workshopLocations = workshopLocations.toArray(list);
 		
 	}
 	
