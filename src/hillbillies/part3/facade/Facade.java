@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.vecmath.Vector3d;
+
 import hillbillies.model.Boulder;
 import hillbillies.model.Faction;
 import hillbillies.model.Log;
@@ -11,6 +13,7 @@ import hillbillies.model.Scheduler;
 import hillbillies.model.Task;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
+import hillbillies.part2.listener.DefaultTerrainChangeListener;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.TaskFactory;
@@ -29,8 +32,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public World createWorld(int[][][] terrainTypes, TerrainChangeListener modelListener) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			World world = new World(terrainTypes, modelListener);
+			return world;
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -38,8 +46,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getNbCubesX(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return world.getNbCubesX();
 	}
 
 	/* (non-Javadoc)
@@ -47,8 +54,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getNbCubesY(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return world.getNbCubesY();
 	}
 
 	/* (non-Javadoc)
@@ -56,8 +62,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getNbCubesZ(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return world.getNbCubesZ();
 	}
 
 	/* (non-Javadoc)
@@ -65,7 +70,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void advanceTime(World world, double dt) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			world.advanceTime(dt);
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -74,8 +84,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getCubeType(World world, int x, int y, int z) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		try{
+			return world.getCubeType(x, y, z).getNumber();
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -83,7 +97,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setCubeType(World world, int x, int y, int z, int value) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			world.setCubeType(x, y, z, value);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -92,8 +111,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isSolidConnectedToBorder(World world, int x, int y, int z) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			return world.getConnectedToBorder().isSolidConnectedToBorder(x, y, z);
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -101,8 +124,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Unit spawnUnit(World world, boolean enableDefaultBehavior) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			Unit unit = world.spawnUnit(enableDefaultBehavior);
+			return unit;
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -110,7 +138,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void addUnit(Unit unit, World world) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.setWorld(world);
+			world.addUnit(unit);
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -119,8 +153,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Unit> getUnits(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return world.getUnits();
 	}
 
 	/* (non-Javadoc)
@@ -128,8 +161,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isCarryingLog(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isCarryingLog();
 	}
 
 	/* (non-Javadoc)
@@ -137,8 +169,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isCarryingBoulder(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isCarryingBoulder();
 	}
 
 	/* (non-Javadoc)
@@ -146,8 +177,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isAlive(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return !unit.isTerminated();
 	}
 
 	/* (non-Javadoc)
@@ -155,8 +185,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getExperiencePoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getExperience();
 	}
 
 	/* (non-Javadoc)
@@ -164,7 +193,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void workAt(Unit unit, int x, int y, int z) throws ModelException {
-		// TODO Auto-generated method stub
+		try{ 
+			int[] target = {x, y, z};
+			unit.workAt(target);
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -173,8 +208,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Faction getFaction(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return unit.getFaction();
 	}
 
 	/* (non-Javadoc)
@@ -182,8 +216,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Unit> getUnitsOfFaction(Faction faction) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return faction.getUnitsOfFaction();
 	}
 
 	/* (non-Javadoc)
@@ -191,8 +224,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Faction> getActiveFactions(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		try{
+			return world.getActiveFactions();
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -200,8 +237,9 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double[] getPosition(Boulder boulder) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Vector3d vector = boulder.getPosition();
+		double[] position = {vector.x, vector.y, vector.z};
+		return position;
 	}
 
 	/* (non-Javadoc)
@@ -209,8 +247,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Boulder> getBoulders(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return world.getBoulders();
 	}
 
 	/* (non-Javadoc)
@@ -218,8 +255,9 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double[] getPosition(Log log) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Vector3d vector = log.getPosition();
+		double[] position = {vector.x, vector.y, vector.z};
+		return position;
 	}
 
 	/* (non-Javadoc)
@@ -227,8 +265,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Log> getLogs(World world) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return world.getLogs();
 	}
 
 	/* (non-Javadoc)
@@ -237,8 +274,11 @@ public class Facade implements IFacade {
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		int[][][] terrain = {{{0}}};
+		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
+		World world = new World(terrain, defaultListener);
+		return new Unit(name, initialPosition, weight, agility, strength, toughness,
+				world, null, enableDefaultBehavior);
 	}
 
 	/* (non-Javadoc)
@@ -246,8 +286,9 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double[] getPosition(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		Vector3d vector = unit.getPosition();
+		double[] position = {vector.x, vector.y, vector.z};
+		return position;
 	}
 
 	/* (non-Javadoc)
@@ -255,8 +296,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int[] getCubeCoordinate(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return unit.getCubePosition();
 	}
 
 	/* (non-Javadoc)
@@ -264,8 +304,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public String getName(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return unit.getName();
 	}
 
 	/* (non-Javadoc)
@@ -273,7 +312,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setName(Unit unit, String newName) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.setName(newName);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -282,8 +326,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getWeight(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getWeight();
 	}
 
 	/* (non-Javadoc)
@@ -291,7 +334,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setWeight(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
+		unit.setWeight(newValue);
 
 	}
 
@@ -300,8 +343,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getStrength(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getStrength();
 	}
 
 	/* (non-Javadoc)
@@ -309,7 +351,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setStrength(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
+		unit.setWeight(newValue);
 
 	}
 
@@ -318,8 +360,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getAgility(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getAgility();
 	}
 
 	/* (non-Javadoc)
@@ -327,8 +368,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setAgility(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
-
+		unit.setAgility(newValue);
 	}
 
 	/* (non-Javadoc)
@@ -336,8 +376,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getToughness(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getToughness();
 	}
 
 	/* (non-Javadoc)
@@ -345,8 +384,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setToughness(Unit unit, int newValue) throws ModelException {
-		// TODO Auto-generated method stub
-
+		unit.setToughness(newValue);
 	}
 
 	/* (non-Javadoc)
@@ -354,8 +392,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getMaxHitPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getMaxHP();
 	}
 
 	/* (non-Javadoc)
@@ -363,8 +400,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getCurrentHitPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getHP();
 	}
 
 	/* (non-Javadoc)
@@ -372,8 +408,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getMaxStaminaPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getMaxStamina();
 	}
 
 	/* (non-Javadoc)
@@ -381,8 +416,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getCurrentStaminaPoints(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getStamina();
 	}
 
 	/* (non-Javadoc)
@@ -390,7 +424,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void advanceTime(Unit unit, double dt) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.advanceTime(dt);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -399,7 +438,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void moveToAdjacent(Unit unit, int dx, int dy, int dz) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			unit.newMoveToAdjacent(dx, dy, dz);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -408,8 +452,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double getCurrentSpeed(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getSpeed();
 	}
 
 	/* (non-Javadoc)
@@ -417,8 +460,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isMoving(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isMoving();
 	}
 
 	/* (non-Javadoc)
@@ -426,8 +468,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void startSprinting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-
+		try{
+			unit.startSprint();
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -435,8 +481,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void stopSprinting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-
+		try{
+			unit.stopSprint();
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -444,8 +494,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isSprinting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isSprinting();
 	}
 
 	/* (non-Javadoc)
@@ -453,8 +502,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double getOrientation(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getOrientation();
 	}
 
 	/* (non-Javadoc)
@@ -462,8 +510,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void moveTo(Unit unit, int[] cube) throws ModelException {
-		// TODO Auto-generated method stub
-
+		try{
+			unit.moveTo(cube);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -471,7 +523,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void work(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
+		// not used
 
 	}
 
@@ -480,8 +532,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isWorking(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isWorking();
 	}
 
 	/* (non-Javadoc)
@@ -489,8 +540,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void fight(Unit attacker, Unit defender) throws ModelException {
-		// TODO Auto-generated method stub
-
+		try{
+			attacker.attack(defender);
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -498,8 +553,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isAttacking(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isAttacking();
 	}
 
 	/* (non-Javadoc)
@@ -507,8 +561,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void rest(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-
+		try {
+			unit.rest();
+		}
+		catch(Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -516,8 +574,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isResting(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.isResting();
 	}
 
 	/* (non-Javadoc)
@@ -525,8 +582,15 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setDefaultBehaviorEnabled(Unit unit, boolean value) throws ModelException {
-		// TODO Auto-generated method stub
-
+		try{
+			if(value)
+				unit.startDefaultBehaviour();
+			else
+				unit.stopDefaultBehaviour();
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -534,8 +598,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isDefaultBehaviorEnabled(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		return unit.getDefaultBoolean();
 	}
 
 	/* (non-Javadoc)
