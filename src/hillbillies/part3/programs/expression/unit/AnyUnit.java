@@ -5,6 +5,7 @@ import java.util.Random;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -12,7 +13,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class AnyUnit extends UnitExpression {
+public class AnyUnit extends MyExpression<Unit> {
 
 	/**
 	 * @param sourceLocation
@@ -25,7 +26,8 @@ public class AnyUnit extends UnitExpression {
 	 * @see hillbillies.part3.programs.expression.UNIT#getUnit(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
-	public Unit getUnit(World world, Unit unit) {
+	public Unit evaluateExpression(Unit unit) {
+		World world = unit.getWorld();
 		int random = new Random().nextInt(world.getNbUnits());
 		int i = -1;
 		for (Unit anyUnit: world.getUnits()){
@@ -42,7 +44,7 @@ public class AnyUnit extends UnitExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		return "AnyUnit: " + this.getUnit(unit.getWorld(), unit).getName();
+		return "AnyUnit: " + this.evaluateExpression(unit).getName();
 	}
 
 }

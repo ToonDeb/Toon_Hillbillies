@@ -4,8 +4,8 @@ import java.util.Random;
 
 import hillbillies.model.Faction;
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -13,7 +13,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class Friend extends UnitExpression {
+public class Friend extends MyExpression<Unit> {
 
 	/**
 	 * @param unit
@@ -27,7 +27,7 @@ public class Friend extends UnitExpression {
 	 * @see hillbillies.part3.programs.expression.UNIT#getUnit(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
-	public Unit getUnit(World world, Unit unit) {
+	public Unit evaluateExpression(Unit unit) {
 		Faction friendlyFaction = unit.getFaction();
 //		int random = new Random().nextInt(friendlyFaction.getNbUnits());
 //		for (Unit friendlyUnit: friendlyFaction.getUnitsOfFaction()){
@@ -51,7 +51,7 @@ public class Friend extends UnitExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		return "FriendUnit: " + this.getUnit(unit.getWorld(), unit).getName();
+		return "FriendUnit: " + this.evaluateExpression(unit).getName();
 	}
 
 

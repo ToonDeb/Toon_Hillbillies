@@ -2,8 +2,9 @@ package hillbillies.part3.programs.expression.position;
 
 import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
-import hillbillies.model.World;
+
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -12,7 +13,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class LiteralPosition extends PositionExpression {
+public class LiteralPosition extends MyExpression<int[]> {
 	
 	public LiteralPosition(int x, int y, int z, SourceLocation sourceLocation){
 		super(sourceLocation);
@@ -20,8 +21,8 @@ public class LiteralPosition extends PositionExpression {
 		this.position = position;
 	}
 	
-	public int[] getPosition(World world, Unit unit){
-		if(world.isValidWorldPosition(this.position))
+	public int[] evaluateExpression(Unit unit){
+		if(unit.getWorld().isValidWorldPosition(this.position))
 			return this.position;
 		else
 			throw new IllegalArgumentException("not a valid position in this world");
@@ -34,7 +35,7 @@ public class LiteralPosition extends PositionExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		int[] position = this.getPosition(unit.getWorld(), unit);
+		int[] position = this.evaluateExpression(unit);
 		return "LiteralPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

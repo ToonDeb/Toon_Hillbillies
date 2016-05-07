@@ -11,11 +11,17 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public abstract class MyExpression {
+public abstract class MyExpression<T> {
 	
 	public MyExpression(SourceLocation sourceLocation){
 		this.sourceLocation = sourceLocation;
 	}
+	
+	public SourceLocation getSourceLocation(){
+		return this.sourceLocation;
+	}
+	
+	public abstract T evaluateExpression(Unit unit);
 	
 	public abstract String toString(Unit unit);
 	

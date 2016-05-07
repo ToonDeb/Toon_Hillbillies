@@ -262,6 +262,6 @@ public class Faction {
 	/**
 	 * Variable registering the Scheduler of this Faction.
 	 */
-	private Scheduler scheduler;
+	private Scheduler scheduler = new Scheduler(this);
 
 }

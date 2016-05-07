@@ -1,6 +1,5 @@
 package hillbillies.part3.programs.statement;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import be.kuleuven.cs.som.annotate.Value;
@@ -21,13 +20,13 @@ public class Print extends MyStatement {
 	/**
 	 * @param sourceLocation
 	 */
-	public Print(MyExpression expression, SourceLocation sourceLocation) {
+	public Print(MyExpression<?> expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		this.expression = expression;
 		
 	}
 	
-	public MyExpression getExpression(){
+	public MyExpression<?> getExpression(){
 		return this.expression;
 	}
 	
@@ -35,7 +34,7 @@ public class Print extends MyStatement {
 		System.out.println(this.getExpression().toString());
 	}
 	
-	private final MyExpression expression;
+	private final MyExpression<?> expression;
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.statement.MyStatement#iterator()

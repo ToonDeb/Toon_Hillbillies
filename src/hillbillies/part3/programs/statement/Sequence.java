@@ -1,7 +1,5 @@
 package hillbillies.part3.programs.statement;
 
-
-import java.util.Currency;
 import java.util.List;
 import java.util.NoSuchElementException;
 

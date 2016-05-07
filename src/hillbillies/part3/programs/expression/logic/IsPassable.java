@@ -1,10 +1,9 @@
 package hillbillies.part3.programs.expression.logic;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.position.PositionExpression;
+
 
 /**
  * A class of ...
@@ -12,33 +11,31 @@ import hillbillies.part3.programs.expression.position.PositionExpression;
  * @author  ...
  * @version 1.0
  */
-public class IsPassable extends BooleanExpression {
+public class IsPassable extends MyExpression<Boolean> {
 
 	/**
 	 * @param sourceLocation
 	 */
-	public IsPassable(MyExpression expression, SourceLocation sourceLocation) {
+	public IsPassable(MyExpression<int[]> expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		position = (PositionExpression)expression;
-		// TODO Auto-generated constructor stub
+		position = expression;
 	}
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.logic.BooleanExpression#get(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
-	public boolean get(World world, Unit unit) {
-		// TODO Auto-generated method stub
-		return world.isPassableTerrain(position.getPosition(world, unit));
+	public Boolean evaluateExpression(Unit unit) {
+		return unit.getWorld().isPassableTerrain(position.evaluateExpression(unit));
 	}
 	
-	private static PositionExpression position;
+	private static MyExpression<int[]> position;
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
 	 */
 	@Override
 	public String toString(Unit unit) {
-		return "IsPassable: " + this.get(unit.getWorld(), unit);
+		return "IsPassable: " + this.evaluateExpression(unit);
 	}
 }

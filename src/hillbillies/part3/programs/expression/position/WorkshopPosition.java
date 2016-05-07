@@ -2,8 +2,8 @@ package hillbillies.part3.programs.expression.position;
 
 import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -12,7 +12,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class WorkshopPosition extends PositionExpression {
+public class WorkshopPosition extends MyExpression<int[]> {
 	
 	/**
 	 * @param sourceLocation
@@ -21,8 +21,8 @@ public class WorkshopPosition extends PositionExpression {
 		super(sourceLocation);
 	}
 
-	public int[] getPosition(World world, Unit unit){
-		return world.getWorkshopLocation();
+	public int[] evaluateExpression(Unit unit){
+		return unit.getWorld().getWorkshopLocation();
 	}
 
 	/* (non-Javadoc)
@@ -30,7 +30,7 @@ public class WorkshopPosition extends PositionExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		int[] position = this.getPosition(unit.getWorld(), unit);
+		int[] position = this.evaluateExpression(unit);
 		return "WorkshopPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

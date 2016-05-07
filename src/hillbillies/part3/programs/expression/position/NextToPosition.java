@@ -4,7 +4,6 @@ import java.util.Random;
 
 import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
@@ -16,30 +15,27 @@ import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
  * @version 1.0
  */
 @Value
-public class NextToPosition extends PositionExpression {
+public class NextToPosition extends MyExpression<int[]> {
 	
-	public NextToPosition(MyExpression position, SourceLocation sourceLocation){
+	public NextToPosition(MyExpression<int[]> position, SourceLocation sourceLocation){
 		super(sourceLocation);
 		otherPosition = position;
 	}
 	
-	private static MyExpression otherPosition;
+	private static MyExpression<int[]> otherPosition;
 
-	public int[] getPosition(World world, Unit unit) {
+	public int[] evaluateExpression(Unit unit) {
 		int[] firstPosition;
-		if (otherPosition instanceof PositionExpression){
-			firstPosition = ((PositionExpression)otherPosition).getPosition(world, unit);
-		}
-		else{
-			throw new IllegalArgumentException("this type of expression is not possible!");
-		}
+		
+		firstPosition = otherPosition.evaluateExpression(unit);
+		
 		int counter = 0;
 		while (counter < 100){
 			int random = new Random().nextInt(6);
 			firstPosition[0] += DIRECTLYNEIGHBOURINGLIST[random][0];
 			firstPosition[1] += DIRECTLYNEIGHBOURINGLIST[random][1];
 			firstPosition[2] += DIRECTLYNEIGHBOURINGLIST[random][2];
-			if (world.isValidWorldPosition(firstPosition))
+			if (unit.getWorld().isValidWorldPosition(firstPosition))
 				return firstPosition;
 		}
 		return null;
@@ -50,7 +46,7 @@ public class NextToPosition extends PositionExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		int[] position = this.getPosition(unit.getWorld(), unit);
+		int[] position = this.evaluateExpression(unit);
 		return "NextToPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

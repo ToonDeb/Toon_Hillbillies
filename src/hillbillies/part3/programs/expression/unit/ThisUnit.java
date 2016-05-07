@@ -1,8 +1,8 @@
 package hillbillies.part3.programs.expression.unit;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -10,7 +10,7 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-public class ThisUnit extends UnitExpression {
+public class ThisUnit extends MyExpression<Unit> {
 
 	/**
 	 * @param sourceLocation
@@ -23,7 +23,7 @@ public class ThisUnit extends UnitExpression {
 	 * @see hillbillies.part3.programs.expression.unit.UnitExpression#getUnit(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
-	public Unit getUnit(World world, Unit unit) {
+	public Unit evaluateExpression(Unit unit) {
 		return unit;
 	}
 
@@ -32,7 +32,7 @@ public class ThisUnit extends UnitExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		return "ThisUnit: " + this.getUnit(unit.getWorld(), unit).getName();
+		return "ThisUnit: " + this.evaluateExpression(unit).getName();
 	}
 
 }

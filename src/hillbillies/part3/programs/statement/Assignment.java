@@ -1,6 +1,6 @@
 package hillbillies.part3.programs.statement;
 
-import java.util.Iterator;
+
 import java.util.NoSuchElementException;
 
 import be.kuleuven.cs.som.annotate.Value;
@@ -18,13 +18,14 @@ import hillbillies.part3.programs.expression.MyExpression;
 @Value
 public class Assignment extends MyStatement {
 	
-	public Assignment(String variableName, MyExpression expression, SourceLocation sourceLocation){
+	
+	public Assignment(String variableName, MyExpression<?> expression, SourceLocation sourceLocation){
 		super(sourceLocation);
 		this.expression = expression;
 		this.variableName = variableName;
 	}
 	
-	public MyExpression getExpression(){
+	public MyExpression<?> getExpression(){
 		return this.expression;
 	}
 	
@@ -32,9 +33,8 @@ public class Assignment extends MyStatement {
 		return this.variableName;
 	}
 	
-	//TODO: manier om de expression terug op te roepen uit de variablename.
-
-	private final MyExpression expression;
+	
+	private final MyExpression<?> expression;
 	private final String variableName;
 	
 	/* (non-Javadoc)

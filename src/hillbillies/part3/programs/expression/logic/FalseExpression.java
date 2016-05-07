@@ -1,7 +1,6 @@
 package hillbillies.part3.programs.expression.logic;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
@@ -11,17 +10,16 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-public class FalseExpression extends BooleanExpression {
+public class FalseExpression extends MyExpression<Boolean> {
 
 	/**
 	 * @param sourceLocation
 	 */
 	public FalseExpression(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
 	}
 	
-	public boolean get(World world, Unit unit){
+	public Boolean evaluateExpression(Unit unit){
 		return false;
 	}
 

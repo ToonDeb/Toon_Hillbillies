@@ -1,10 +1,8 @@
 package hillbillies.part3.programs.expression.logic;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.unit.UnitExpression;
 
 /**
  * A class of ...
@@ -12,34 +10,34 @@ import hillbillies.part3.programs.expression.unit.UnitExpression;
  * @author  ...
  * @version 1.0
  */
-public class IsCarryingItem extends BooleanExpression {
+public class IsCarryingItem extends MyExpression<Boolean> {
 
 	/**
 	 * 
 	 * @param expression
 	 * @param sourceLocation
 	 */
-	public IsCarryingItem(MyExpression expression, SourceLocation sourceLocation) {
+	public IsCarryingItem(MyExpression<Unit> expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		unitExpression = (UnitExpression)expression;
+		unitExpression = expression;
 	}
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.logic.BooleanExpression#get(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
-	public boolean get(World world, Unit unit) {
-		return unitExpression.getUnit(world, unit).isCarryingItem();
+	public Boolean evaluateExpression(Unit unit) {
+		return unitExpression.evaluateExpression(unit).isCarryingItem();
 	}
 	
-	private static UnitExpression unitExpression;
+	private static MyExpression<Unit> unitExpression;
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.MyExpression#toString()
 	 */
 	@Override
 	public String toString(Unit unit) {
-		return "isCarryingItem: " + this.get(unit.getWorld(), unit);
+		return "isCarryingItem: " + this.evaluateExpression(unit);
 	}
 
 }

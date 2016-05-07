@@ -1,6 +1,6 @@
 package hillbillies.part3.programs.statement;
 
-import java.util.Iterator;
+
 import java.util.NoSuchElementException;
 
 import be.kuleuven.cs.som.annotate.Value;
@@ -8,7 +8,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.logic.BooleanExpression;
+
 
 /**
  * A class of ...
@@ -19,20 +19,20 @@ import hillbillies.part3.programs.expression.logic.BooleanExpression;
 @Value
 public class WhileLoop extends MyStatement {
 	
-	public WhileLoop(MyExpression expression, MyStatement statement, SourceLocation sourceLocation){
+	public WhileLoop(MyExpression<Boolean> expression, MyStatement statement, SourceLocation sourceLocation){
 		super(sourceLocation);
 		this.expression = expression;
 		this.statement = statement;
 	}
 	
-	public MyExpression getExpression(){
+	public MyExpression<Boolean> getExpression(){
 		return this.expression;
 	}
 	
 	public MyStatement getStatement(){
 		return this.statement;
 	}
-	private final MyExpression expression;
+	private final MyExpression<Boolean> expression;
 	private final MyStatement statement;
 	
 	/* (non-Javadoc)
@@ -44,7 +44,7 @@ public class WhileLoop extends MyStatement {
 
 			@Override
 			public boolean hasNext() {
-				if(((BooleanExpression)WhileLoop.this.getExpression()).get(world, unit)){
+				if((WhileLoop.this.getExpression()).evaluateExpression(unit)){
 					if(iterator.isTerminal()){
 						return true;
 					}

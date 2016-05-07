@@ -6,8 +6,8 @@ import java.util.Set;
 import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Log;
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
 
 /**
  * A class of ...
@@ -16,14 +16,14 @@ import hillbillies.part3.programs.SourceLocation;
  * @version 1.0
  */
 @Value
-public class LogPosition extends PositionExpression {
+public class LogPosition extends MyExpression<int[]> {
 	
 	public LogPosition(SourceLocation sourceLocation){
 		super(sourceLocation);
 	}
 	
-	public int[] getPosition(World world, Unit unit){
-		Set<Log> logs = world.getLogs();
+	public int[] evaluateExpression(Unit unit){
+		Set<Log> logs = unit.getWorld().getLogs();
 		int random = new Random().nextInt(logs.size());
 		int i = 0;
 		for (Log log: logs){
@@ -40,7 +40,7 @@ public class LogPosition extends PositionExpression {
 	 */
 	@Override
 	public String toString(Unit unit) {
-		int[] position = this.getPosition(unit.getWorld(), unit);
+		int[] position = this.evaluateExpression(unit);
 		return "LogPosition: " + "{" + position[0] + "," + position[1]+","+position[2]+"}";
 	}
 }

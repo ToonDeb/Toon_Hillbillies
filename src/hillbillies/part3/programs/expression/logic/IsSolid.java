@@ -1,10 +1,8 @@
 package hillbillies.part3.programs.expression.logic;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.position.PositionExpression;
 
 /**
  * A class of ...
@@ -12,30 +10,29 @@ import hillbillies.part3.programs.expression.position.PositionExpression;
  * @author  ...
  * @version 1.0
  */
-public class IsSolid extends BooleanExpression {
+public class IsSolid extends MyExpression<Boolean> {
 
 	/**
 	 * @param sourceLocation
 	 */
-	public IsSolid(MyExpression expression, SourceLocation sourceLocation) {
+	public IsSolid(MyExpression<int[]> expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		position = (PositionExpression)expression;
+		position = expression;
 		
 	}
 
-	public boolean get(World world, Unit unit) {
-		// TODO Auto-generated method stub
-		return world.isPassableTerrain(position.getPosition(world, unit));
+	public Boolean evaluateExpression(Unit unit) {
+		return !unit.getWorld().isPassableTerrain(position.evaluateExpression(unit));
 	}
 	
-	private static PositionExpression position;
+	private static MyExpression<int[]> position;
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.MyExpression#toString(hillbillies.model.Unit)
 	 */
 	@Override
 	public String toString(Unit unit) {
-		return "IsSolid: " + this.get(unit.getWorld(), unit);
+		return "IsSolid: " + this.evaluateExpression(unit);
 	}
 
 }

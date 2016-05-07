@@ -1,10 +1,8 @@
 package hillbillies.part3.programs.expression.logic;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import javafx.beans.binding.MapExpression;
 
 /**
  * A class of ...
@@ -12,36 +10,35 @@ import javafx.beans.binding.MapExpression;
  * @author  ...
  * @version 1.0
  */
-public class AndExpression extends BooleanExpression {
+public class AndExpression extends MyExpression<Boolean> {
 
 	/**
 	 * @param sourceLocation
 	 */
-	public AndExpression(MyExpression leftExpression, MyExpression rightExpression, SourceLocation sourceLocation) {
+	public AndExpression(MyExpression<Boolean> leftExpression, MyExpression<Boolean> rightExpression, SourceLocation sourceLocation) {
 		super(sourceLocation);
-		left = (BooleanExpression)leftExpression;
-		right = (BooleanExpression)rightExpression;
+		left = leftExpression;
+		right = rightExpression;
 	}
 
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.logic.BooleanExpression#get(hillbillies.model.World, hillbillies.model.Unit)
 	 */
 	@Override
-	public boolean get(World world, Unit unit) {
-		return left.get(world, unit) && right.get(world, unit);
+	public Boolean evaluateExpression(Unit unit) {
+		return left.evaluateExpression(unit) && right.evaluateExpression(unit);
 	}
 	
 	
 	
-	private static BooleanExpression left;
-	private static BooleanExpression right;
+	private static MyExpression<Boolean> left;
+	private static MyExpression<Boolean> right;
 	
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.expression.MyExpression#toString()
 	 */
 	@Override
 	public String toString(Unit unit) {
-		// TODO Auto-generated method stub
 		return left.toString(unit) + " and " + right.toString(unit);
 	}
 

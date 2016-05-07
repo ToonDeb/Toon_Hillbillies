@@ -1,6 +1,5 @@
 package hillbillies.part3.programs.statement.action;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import be.kuleuven.cs.som.annotate.Value;
@@ -18,21 +17,21 @@ import hillbillies.part3.programs.statement.StatementIterator;
  * @version 1.0
  */
 @Value
-public abstract class Action extends MyStatement {
+public abstract class Action<T> extends MyStatement {
 
 	/**
 	 * @param sourceLocation
 	 */
-	public Action(MyExpression expression, SourceLocation sourceLocation) {
+	public Action(MyExpression<T> expression, SourceLocation sourceLocation) {
 		super(sourceLocation);
 		this.expression = expression;
 	}
 	
-	public MyExpression getExpression(){
+	public MyExpression<T> getExpression(){
 		return this.expression;
 	}
 	
-	private final MyExpression expression;
+	private final MyExpression<T> expression;
 	
 	public abstract void execute(World world, Unit unit);
 	

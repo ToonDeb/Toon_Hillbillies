@@ -1,9 +1,9 @@
 package hillbillies.part3.programs.expression.logic;
 
 import hillbillies.model.Unit;
-import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
+
 
 /**
  * A class of ...
@@ -11,7 +11,7 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-public class TrueExpression extends BooleanExpression {
+public class TrueExpression extends MyExpression<Boolean> {
 
 	/**
 	 * @param sourceLocation
@@ -20,7 +20,7 @@ public class TrueExpression extends BooleanExpression {
 		super(sourceLocation);
 	}
 	
-	public boolean get(World world, Unit unit){
+	public Boolean evaluateExpression(Unit unit){
 		return true;
 	}
 

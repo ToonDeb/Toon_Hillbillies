@@ -5,7 +5,6 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.unit.UnitExpression;
 
 /**
  * A class of ...
@@ -14,13 +13,13 @@ import hillbillies.part3.programs.expression.unit.UnitExpression;
  * @version 1.0
  */
 @Value
-public class Attack extends Action {
+public class Attack extends Action<Unit> {
 
 	/**
 	 * @param expression
 	 * @param sourceLocation
 	 */
-	public Attack(MyExpression expression, SourceLocation sourceLocation) {
+	public Attack(MyExpression<Unit> expression, SourceLocation sourceLocation) {
 		super(expression, sourceLocation);
 	}
 
@@ -29,7 +28,7 @@ public class Attack extends Action {
 	 */
 	@Override
 	public void execute(World world, Unit unit) {
-		unit.attack(((UnitExpression)this.getExpression()).getUnit(world, unit));
+		unit.attack(this.getExpression().evaluateExpression(unit));
 		
 	}
 	

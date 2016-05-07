@@ -1,6 +1,5 @@
 package hillbillies.part3.programs.statement;
 
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import be.kuleuven.cs.som.annotate.Value;
@@ -8,7 +7,6 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.logic.BooleanExpression;
 
 /**
  * A class of ...
@@ -19,7 +17,7 @@ import hillbillies.part3.programs.expression.logic.BooleanExpression;
 @Value
 public class IfThenElse extends MyStatement {
 	
-	public IfThenElse(MyExpression expression, MyStatement then, MyStatement other, SourceLocation sourceLocation){
+	public IfThenElse(MyExpression<Boolean> expression, MyStatement then, MyStatement other, SourceLocation sourceLocation){
 		super(sourceLocation);
 		this.expression = expression;
 		this.then = then;
@@ -29,7 +27,7 @@ public class IfThenElse extends MyStatement {
 			this.other = other;
 	}
 	
-	public MyExpression getExpression(){
+	public MyExpression<Boolean> getExpression(){
 		return this.expression;
 	}
 	
@@ -42,18 +40,15 @@ public class IfThenElse extends MyStatement {
 	}
 	
 	public MyStatement evaluate(World world, Unit unit){
-		MyExpression expression = this.getExpression();
-		if(expression instanceof BooleanExpression){
-			if (((BooleanExpression)expression).get(world, unit)){
-				return this.getThen();
-			}
-			else{
-				return this.getElse();
-			}
+		MyExpression<Boolean> expression = this.getExpression();
+		
+		if(expression.evaluateExpression(unit)){
+			return this.getThen();
 		}
 		else{
-			throw new IllegalArgumentException("the expression is not a booleanexpression!");
+			return this.getElse();
 		}
+		
 	}
 	
 	/* (non-Javadoc)
@@ -114,7 +109,7 @@ public class IfThenElse extends MyStatement {
 		};
 	}
 	
-	private final MyExpression expression;
+	private final MyExpression<Boolean> expression;
 	private final MyStatement then;
 	private final MyStatement other;
 	

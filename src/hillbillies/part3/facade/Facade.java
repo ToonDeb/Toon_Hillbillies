@@ -614,7 +614,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isWellFormed(Task task) throws ModelException {
-		// TODO Auto-generated method stub
+		// not required
 		return false;
 	}
 
@@ -623,8 +623,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Scheduler getScheduler(Faction faction) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return faction.getScheduler();
 	}
 
 	/* (non-Javadoc)
@@ -632,8 +631,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void schedule(Scheduler scheduler, Task task) throws ModelException {
-		// TODO Auto-generated method stub
-
+		scheduler.addTask(task);
 	}
 
 	/* (non-Javadoc)
@@ -641,7 +639,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void replace(Scheduler scheduler, Task original, Task replacement) throws ModelException {
-		// TODO Auto-generated method stub
+		try{
+			scheduler.replaceTask(original, replacement);
+		}
+		catch (Exception e){
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -650,8 +653,12 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean areTasksPartOf(Scheduler scheduler, Collection<Task> tasks) throws ModelException {
-		// TODO Auto-generated method stub
-		return false;
+		try {
+			return scheduler.arePartOf(tasks);
+		} 
+		catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -659,8 +666,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Iterator<Task> getAllTasksIterator(Scheduler scheduler) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return scheduler.iterator();
 	}
 
 	/* (non-Javadoc)
@@ -668,8 +674,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Scheduler> getSchedulersForTask(Task task) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return task.getSchedulers();
 	}
 
 	/* (non-Javadoc)
@@ -677,8 +682,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Unit getAssignedUnit(Task task) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return task.getUnit();
 	}
 
 	/* (non-Javadoc)
@@ -686,8 +690,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Task getAssignedTask(Unit unit) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return unit.getTask();
 	}
 
 	/* (non-Javadoc)
@@ -695,8 +698,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public String getName(Task task) throws ModelException {
-		// TODO Auto-generated method stub
-		return null;
+		return task.getName();
 	}
 
 	/* (non-Javadoc)
@@ -704,8 +706,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getPriority(Task task) throws ModelException {
-		// TODO Auto-generated method stub
-		return 0;
+		return task.getPriority();
 	}
 
 }
