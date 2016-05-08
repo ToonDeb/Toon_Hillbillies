@@ -27,7 +27,7 @@ import static hillbillies.model.Constants.AIR;
 /**
  * 
  * 
- * @authors Toon Deburchgrave CWS-ELT
+ * @author Toon Deburchgrave CWS-ELT
  *          
  * 
  *          A class for Units

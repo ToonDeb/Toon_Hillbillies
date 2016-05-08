@@ -407,6 +407,7 @@ public class World {
 	 *       |     then canHaveAsLog(log) &&
 	 *       |          (log.getWorld() == this)
 	 */
+	@SuppressWarnings("unused")
 	private boolean hasProperLogs() {
 		for (Log log : logs) {
 			if (!canHaveAsLog(log))

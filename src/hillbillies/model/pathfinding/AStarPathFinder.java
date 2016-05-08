@@ -150,7 +150,7 @@ public class AStarPathFinder{
 	
 							float nextStepCost = current.cost + getMovementCost(mover, current.x, current.y, current.z, xp, yp, zp);
 							Node neighbour = nodes[xp][yp][zp];
-							//map.pathFinderVisited(xp, yp, zp); TODO: check if nog werkt
+							//map.pathFinderVisited(xp, yp, zp); 
 							// if the new cost we've determined for this node is lower than 
 							// it has been previously makes sure the node hasn'e've
 							// determined that there might have been a better path to get to
@@ -373,7 +373,7 @@ public class AStarPathFinder{
 		 * 
 		 * @param o The element to add
 		 */
-		@SuppressWarnings("unchecked")
+		//@SuppressWarnings("unchecked")
 		public void add(Node o) {
 			list.add(o);
 			Collections.sort(list);
@@ -411,7 +411,7 @@ public class AStarPathFinder{
 	/**
 	 * A single node in the search graph
 	 */
-	private class Node implements Comparable {
+	private class Node implements Comparable<Node> {
 		/** The x coordinate of the node */
 		private int x;
 		/** The y coordinate of the node */
@@ -456,8 +456,8 @@ public class AStarPathFinder{
 		/**
 		 * @see Comparable#compareTo(Object)
 		 */
-		public int compareTo(Object other) {
-			Node o = (Node) other;
+		public int compareTo(Node other) {
+			Node o = other;
 			
 			float f = heuristic + cost;
 			float of = o.heuristic + o.cost;

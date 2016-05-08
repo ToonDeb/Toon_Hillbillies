@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
-import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.internal.generated.HillbilliesTaskLangParser.AssignmentStatementContext;
 import hillbillies.part3.programs.statement.Assignment;
 import hillbillies.part3.programs.statement.MyStatement;
 import hillbillies.part3.programs.statement.NullStatement;
@@ -455,7 +453,7 @@ public class Task implements Comparable<Task>{
 					this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement.getExpression());
 				}
 				else if(statement instanceof Action){
-					Action actionStatement = (Action)statement;
+					Action<?> actionStatement = (Action<?>)statement;
 					actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
 					this.getUnit().startAction();
 					return;

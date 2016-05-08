@@ -39,6 +39,7 @@ import hillbillies.part3.programs.statement.action.Work;
  * @author  ...
  * @version 1.0
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task> {
 
 	/* (non-Javadoc)
