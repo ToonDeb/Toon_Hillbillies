@@ -80,10 +80,12 @@ public class Task implements Comparable<Task>{
 		this.name = name;
 		
 		this.setPriority(priority);
-		
+		System.out.println("task created: ");
+		System.out.println(this);
+		System.out.println(statement);
 		this.setStatement(statement); //mss immutable?
 		
-		this.setAssignedVariables(new HashMap<String, Object>());
+		this.setAssignedVariables(new HashMap<String, Assignment<?>>());
 	}
 	
 	/**
@@ -207,17 +209,7 @@ public class Task implements Comparable<Task>{
 	 */
 	private MyStatement statement;
 	
-	/**
-	 * Returns the expression assigned to the given variableName
-	 * 
-	 * @param variableName
-	 * 		  The name of the expression to search for
-	 * @return 
-	 * 			| return this.getAssignedVariables().get(variableName)
-	 */
-	public Object getExpression(String variableName){
-		return this.getAssignedVariables().get(variableName);
-	}
+	
 	
 
 
@@ -240,7 +232,7 @@ public class Task implements Comparable<Task>{
 	 * Return the AssignedVariables of this Task.
 	 */
 	@Basic @Raw
-	public HashMap<String, Object> getAssignedVariables() {
+	public HashMap<String, Assignment<?>> getAssignedVariables() {
 		return this.assignedVariable;
 	}
 
@@ -253,7 +245,7 @@ public class Task implements Comparable<Task>{
 	 * @return 
 	 *       | result == 
 	*/
-	public static boolean isValidAssignedVariables(HashMap<String, Object> assignedVariable) {
+	public static boolean isValidAssignedVariables(HashMap<String, Assignment<?>> assignedVariable) {
 		return true;
 	}
 
@@ -271,17 +263,29 @@ public class Task implements Comparable<Task>{
 	 *       | ! isValidAssignedVariables(getAssignedVariables())
 	 */
 	@Raw
-	public void setAssignedVariables(HashMap<String, Object> assignedVariable) 
+	public void setAssignedVariables(HashMap<String, Assignment<?>> assignedVariable) 
 			throws IllegalArgumentException {
 		if (! isValidAssignedVariables(assignedVariable))
 			throw new IllegalArgumentException();
 		this.assignedVariable = assignedVariable;
 	}
+	
+	/**
+	 * Returns the expression assigned to the given variableName
+	 * 
+	 * @param variableName
+	 * 		  The name of the expression to search for
+	 * @return 
+	 * 			| return this.getAssignedVariables().get(variableName)
+	 */
+	public Assignment<?> getAssignment(String variableName){
+		return this.getAssignedVariables().get(variableName);
+	}
 
 	/**
 	 * Variable registering the AssignedVariables of this Task.
 	 */
-	private HashMap<String, Object> assignedVariable;
+	private HashMap<String, Assignment<?>> assignedVariable;
 	
 	/**
 	 * TODO: task iterator documententatie
@@ -332,7 +336,20 @@ public class Task implements Comparable<Task>{
 		if (! isValidUnit(unit))
 			throw new IllegalArgumentException();
 		this.unit = unit;
-		this.setStatementIterator();
+		
+		if(unit != null){
+			this.setStatementIterator();
+		}
+		
+	}
+	
+	public boolean isAssigned(){
+		return(this.getUnit() != null);
+	}
+	
+	public void assignTo(Unit unit){
+		unit.setTask(this);
+		this.setUnit(unit);
 	}
 
 	/**
@@ -395,7 +412,7 @@ public class Task implements Comparable<Task>{
 	public void setStatementIterator() throws IllegalArgumentException {
 		if (this.getUnit() == null)
 			throw new IllegalStateException("no assigned unit");
-		this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit());
+		this.iterator = this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit());
 	}
 
 	/**
@@ -412,11 +429,13 @@ public class Task implements Comparable<Task>{
 	 *       | ...
 	 */
 	 public void terminate() {
+		 
 		 this.isTerminated = true;
 		 this.getUnit().setTask(null);
 		 this.setUnit(null);
 		 
 		 for(Scheduler scheduler: this.schedulers){
+			 //scheduler.removeTask(this);
 			 this.removeScheduler(scheduler);
 		 }
 		 //delete from unit
@@ -440,17 +459,27 @@ public class Task implements Comparable<Task>{
 	
 	public void advanceTime(double deltaT){
 		double taskTime = deltaT;
-		
 		while (taskTime > 0){
 			taskTime -= 0.001;
+			if (this.getStatementIterator().isTerminal()){
+				MyStatement statement = this.getStatement();
+				if(statement instanceof Action){
+					Action<?> actionStatement = (Action<?>)statement;
+					actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+					this.getUnit().startAction();
+					this.terminate();
+					return;
+				}
+			}
 			if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
+				System.out.println(statement);
 				if (statement instanceof NullStatement){
 					
 				}
 				else if(statement instanceof Assignment){
-					Assignment assignStatement = (Assignment)statement;
-					this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement.getExpression());
+					Assignment<?> assignStatement = (Assignment<?>)statement;
+					this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
 				}
 				else if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
@@ -577,8 +606,9 @@ public class Task implements Comparable<Task>{
 	@Raw
 	public void removeScheduler(Scheduler scheduler) {
 		assert this.hasAsScheduler(scheduler);
-		schedulers.remove(scheduler);
 		scheduler.removeTask(this);
+		schedulers.remove(scheduler);
+		System.out.println("scheduler removed");
 	}
 	
 	public Set<Scheduler> getSchedulers(){

@@ -3,10 +3,8 @@ package hillbillies.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
 
@@ -251,8 +249,8 @@ public class Scheduler {
 	 */
 	@Raw
 	public void removeTask(Task task) {
-		assert (task != null) && this.hasAsTask(task)
-				&& (!task.hasAsScheduler(this));
+//		assert (task != null) && this.hasAsTask(task)
+//				&& (!task.hasAsScheduler(this));
 		tasks.remove(task);
 	}
 
@@ -302,12 +300,13 @@ public class Scheduler {
 		return true;
 	}
 	
+	
 	public Iterator<Task> iterator(){
 		return new Iterator<Task>(){
 
 			@Override
 			public boolean hasNext() {
-				return this.index < getNbTasks();
+				return this.index-1 < getNbTasks();
 			}
 
 			@Override
@@ -319,5 +318,16 @@ public class Scheduler {
 			private int index = 1;
 			
 		};
+	}
+	
+	public Task getNextAvailableTask(){
+		Iterator<Task> iterator = this.iterator();
+		while(iterator.hasNext()){
+			Task task = iterator.next();
+			if(!task.isAssigned()){
+				return task;
+			}
+		}
+		return null;
 	}
 }

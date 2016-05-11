@@ -5,6 +5,7 @@ import java.util.List;
 
 import hillbillies.model.Task;
 import hillbillies.part3.programs.expression.MyExpression;
+import hillbillies.part3.programs.expression.ReadVariable;
 import hillbillies.part3.programs.expression.logic.AndExpression;
 import hillbillies.part3.programs.expression.logic.FalseExpression;
 import hillbillies.part3.programs.expression.logic.IsAlive;
@@ -141,8 +142,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createReadVariable(String variableName, SourceLocation sourceLocation) {
-		// TODO createReadVariable, op variablename de expression kunnen zoeken
-		return null;
+		return new ReadVariable(variableName, sourceLocation);
 	}
 
 	/* (non-Javadoc)

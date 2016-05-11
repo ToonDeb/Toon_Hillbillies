@@ -3,11 +3,9 @@ package hillbillies.model;
 import hillbillies.model.UnitStatus;
 import hillbillies.model.pathfinding.AStarPathFinder;
 import hillbillies.model.pathfinding.Path;
-import hillbillies.part3.programs.statement.MyStatement;
-import hillbillies.part3.programs.statement.StatementIterator;
 
 import java.util.Arrays;
-import java.util.Iterator;
+
 import java.util.Random;
 
 import javax.vecmath.*;
@@ -15,14 +13,8 @@ import javax.vecmath.*;
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
 
-//import static hillbillies.model.Constants.MAX_X_POSITION;
-//import static hillbillies.model.Constants.MAX_Y_POSITION;
-//import static hillbillies.model.Constants.MAX_Z_POSITION;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
-import static hillbillies.model.Constants.WORKSHOP;
-import static hillbillies.model.Constants.TREE;
-import static hillbillies.model.Constants.ROCK;
-import static hillbillies.model.Constants.AIR;
+
 
 /**
  * 
@@ -311,7 +303,7 @@ public class Unit extends GameObject {
 		if(this.isFalling())
 			throw new IllegalStateException("can't move while falling!");
 		
-		if(!this.isSprinting())
+		if(!this.isSprinting() && !this.isFollowing())
 			this.setStatus(UnitStatus.WALKING);
 
 		if (Arrays.equals(this.getCubePosition(), this.getFinalDestination())) {
@@ -387,10 +379,36 @@ public class Unit extends GameObject {
 			throw new IllegalArgumentException("Invalid final destination!");
 		if (this.isFalling())
 			throw new IllegalStateException("can't move while falling");
+		if (Arrays.equals(this.getCubePosition(), finalDestination))
+			return;
 		this.setFinalDestination(finalDestination);
 		this.resetPath();
 		this.moveToAdjacent(this.findPath());
 	}
+	
+	public void startFollowing(Unit otherUnit){
+		if (otherUnit == null)
+			throw new NullPointerException("no other unit given!");
+		this.followUnit = otherUnit;
+		this.setStatus(UnitStatus.FOLLOWING);
+		this.moveTo(otherUnit.getCubePosition());
+	}
+	
+	public void follow(){
+		if(!this.isNeighbouringCube(followUnit.getCubePosition())){
+			this.moveTo(followUnit.getCubePosition());
+		}
+		else{
+			this.setStatus(UnitStatus.IDLE);
+			this.followUnit = null;
+		}
+	}
+	
+	public boolean isFollowing(){
+		return this.getStatus() == UnitStatus.FOLLOWING;
+	}
+	
+	private Unit followUnit;
 	
 	/**
 	 * Check if the Unit is moving
@@ -401,7 +419,8 @@ public class Unit extends GameObject {
 	 */
 	public boolean isMoving(){
 		 return ((this.getStatus() == UnitStatus.WALKING) 
-				 || (this.getStatus() == UnitStatus.SPRINTING));
+				 || (this.getStatus() == UnitStatus.SPRINTING)
+				 || (this.getStatus() == UnitStatus.FOLLOWING));
 	}
 
 	/** 
@@ -1643,7 +1662,7 @@ public class Unit extends GameObject {
 		
 		// if the target cube is a tree, destroy the tree and drop a log
 		if(world.getCubeType(workX, workY, workZ)==CubeType.TREE){
-			world.setCubeType(workX, workY, workZ, AIR);
+			world.setCubeType(workX, workY, workZ, CubeType.AIR.getNumber());
 			Log newLog = new Log(this.getWorkTarget(), world);
 			world.addLog(newLog);
 			
@@ -1652,7 +1671,7 @@ public class Unit extends GameObject {
 		
 		//if the target cube is a rock, destroy the rock and drop a boulder
 		if(world.getCubeType(workX, workY, workZ)==CubeType.ROCK){
-			world.setCubeType(workX, workY, workZ, AIR);
+			world.setCubeType(workX, workY, workZ, CubeType.AIR.getNumber());
 			Boulder newBoulder = new Boulder(this.getWorkTarget(), world);
 			world.addBoulder(newBoulder);
 			
@@ -2306,9 +2325,12 @@ public class Unit extends GameObject {
 	 * update all timers and properties of this unit
 	 */
 	public void advanceTime(double deltaT) {
+		if(!this.isFollowing())
+			this.followUnit = null;
 		
 		if(this.getTask() != null && this.hasFinishedAction() && !this.isInterrupted){
 			this.getTask().advanceTime(deltaT);
+			
 		}
 		
 		// Check if unit stands on solid ground
@@ -2343,6 +2365,10 @@ public class Unit extends GameObject {
 		else if (this.isMoving()) {
 			if(this.isSprinting())
 				this.updateSprint(deltaT);
+			else if(this.isFollowing()){
+				this.follow();
+				this.updatePosition(deltaT);
+			}	
 			else
 				this.updatePosition(deltaT);
 		}
@@ -2358,13 +2384,27 @@ public class Unit extends GameObject {
 			this.rest3MinTime = this.rest3MinTime + deltaT;
 		}
 
-		if ((this.getStatus() == UnitStatus.IDLE) && (this.getDefaultBoolean() == true)) {
-			this.defaultBehaviour();
-		}
+//		if ((this.getStatus() == UnitStatus.IDLE) && (this.getDefaultBoolean() == true)) {
+//			this.defaultBehaviour();
+//		}
 		
 		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted)
 			this.isInterrupted = false;
 		
+		if(this.getStatus() == UnitStatus.IDLE && !this.hasFinishedAction()){
+			this.hasFinishedAction = true;
+			return;
+		}
+		
+		if(this.getStatus() == UnitStatus.IDLE){
+			Task task = this.getFaction().getScheduler().getNextAvailableTask();
+			if(task != null){
+				task.setUnit(this);
+				this.setTask(task);
+				//task.assignTo(this);
+				//task.advanceTime(deltaT);
+			}
+		}
 		
 
 	}

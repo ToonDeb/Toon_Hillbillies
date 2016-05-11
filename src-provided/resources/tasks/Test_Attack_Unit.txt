@@ -1,0 +1,4 @@
+name: "follow_unit"
+priority: 1
+activities: moveTo (next_to (position_of enemy));
+attack enemy;

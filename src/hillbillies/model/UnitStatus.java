@@ -28,5 +28,7 @@ public enum UnitStatus {
 	
 	FALLING,
 	
-	DODGING
+	DODGING,
+	
+	FOLLOWING
 }

@@ -28,9 +28,9 @@ public class Follow extends Action<Unit> {
 	 */
 	@Override
 	public void execute(World world, Unit unit) {
-		Unit following = (this.getExpression()).evaluateExpression(unit);
+		Unit following = this.getExpression().evaluateExpression(unit);
 		if(!following.isNeighbouringCube(unit.getCubePosition())){
-			unit.moveTo(following.getCubePosition());
+			unit.startFollowing(following);
 		}
 		else{
 			this.hasArrived = true;

@@ -16,25 +16,37 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @version 1.0
  */
 @Value
-public class Assignment extends MyStatement {
+public class Assignment<T> extends MyStatement {
 	
 	
-	public Assignment(String variableName, MyExpression<?> expression, SourceLocation sourceLocation){
+	public Assignment(String variableName, MyExpression<T> expression, SourceLocation sourceLocation){
 		super(sourceLocation);
 		this.expression = expression;
 		this.variableName = variableName;
 	}
 	
-	public MyExpression<?> getExpression(){
+	public MyExpression<T> getExpression(){
 		return this.expression;
+	}
+	
+//	public void setEvaluatedExpression(T evaluatedExpression){
+//		this.evaluatedExpression = evaluatedExpression;
+//	}
+	
+	public T getEvaluatedExpression(Unit unit){
+		if (this.evaluatedExpression == null)
+			this.evaluatedExpression = this.getExpression().evaluateExpression(unit);
+		
+		return this.evaluatedExpression;
+		
 	}
 	
 	public String getVariableName(){
 		return this.variableName;
 	}
 	
-	
-	private final MyExpression<?> expression;
+	private T evaluatedExpression;
+	private final MyExpression<T> expression;
 	private final String variableName;
 	
 	/* (non-Javadoc)

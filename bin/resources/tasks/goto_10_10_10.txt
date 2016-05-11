@@ -1,3 +1,10 @@
-name: "goto (10, 10, 10)"
+name: "goto (3, 6, 9)"
 priority : 5
-activities : moveTo (10, 10, 10);
+activities : moveTo (3, 6, 9);
+if (carries_item(this)) then
+		work here;
+fi
+moveTo (2, 6, 9);
+moveTo (1, 6, 9);
+moveTo (0,0,2);
+moveTo (3,6,9);
