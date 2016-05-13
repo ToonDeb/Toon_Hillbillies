@@ -465,7 +465,12 @@ public class Task implements Comparable<Task>{
 				MyStatement statement = this.getStatement();
 				if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
-					actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+					try{
+						actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+					}
+					catch(Exception e){
+						this.interrupt();
+					}
 					this.getUnit().startAction();
 					this.terminate();
 					//return;
@@ -484,7 +489,7 @@ public class Task implements Comparable<Task>{
 			if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
 				System.out.println(statement);
-				this.lastStatement = statement;
+				//this.lastStatement = statement;
 			
 				if (statement instanceof NullStatement){
 					
@@ -495,7 +500,13 @@ public class Task implements Comparable<Task>{
 				}
 				else if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
-					actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+					try{
+						actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+					}
+					catch(Exception e){
+						this.interrupt();
+						return;
+					}
 					this.getUnit().startAction();
 					return;
 				}
@@ -514,40 +525,22 @@ public class Task implements Comparable<Task>{
 		}
 	}
 	
-	public void executeStatement(MyStatement statement){
-		if (statement instanceof NullStatement){
-			
-		}
-		else if(statement instanceof Assignment){
-			Assignment assignStatement = (Assignment)statement;
-			this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
-		}
-		else if(statement instanceof Action){
-			Action<?> actionStatement = (Action<?>)statement;
-			actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
-			this.getUnit().startAction();
-		}
-		else if(statement instanceof Print){
-			Print printStatement = (Print)statement;
-			printStatement.execute(this.getUnit());
-		}
-		else{
-			throw new IllegalStateException("not a valid/known instance of statement");
-		}
+	/**
+	 * 
+	 */
+	public void interrupt(){
+		if(this.getUnit() == null)
+			throw new IllegalStateException("not being executed!");
+		this.getUnit().setTask(null);
+		this.setUnit(null);
+		this.setPriority(this.getPriority()-1);
 	}
 	
-	public void redoLastStatement(){
-		executeStatement(this.lastStatement);
-	}
-	
-	private MyStatement lastStatement;
-	
-//	public void interruptAction(){
-//		this.setPriority(this.getPriority()-1);
-//		this.getUnit().setTask(null);
-//		this.setUnit(null);
-//		this.iterator = null;
+//	public void redoLastStatement(){
+//		executeStatement(this.lastStatement);
 //	}
+//	
+//	private MyStatement lastStatement;
 
 	/**
 	 * Check whether this Task has the given Scheduler as one of its
@@ -651,6 +644,7 @@ public class Task implements Comparable<Task>{
 		System.out.println("scheduler removed");
 	}
 	
+	
 	public Set<Scheduler> getSchedulers(){
 		Set<Scheduler> newSet = new HashSet<Scheduler>();
 		for(Scheduler scheduler: this.schedulers){
@@ -681,7 +675,7 @@ public class Task implements Comparable<Task>{
 	public int compareTo(Task other) {
 		if (this.getPriority() == other.getPriority())
 			return 0;
-		else if(this.getPriority() > other.getPriority())
+		else if(this.getPriority() < other.getPriority())
 			return 1;
 		else
 			return -1;

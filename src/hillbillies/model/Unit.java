@@ -17,12 +17,10 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
 
 
 /**
- * 
+ * A class for Units
  * 
  * @author Toon Deburchgrave CWS-ELT
  *          
- * 
- *          A class for Units
  *
  * @invar The position of each Unit must be a valid position for any Unit. 
  * 		  | isValidPosition(getPosition())
@@ -99,9 +97,6 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  *         Unit.	
  *       | isValidTask(getTask())
  *
- * @invar  The TaskIterator of each Unit must be a valid TaskIterator for any
- *         Unit.	
- *       | isValidTaskIterator(getTaskIterator())
  *       
  * @version 0.1
  */
@@ -2089,7 +2084,7 @@ public class Unit extends GameObject {
 		if (!other.canAttack(this))
 			throw new IllegalArgumentException("This Unit can not be attacked by the other unit");
 		
-		this.isInterrupted = true;
+		this.interruptTask();
 		
 		this.setStatus(UnitStatus.DEFENDING);
 		this.face(other.getCubePosition());
@@ -2328,9 +2323,8 @@ public class Unit extends GameObject {
 		if(!this.isFollowing())
 			this.followUnit = null;
 		
-		if(this.getTask() != null && this.hasFinishedAction() && !this.isInterrupted){
+		if(this.getTask() != null && this.hasFinishedAction()){
 			this.getTask().advanceTime(deltaT);
-			
 		}
 		
 		// Check if unit stands on solid ground
@@ -2344,7 +2338,7 @@ public class Unit extends GameObject {
 		else if(this.getWorld().isPassableTerrain(belowPosition)&&
 				!this.getWorld().isNeighbouringSolid(this.getCubePosition())){
 			this.startFall();
-			this.isInterrupted = true;
+			this.interruptTask();
 			this.setStatus(UnitStatus.FALLING);
 		}
 		else if (this.getStatus() == UnitStatus.DODGING) {
@@ -2378,7 +2372,7 @@ public class Unit extends GameObject {
 				&& (!this.isFalling())) {
 			this.rest3MinTime = 0;
 			this.rest();
-			this.isInterrupted = true;
+			this.interruptTask();
 		} 
 		else {
 			this.rest3MinTime = this.rest3MinTime + deltaT;
@@ -2388,23 +2382,18 @@ public class Unit extends GameObject {
 //			this.defaultBehaviour();
 //		}
 		
-		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted){
-			this.isInterrupted = false;
-			this.getTask().redoLastStatement();
-		}
+//		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted){
+//			this.isInterrupted = false;
+//			this.getTask().redoLastStatement();
+//		}
 		if(this.getStatus() == UnitStatus.IDLE && !this.hasFinishedAction()){
 			this.hasFinishedAction = true;
 			return;
 		}
 		
 		if(this.getStatus() == UnitStatus.IDLE){
-			Task task = this.getFaction().getScheduler().getNextAvailableTask();
-			if(task != null){
-				task.setUnit(this);
-				this.setTask(task);
-				//task.assignTo(this);
-				//task.advanceTime(deltaT);
-			}
+			Scheduler scheduler = this.getFaction().getScheduler();
+			scheduler.assignNextTaskTo(this);
 		}
 		
 
@@ -2492,10 +2481,6 @@ public class Unit extends GameObject {
 	 * Variable registering whether this person is terminated.
 	 */
 	private boolean isTerminated = false;
-
-	/* END Terminate */
-
-	/* DefaultBehaviour */
 
 	/**
 	 * The Unit is in default behaviour mode
@@ -2727,7 +2712,14 @@ public class Unit extends GameObject {
 	 * Variable registering the Experience of this Unit.
 	 */
 	private int experience = 0;
-
+	
+	/**
+	 * TODO
+	 */
+	public void interruptTask(){
+		if(this.getTask() != null)
+			this.getTask().interrupt();
+	}
 
 	/**
 	 * Return the Task of this Unit.
@@ -2793,6 +2785,5 @@ public class Unit extends GameObject {
 	 */
 	private boolean hasFinishedAction = true;
 	
-	private boolean isInterrupted = false;
 	
 }

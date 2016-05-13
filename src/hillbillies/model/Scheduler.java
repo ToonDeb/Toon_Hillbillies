@@ -18,7 +18,7 @@ import be.kuleuven.cs.som.annotate.*;
  * @invar   Each Scheduler must have proper Tasks.
  *        | hasProperTasks()
  *        
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class Scheduler {
@@ -120,15 +120,16 @@ public class Scheduler {
 	 * 
 	 * @param  task
 	 *         The Task to check.
-	 * @return True if and only if the given Task is effective
+	 * @return True if and only if the given Task is effective, not terminated
 	 *         and that Task can have this Scheduler as its Scheduler.
 	 *       | result ==
 	 *       |   (task != null) &&
-	 *       |   task.canHaveAsScheduler(this)
+	 *       |   task.canHaveAsScheduler(this) &&
+	 *       | 	 !task.isTerminated()
 	 */
 	@Raw
 	public boolean canHaveAsTask(Task task) {
-		return (task != null) && (task.canHaveAsScheduler(this));
+		return (task != null) && (task.canHaveAsScheduler(this)) && !task.isTerminated();
 	}
 
 	/**
@@ -205,22 +206,47 @@ public class Scheduler {
 	 * 
 	 * @param  task
 	 *         The Task to be added.
-	 * @pre    The given Task is effective and already references
-	 *         this Scheduler, and this Scheduler does not yet have the given
-	 *         Task as one of its Tasks.
-	 *       | (task != null) && (task.getScheduler() == this) &&
-	 *       | (! this.hasAsTask(task))
+	 *        
 	 * @post   The number of Tasks of this Scheduler is
 	 *         incremented by 1.
 	 *       | new.getNbTasks() == getNbTasks() + 1
 	 * @post   This Scheduler has the given Task as its very last Task.
 	 *       | new.getTaskAt(getNbTasks()+1) == task
+	 * @throws IllegalArgumentException
+	 * 		   The given Task is effective and already references
+	 *         this Scheduler, and this Scheduler does not yet have the given
+	 *         Task as one of its Tasks. Else, throw exception
+	 *       | (task == null) || (task.getScheduler() != this) ||
+	 *       | (this.hasAsTask(task))
 	 */
 	public void addTask(@Raw Task task) {
-		assert (task != null) && (task.hasAsScheduler(this))
-				&& (!this.hasAsTask(task));
+		if ((task == null) || (!task.hasAsScheduler(this)) && (this.hasAsTask(task))){
+			throw new IllegalArgumentException("task is not valid for this scheduler");
+		}
 		tasks.add(task);
 		Collections.sort(tasks);
+		System.out.println("sorted");
+	}
+	
+	
+	public void scheduleTask(Task task){
+		task.addScheduler(this);
+		this.addTask(task);
+	}
+	
+	/**
+	 * add multiple Tasks to this Scheduler
+	 * 
+	 * @param tasks
+	 * 		  A list with all the tasks to be added
+	 * @effect The tasks are added to this scheduler
+	 * 		   for(Task task in tasks)
+	 * 		   do  this.addTask(task)
+	 */
+	public void addMultipleTasks(@Raw List<Task> tasks){
+		for(Task task: tasks){
+			this.addTask(task);
+		}
 	}
 
 	/**
@@ -228,12 +254,7 @@ public class Scheduler {
 	 * 
 	 * @param  task
 	 *         The Task to be removed.
-	 * @pre    The given Task is effective, this Scheduler has the
-	 *         given Task as one of its Tasks, and the given
-	 *         Task does not reference any Scheduler.
-	 *       | (task != null) &&
-	 *       | this.hasAsTask(task) &&
-	 *       | (task.getScheduler() == null)
+	 
 	 * @post   The number of Tasks of this Scheduler is
 	 *         decremented by 1.
 	 *       | new.getNbTasks() == getNbTasks() - 1
@@ -246,12 +267,37 @@ public class Scheduler {
 	 *       | for each I,J in 1..getNbTasks():
 	 *       |   if ( (getTaskAt(I) == task) and (I < J) )
 	 *       |     then new.getTaskAt(J-1) == getTaskAt(J)
+	 * @throws IllegalArgumentException   
+	 * 		   The given Task is effective, this Scheduler has the
+	 *         given Task as one of its Tasks, and the given
+	 *         Task does not reference any Scheduler. 
+	 *         Else throw the exception
+	 *       | (task == null) ||
+	 *       | !this.hasAsTask(task) ||
+	 *       | (task.getScheduler() != null)
 	 */
 	@Raw
 	public void removeTask(Task task) {
-//		assert (task != null) && this.hasAsTask(task)
-//				&& (!task.hasAsScheduler(this));
+		if ((task == null) || this.hasAsTask(task) || (!task.hasAsScheduler(this))){
+			throw new IllegalArgumentException("tasks can't be removed");
+		}
 		tasks.remove(task);
+	}
+	
+	/**
+	 * remove all the tasks listed from this Scheduler
+	 * 
+	 * @param tasks
+	 * 		  List of the tasks to be removed
+	 * 
+	 * @effect The tasks are removed
+	 * 			for(Task task in tasks)
+	 * 			do this.removeTask(task)
+	 */
+	public void removeMultipleTasks(List<Task> tasks){
+		for(Task task: tasks){
+			this.removeTask(task);
+		}
 	}
 
 	/**
@@ -274,9 +320,31 @@ public class Scheduler {
 	private final List<Task> tasks = new ArrayList<Task>();
 
 	
-	
-	public void replaceTask(Task original, Task replacement){
-		if (!this.hasAsTask(original))
+	/**
+	 * Replace a task in this scheduler by another task
+	 * 
+	 * @param original
+	 * 		  The Task already in this scheduler
+	 * @param replacement
+	 * 		  The new Task
+	 * @throws  IllegalArgumentException
+	 * 			Original is not a task in this scheduler, or replacement can't be in this scheduler
+	 * 			| (this.hasAsTask(original)) || (!this.canHaveAsTask(replacement)
+	 * @post original is no longer part of this scheduler
+	 * 		 | new.hasAsTask(original) == false
+	 * 		 | (new original).hasAsScheduler(new) == false
+	 * @post replacement is part of this scheduler
+	 * 		 | new.hasAsTask(replacement) == true
+	 * 		 | (new replacement).hasAsScheduler(new) == true
+	 *
+	 * @post if original was being executed by a Unit, it isn't now
+	 * 		 | if(original.getUnit != null)
+	 * 		 | then original.getUnit().setTask(null)
+	 *		 |		original.setUnit(null)
+	 *
+	 */
+	public void replaceTask(Task original, Task replacement) throws IllegalArgumentException{
+		if (this.hasAsTask(original))
 			throw new IllegalArgumentException("the given task is not part of this scheduler");
 		if(!this.canHaveAsTask(replacement))
 			throw new IllegalArgumentException("can't have this task as task");
@@ -329,5 +397,28 @@ public class Scheduler {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * returns all tasks of this scheduler as a list
+	 * 
+	 * @return a list of all tasks
+	 * 		   | result == this.tasks
+	 */
+	public List<Task> getAllTasks(){
+		List<Task> list = new ArrayList<Task>();
+		list.addAll(this.tasks);
+		Collections.sort(list);
+		return list;
+	}
+	
+	public void interruptTaskOf(Unit unit){
+		unit.interruptTask();
+	}
+	
+	public void assignNextTaskTo(Unit unit){
+		Task task = this.getNextAvailableTask();
+		if(task != null)
+			task.assignTo(unit);
 	}
 }

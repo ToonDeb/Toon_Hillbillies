@@ -631,11 +631,7 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void schedule(Scheduler scheduler, Task task) throws ModelException {
-		task.addScheduler(scheduler);
-		scheduler.addTask(task);
-		System.out.println("scheduled new task: ");
-		System.out.println(scheduler);
-		System.out.println(task);
+		scheduler.scheduleTask(task);
 	}
 
 	/* (non-Javadoc)
