@@ -27,6 +27,8 @@ public class BoulderPosition extends MyExpression<int[]> {
 	public int[] evaluateExpression(Unit unit){
 		World world = unit.getWorld();
 		Set<Boulder> boulders = world.getBoulders();
+		if(boulders.size() == 0)
+			throw new NullPointerException("no boulders in this world");
 		int random = new Random().nextInt(boulders.size());
 		int i = 0;
 		for (Boulder boulder: boulders){

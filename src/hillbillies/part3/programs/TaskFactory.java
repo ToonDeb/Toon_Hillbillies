@@ -1,11 +1,19 @@
 package hillbillies.part3.programs;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import hillbillies.model.Faction;
 import hillbillies.model.Task;
+import hillbillies.model.Unit;
+import hillbillies.model.World;
+import hillbillies.part2.listener.DefaultTerrainChangeListener;
+import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.part3.programs.expression.MyExpression;
-import hillbillies.part3.programs.expression.ReadVariable;
+import hillbillies.part3.programs.expression.ReadBooleanVariable;
+import hillbillies.part3.programs.expression.ReadPositionVariable;
+import hillbillies.part3.programs.expression.ReadUnitVariable;
 import hillbillies.part3.programs.expression.logic.AndExpression;
 import hillbillies.part3.programs.expression.logic.FalseExpression;
 import hillbillies.part3.programs.expression.logic.IsAlive;
@@ -61,7 +69,9 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyStatement createAssignment(String variableName, MyExpression value, SourceLocation sourceLocation) {
-		return new Assignment(variableName, value, sourceLocation);
+		Assignment assignment = new Assignment(variableName, value, sourceLocation);
+		this.assignmentmap.put(variableName, assignment);
+		return assignment;
 	}
 
 	/* (non-Javadoc)
@@ -142,7 +152,25 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createReadVariable(String variableName, SourceLocation sourceLocation) {
-		return new ReadVariable(variableName, sourceLocation);
+		Assignment assignment = this.assignmentmap.get(variableName);
+		MyExpression<?> expression = assignment.getExpression();
+		
+		TerrainChangeListener modelListener = new DefaultTerrainChangeListener();
+		World world = new World(new int[][][]{{{3}}}, modelListener);
+		Faction faction = new Faction(world);
+		Unit unit = new Unit("Steegmans", new int[] {0, 0, 0}, 50, 50, 50, 50, world, faction, false);
+		
+		if(expression.evaluateExpression(unit) instanceof Unit){
+			return new ReadUnitVariable(variableName, sourceLocation);
+		}
+		else if(expression.evaluateExpression(unit) instanceof int[]){
+			return new ReadPositionVariable(variableName, sourceLocation);
+		}
+		else if(expression.evaluateExpression(unit) instanceof Boolean){
+			return new ReadBooleanVariable(variableName, sourceLocation);
+		}
+		else
+			throw new IllegalArgumentException();
 	}
 
 	/* (non-Javadoc)
@@ -328,5 +356,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	public MyExpression createPositionOf(MyExpression unit, SourceLocation sourceLocation) {
 		return new PositionOf(unit, sourceLocation);
 	}
+	
+	private HashMap<String, Assignment> assignmentmap = new HashMap<String, Assignment>();
 
 }

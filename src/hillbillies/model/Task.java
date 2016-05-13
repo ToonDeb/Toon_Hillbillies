@@ -85,7 +85,7 @@ public class Task implements Comparable<Task>{
 		System.out.println(statement);
 		this.setStatement(statement); //mss immutable?
 		
-		this.setAssignedVariables(new HashMap<String, Assignment<?>>());
+		this.setAssignedVariables(new HashMap<String, Assignment>());
 	}
 	
 	/**
@@ -232,7 +232,7 @@ public class Task implements Comparable<Task>{
 	 * Return the AssignedVariables of this Task.
 	 */
 	@Basic @Raw
-	public HashMap<String, Assignment<?>> getAssignedVariables() {
+	public HashMap<String, Assignment> getAssignedVariables() {
 		return this.assignedVariable;
 	}
 
@@ -245,7 +245,7 @@ public class Task implements Comparable<Task>{
 	 * @return 
 	 *       | result == 
 	*/
-	public static boolean isValidAssignedVariables(HashMap<String, Assignment<?>> assignedVariable) {
+	public static boolean isValidAssignedVariables(HashMap<String, Assignment> assignedVariable) {
 		return true;
 	}
 
@@ -263,7 +263,7 @@ public class Task implements Comparable<Task>{
 	 *       | ! isValidAssignedVariables(getAssignedVariables())
 	 */
 	@Raw
-	public void setAssignedVariables(HashMap<String, Assignment<?>> assignedVariable) 
+	public void setAssignedVariables(HashMap<String, Assignment> assignedVariable) 
 			throws IllegalArgumentException {
 		if (! isValidAssignedVariables(assignedVariable))
 			throw new IllegalArgumentException();
@@ -278,14 +278,14 @@ public class Task implements Comparable<Task>{
 	 * @return 
 	 * 			| return this.getAssignedVariables().get(variableName)
 	 */
-	public Assignment<?> getAssignment(String variableName){
+	public Assignment getAssignment(String variableName){
 		return this.getAssignedVariables().get(variableName);
 	}
 
 	/**
 	 * Variable registering the AssignedVariables of this Task.
 	 */
-	private HashMap<String, Assignment<?>> assignedVariable;
+	private HashMap<String, Assignment> assignedVariable;
 	
 	/**
 	 * TODO: task iterator documententatie
@@ -468,17 +468,29 @@ public class Task implements Comparable<Task>{
 					actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
 					this.getUnit().startAction();
 					this.terminate();
-					return;
+					//return;
 				}
+				else if (statement instanceof Print){
+					Print printStatement = (Print)statement;
+					printStatement.execute(this.getUnit());
+					this.terminate();
+					//return;
+				}
+				else{
+					this.terminate();
+				}
+				//all other cases, no influence
 			}
 			if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
 				System.out.println(statement);
+				this.lastStatement = statement;
+			
 				if (statement instanceof NullStatement){
 					
 				}
 				else if(statement instanceof Assignment){
-					Assignment<?> assignStatement = (Assignment<?>)statement;
+					Assignment assignStatement = (Assignment)statement;
 					this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
 				}
 				else if(statement instanceof Action){
@@ -489,7 +501,7 @@ public class Task implements Comparable<Task>{
 				}
 				else if(statement instanceof Print){
 					Print printStatement = (Print)statement;
-					printStatement.execute();
+					printStatement.execute(this.getUnit());
 				}
 				else{
 					throw new IllegalStateException("not a valid/known instance of statment");
@@ -501,6 +513,34 @@ public class Task implements Comparable<Task>{
 			}
 		}
 	}
+	
+	public void executeStatement(MyStatement statement){
+		if (statement instanceof NullStatement){
+			
+		}
+		else if(statement instanceof Assignment){
+			Assignment assignStatement = (Assignment)statement;
+			this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
+		}
+		else if(statement instanceof Action){
+			Action<?> actionStatement = (Action<?>)statement;
+			actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+			this.getUnit().startAction();
+		}
+		else if(statement instanceof Print){
+			Print printStatement = (Print)statement;
+			printStatement.execute(this.getUnit());
+		}
+		else{
+			throw new IllegalStateException("not a valid/known instance of statement");
+		}
+	}
+	
+	public void redoLastStatement(){
+		executeStatement(this.lastStatement);
+	}
+	
+	private MyStatement lastStatement;
 	
 //	public void interruptAction(){
 //		this.setPriority(this.getPriority()-1);

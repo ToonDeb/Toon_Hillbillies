@@ -1,6 +1,5 @@
 package hillbillies.model;
 
-import javax.vecmath.Vector3d;
 
 //import be.kuleuven.cs.som.annotate.*;
 

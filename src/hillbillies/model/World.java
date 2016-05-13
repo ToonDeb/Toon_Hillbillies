@@ -110,7 +110,6 @@ public class World {
 		}
 		int list[][] = new int[workshopLocations.size()][3];
 		this.workshopLocations = workshopLocations.toArray(list);
-		
 	}
 	
 	/**

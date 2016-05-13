@@ -12,7 +12,7 @@ import hillbillies.part3.programs.SourceLocation;
  */
 @Value
 public abstract class MyExpression<T> {
-	
+
 	public MyExpression(SourceLocation sourceLocation){
 		this.sourceLocation = sourceLocation;
 	}

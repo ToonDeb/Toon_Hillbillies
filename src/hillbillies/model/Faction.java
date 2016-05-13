@@ -22,8 +22,6 @@ import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
  */
 public class Faction {
 
-	
-
 	/**
 	 * Initialize this new Faction with given World.
 	 *

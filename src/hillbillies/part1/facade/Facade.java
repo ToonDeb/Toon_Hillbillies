@@ -20,21 +20,19 @@ public class Facade implements IFacade {
 			boolean enableDefaultBehavior) throws ModelException {
 		try{
 		// change initialPosition from int to double
-		double[] initialPositionDouble = new double[initialPosition.length];
-		for(int i=0; i<initialPosition.length; i++) {
-			initialPositionDouble[i] = initialPosition[i] + 0.5;
-		}
-		Vector3d position = new Vector3d(initialPositionDouble);
-		Unit unit = new Unit(name, position, weight, agility, strength, toughness);
-		if (enableDefaultBehavior)
-			unit.startDefaultBehaviour();
-		return unit;
+		
+	
+		//Unit unit = new Unit(name, initialPosition, weight, agility, strength, toughness);
+		//if (enableDefaultBehavior)
+			//unit.startDefaultBehaviour();
+		return null;
 		} catch (IllegalArgumentException e){
 			throw new ModelException(e);
 		} catch (IllegalStateException e) {
 			throw new ModelException();
 			
 		}
+	
 	}
 
 	
@@ -338,7 +336,7 @@ public class Facade implements IFacade {
 		try{
 		Vector3d destination = new Vector3d();
 		destination.set(cube[0]+0.5,cube[1]+0.5, cube[2]+0.5);
-		unit.moveTo(destination);
+		//unit.moveTo(destination);
 	} catch (IllegalArgumentException e){
 		throw new ModelException();
 	} catch (IllegalStateException e) {
@@ -349,7 +347,7 @@ public class Facade implements IFacade {
 	@Override
 	public void work(Unit unit) throws ModelException {
 		try{
-		unit.work();
+		//unit.work();
 	} catch (IllegalArgumentException e){
 		throw new ModelException();
 	} catch (IllegalStateException e) {

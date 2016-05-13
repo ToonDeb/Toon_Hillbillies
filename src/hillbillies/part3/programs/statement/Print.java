@@ -30,8 +30,8 @@ public class Print extends MyStatement {
 		return this.expression;
 	}
 	
-	public void execute(){
-		System.out.println(this.getExpression().toString());
+	public void execute(Unit unit){
+		System.out.println(this.getExpression().toString(unit));
 	}
 	
 	private final MyExpression<?> expression;

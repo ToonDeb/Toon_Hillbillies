@@ -2,7 +2,6 @@ package hillbillies.part3.programs.expression;
 
 import hillbillies.model.Unit;
 import hillbillies.part3.programs.SourceLocation;
-import hillbillies.part3.programs.statement.Assignment;
 
 /**
  * A class of ...
@@ -11,7 +10,7 @@ import hillbillies.part3.programs.statement.Assignment;
  * @version 1.0
  */
 //@SuppressWarnings("rawtypes")
-public class ReadVariable<T> extends MyExpression<T>{
+public abstract class ReadVariable<T> extends MyExpression<T>{
 
 	/**
 	 * @param sourceLocation
@@ -21,8 +20,10 @@ public class ReadVariable<T> extends MyExpression<T>{
 		name = variableName;
 	}
 	
-	public T evaluateExpression(Unit unit){
-		return (T) unit.getTask().getAssignment(name).getEvaluatedExpression(unit);
+	//public abstract T evaluateExpression(Unit unit);
+	
+	public String getName(){
+		return name;
 	}
 	
 	private static String name;
@@ -34,5 +35,21 @@ public class ReadVariable<T> extends MyExpression<T>{
 	public String toString(Unit unit) {
 		return "readVariable: name = "+ name +", variable = "+ this.evaluateExpression(unit);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public T evaluateExpression(Unit unit) {
+		if (this.getEvaluatedExpression() == null)
+			this.setEvaluatedExpression((T) unit.getTask().getAssignment(this.getName()).getExpression().evaluateExpression(unit));
+		return this.getEvaluatedExpression();
+	}
+	
+	private T evaluatedExpression = null;
+	
+	public T getEvaluatedExpression(){
+		return this.evaluatedExpression;
+	}
 
+	public void setEvaluatedExpression(T expression){
+		this.evaluatedExpression = expression;
+	}
 }

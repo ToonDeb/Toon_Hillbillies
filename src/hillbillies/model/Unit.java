@@ -376,7 +376,7 @@ public class Unit extends GameObject {
 		if (!this.getWorld().isValidWorldPosition(finalDestination) || 
 				!this.getWorld().isNeighbouringSolid(finalDestination)||
 				!this.getWorld().isPassableTerrain(finalDestination))
-			throw new IllegalArgumentException("Invalid final destination!");
+			throw new IllegalArgumentException("Invalid final destination! " + finalDestination[0] + "," + finalDestination[1] + "," + finalDestination[2]);
 		if (this.isFalling())
 			throw new IllegalStateException("can't move while falling");
 		if (Arrays.equals(this.getCubePosition(), finalDestination))
@@ -1066,24 +1066,24 @@ public class Unit extends GameObject {
 	 *         | this.moveTo(randomPosition)
 	 * 
 	 */
-	private void moveToRandom(){
-		int counter = 0;
-		int[] position = {-1,-1,-1};
-		while (counter < 10000) {
-			// Returns a double between -1 and +1
-			position[0] = random.nextInt(this.getWorld().getNbCubesX());
-			position[1] = random.nextInt(this.getWorld().getNbCubesY());
-			position[2] = random.nextInt(this.getWorld().getNbCubesZ());
-
-			counter++;
-			// in this way, because ispassableterrain requires a valid position
-			if(this.getWorld().isValidWorldPosition(position))
-				if(this.getWorld().isPassableTerrain(position))
-					if(this.getWorld().isNeighbouringSolid(position))
-						break;
-		}
-		this.moveTo(position);
-	}
+//	private void moveToRandom(){
+//		int counter = 0;
+//		int[] position = {-1,-1,-1};
+//		while (counter < 10000) {
+//			// Returns a double between -1 and +1
+//			position[0] = random.nextInt(this.getWorld().getNbCubesX());
+//			position[1] = random.nextInt(this.getWorld().getNbCubesY());
+//			position[2] = random.nextInt(this.getWorld().getNbCubesZ());
+//
+//			counter++;
+//			// in this way, because ispassableterrain requires a valid position
+//			if(this.getWorld().isValidWorldPosition(position))
+//				if(this.getWorld().isPassableTerrain(position))
+//					if(this.getWorld().isNeighbouringSolid(position))
+//						break;
+//		}
+//		this.moveTo(position);
+//	}
 	
 
 	/**
@@ -2388,9 +2388,10 @@ public class Unit extends GameObject {
 //			this.defaultBehaviour();
 //		}
 		
-		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted)
+		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted){
 			this.isInterrupted = false;
-		
+			this.getTask().redoLastStatement();
+		}
 		if(this.getStatus() == UnitStatus.IDLE && !this.hasFinishedAction()){
 			this.hasFinishedAction = true;
 			return;
@@ -2536,11 +2537,11 @@ public class Unit extends GameObject {
 	 *         	| if (2/3 < RandomNumberBetween0And1) 
 	 *         	|		then this.moveToRandom()
 	 */
-	private void defaultBehaviour() throws IllegalStateException {
-		if (!this.getDefaultBoolean())
-			throw new IllegalStateException();
-
-		double chance = random.nextDouble();
+//	private void defaultBehaviour() throws IllegalStateException {
+//		if (!this.getDefaultBoolean())
+//			throw new IllegalStateException();
+//
+//		double chance = random.nextDouble();
 		
 //		
 //		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
@@ -2553,7 +2554,7 @@ public class Unit extends GameObject {
 //			this.moveToRandom();
 //		}
 
-	}
+	//}
 
 	/**
 	 * Return the defaultBoolean of this Unit.

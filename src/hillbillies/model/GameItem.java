@@ -5,8 +5,6 @@ import static hillbillies.model.Constants.MIN_OBJECT_WEIGHT;
 
 import java.util.Random;
 
-import javax.vecmath.*;
-
 import be.kuleuven.cs.som.annotate.Basic;
 import be.kuleuven.cs.som.annotate.Immutable;
 import be.kuleuven.cs.som.annotate.Raw;
