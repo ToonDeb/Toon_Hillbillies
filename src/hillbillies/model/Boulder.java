@@ -1,9 +1,5 @@
 package hillbillies.model;
 
-
-//import be.kuleuven.cs.som.annotate.*;
-
-
 /**
  * A class of Boulders
  * 

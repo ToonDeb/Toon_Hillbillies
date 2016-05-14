@@ -257,7 +257,6 @@ public abstract class GameObject {
 		}
 		
 		this.setFallDepth(depth);
-		System.out.println(belowPosition[0] + " " + belowPosition[1] + " " + belowPosition[2]);
 		this.setFallDestination(belowPosition);
 		this.setFallTimer(depth/3.0);
 	}
@@ -424,9 +423,9 @@ public abstract class GameObject {
 	 * this GameObject.
 	 */
 	public boolean isValidWorld(World world) {
-//		if (world == null){
-//			return false;
-//		}
+		if (world == null){
+			return true;
+		}
 		if (this instanceof Unit){
 			if (world.getNbUnits() <= MAX_NB_UNITS_IN_WORLD){
 				return true;

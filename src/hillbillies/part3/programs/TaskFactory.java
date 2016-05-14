@@ -157,8 +157,11 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 		
 		TerrainChangeListener modelListener = new DefaultTerrainChangeListener();
 		World world = new World(new int[][][]{{{3}}}, modelListener);
-		Faction faction = new Faction(world);
-		Unit unit = new Unit("Steegmans", new int[] {0, 0, 0}, 50, 50, 50, 50, world, faction, false);
+		world.spawnUnit(false);
+		world.spawnUnit(false); //to have an enemy unit
+		Unit unit = (Unit) world.getUnits().toArray()[0];
+		Faction faction = unit.getFaction();
+		Unit newunit = new Unit("Steegmans", new int[] {0, 0, 0}, 50, 50, 50, 50, world, faction, false);
 		
 		if(expression.evaluateExpression(unit) instanceof Unit){
 			return new ReadUnitVariable(variableName, sourceLocation);

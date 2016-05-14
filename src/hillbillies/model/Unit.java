@@ -2459,13 +2459,21 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	public void terminate() {
+		System.out.println("Unit being terminated");
 		this.isTerminated = true;
-		this.getWorld().removeUnit(this);
+		System.out.println("isterminated");
+		this.getWorld().scheduleToRemove(this);
+		System.out.println("world remove");
 		this.dropItem();
+		System.out.println("item dropped");
 		this.setStatus(UnitStatus.IDLE);
+		System.out.println("status set");
 		this.setWorld(null);
+		System.out.println("world set");
 		this.getFaction().removeUnit(this);
+		System.out.println("removed from faction");
 		this.setFaction(null);
+		System.out.println("faction set to null");
 	}
 
 	/**

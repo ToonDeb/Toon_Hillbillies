@@ -20,7 +20,7 @@ import javax.vecmath.*;
  * @author  ...
  * @version 1.0
  */
-public class NewUnitTest {
+public class UnitTest {
 	private static int[][][] terrainType = 
 		{{	{1,0,0},
 			{1,0,0},
@@ -37,8 +37,8 @@ public class NewUnitTest {
 	private static World world;
 	private static Faction faction1;
 	private static Faction faction2;
-	private Log log;
-	private Boulder boulder;
+//	private Log log;
+//	private Boulder boulder;
 	private Unit testUnit, otherUnit, farUnit, otherFactionUnit;
 	
 	@BeforeClass

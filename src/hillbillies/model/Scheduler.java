@@ -225,7 +225,6 @@ public class Scheduler {
 		}
 		tasks.add(task);
 		Collections.sort(tasks);
-		System.out.println("sorted");
 	}
 	
 	
@@ -251,6 +250,7 @@ public class Scheduler {
 
 	/**
 	 * Remove the given Task from the list of Tasks of this Scheduler.
+	 * TODO: herzien throw exception
 	 * 
 	 * @param  task
 	 *         The Task to be removed.
@@ -278,7 +278,7 @@ public class Scheduler {
 	 */
 	@Raw
 	public void removeTask(Task task) {
-		if ((task == null) || this.hasAsTask(task) || (!task.hasAsScheduler(this))){
+		if ((task == null) || !this.hasAsTask(task) || (!task.hasAsScheduler(this))){
 			throw new IllegalArgumentException("tasks can't be removed");
 		}
 		tasks.remove(task);
@@ -420,5 +420,9 @@ public class Scheduler {
 		Task task = this.getNextAvailableTask();
 		if(task != null)
 			task.assignTo(unit);
+	}
+	
+	public void sortTasks(){
+		Collections.sort(this.tasks);
 	}
 }

@@ -1023,6 +1023,11 @@ public class World {
 		for(Unit unit: units){
 			unit.advanceTime(dt);
 		}
+		
+		for(Unit unit: toRemove){
+			this.removeUnit(unit);
+		}
+		this.toRemove = new HashSet<Unit>();
 	}
 	
 	/**
@@ -1056,5 +1061,11 @@ public class World {
 	/**
 	 * A variable containing the location of every workshop in this world.
 	 */
-	public int[][] workshopLocations;
+	private int[][] workshopLocations;
+	
+	public void scheduleToRemove(Unit unit){
+		toRemove.add(unit);
+	}
+	
+	private Set<Unit> toRemove = new HashSet<Unit>();
 }	

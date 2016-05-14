@@ -80,9 +80,6 @@ public class Task implements Comparable<Task>{
 		this.name = name;
 		
 		this.setPriority(priority);
-		System.out.println("task created: ");
-		System.out.println(this);
-		System.out.println(statement);
 		this.setStatement(statement); //mss immutable?
 		
 		this.setAssignedVariables(new HashMap<String, Assignment>());
@@ -155,6 +152,10 @@ public class Task implements Comparable<Task>{
 		if (! isValidPriority(priority))
 			throw new IllegalArgumentException();
 		this.priority = priority;
+		System.out.println("setpriority");
+		for(Scheduler scheduler: this.getSchedulers()){
+			scheduler.sortTasks();
+		}
 	}
 	
 	/**
@@ -492,11 +493,20 @@ public class Task implements Comparable<Task>{
 				//this.lastStatement = statement;
 			
 				if (statement instanceof NullStatement){
-					
+					taskTime += 0.001;
 				}
 				else if(statement instanceof Assignment){
 					Assignment assignStatement = (Assignment)statement;
-					this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
+					//Assignment previousAssignment = this.getAssignedVariables().get(assignStatement.getVariableName());
+					//if((previousAssignment != null) && 
+					//		(previousAssignment.getExpression().getClass().isInstance(assignStatement.getExpression()))){
+						this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
+					//}
+					//else{
+					//	throw new IllegalArgumentException("wrong type of assigned variable");
+					//}
+					
+					
 				}
 				else if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
@@ -641,7 +651,6 @@ public class Task implements Comparable<Task>{
 		assert this.hasAsScheduler(scheduler);
 		scheduler.removeTask(this);
 		schedulers.remove(scheduler);
-		System.out.println("scheduler removed");
 	}
 	
 	

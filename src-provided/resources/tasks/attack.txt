@@ -1,0 +1,8 @@
+name: "attack"
+priority : 1000
+activities: 
+evil := enemy;
+moveTo position_of(evil);
+while is_alive(evil) do
+	attack evil;
+done

@@ -108,7 +108,6 @@ public class Sequence extends MyStatement {
 
 			@Override
 			public MyStatement next() throws NoSuchElementException{
-				System.out.println("index: " + index);
 				if (this.currentIterator.isTerminal()){
 					index += 1;
 					if(index <= getNbMyStatements()){

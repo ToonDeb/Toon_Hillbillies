@@ -189,8 +189,9 @@ public class Faction {
 	 */
 	@Raw
 	public void removeUnit(Unit unit) {
-		assert this.hasAsUnit(unit) && (unit.getFaction() == null);
+		//assert this.hasAsUnit(unit) && (unit.getFaction() == null);
 		units.remove(unit);
+		System.out.println("unit removed");
 	}
 	
 	/**

@@ -44,13 +44,11 @@ public class WhileLoop extends MyStatement {
 
 			@Override
 			public boolean hasNext() {
+				if(this.inLoop){
+					return true;
+				}
 				if((WhileLoop.this.getExpression()).evaluateExpression(unit)){
-					if(iterator.isTerminal()){
-						return true;
-					}
-					else {
-						return(iterator.hasNext());
-					}
+					return true;
 				}
 				else{
 					return false;
@@ -63,14 +61,23 @@ public class WhileLoop extends MyStatement {
 					throw new NoSuchElementException("the while loop is false");
 				if(iterator.isTerminal())
 					return getStatement();
-				else
-					return iterator.next();
+				else{
+					MyStatement statement = iterator.next();
+					if(this.inLoop && !iterator.hasNext()){
+						this.inLoop = false;
+						iterator = getStatement().iterator(world, unit);
+					}
+					else if(!this.inLoop){
+						this.inLoop = true;
+					}
+					return statement;
+				}
 			}
 			
 			public boolean isTerminal(){
 				return false;
 			}
-			
+			private boolean inLoop = false;
 			private StatementIterator iterator = getStatement().iterator(world, unit);
 		};
 	}

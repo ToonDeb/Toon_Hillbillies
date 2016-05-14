@@ -23,10 +23,10 @@ public class WorldTest {
 	private World testWorld;
 	private Faction faction1;
 	private Faction faction2;
-	private Faction faction3;
-	private Faction faction4;
-	private Faction faction5;
-	private Faction faction6;
+//	private Faction faction3;
+//	private Faction faction4;
+//	private Faction faction5;
+//	private Faction faction6;
 	
 	private Log log;
 	private Boulder boulder;
