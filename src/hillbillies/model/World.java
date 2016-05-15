@@ -26,6 +26,7 @@ import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
  * @invar  The TerrainChangeListener of each World must be a valid TerrainChangeListener for any
  *         World.
  *       | isValidTerrainChangeListener(getTerrainChangeListener())
+ *       
  * @invar  The terrainTypes of each World must be a valid terrainTypes for any
  *         World.
  *       | isValidTerrainType(getTerrainType())
@@ -58,8 +59,10 @@ public class World {
 	 *       | this.setTerrainType(terrainType)
 	 * @param  modelListener
 	 *         The TerrainChangeListener for this new World.
+	 *         
 	 * @pre    The given TerrainChangeListener must be a valid TerrainChangeListener for any World.
 	 *       | isValidTerrainChangeListener(TerrainChangeListener)
+	 *       
 	 * @post   The TerrainChangeListener of this new World is equal to the given
 	 *         TerrainChangeListener.
 	 *       | new.getTerrainChangeListener() == modelListener
@@ -141,13 +144,13 @@ public class World {
 	 * Check whether the given TerrainChangeListener is a valid TerrainChangeListener for
 	 * any World.
 	 *  
-	 * @param  TerrainChangeListener
+	 * @param  terrainChangeListener
 	 *         The TerrainChangeListener to check.
-	 * @return 
-	 *       | result == true 
+	 * @return terrainchangelistener is not null
+	 *       | result = terrainChangeListener != null
 	*/
-	private static boolean isValidTerrainChangeListener(TerrainChangeListener modelListener) {
-		return true;
+	private static boolean isValidTerrainChangeListener(TerrainChangeListener terrainChangeListener) {
+		return (terrainChangeListener != null);
 	}
 
 	/**
@@ -181,12 +184,15 @@ public class World {
 		return this.terrainType;
 	}
 	
-	/** TODO: isvalidterrainType
+	/** 
 	 * Check whether the given terrainTypes is a valid terrainTypes for
 	 * any World.
+	 * 
+	 * @return true if terraintType is not null
+	 * 		   | result = (terrainType != null)
 	*/
 	private static boolean isValidTerrainType(int[][][] terrainType) {
-		return true;
+		return (terrainType != null);
 	}
 	
 	/**
@@ -203,28 +209,28 @@ public class World {
 	 *       | ! isValidTerrainType(getTerrainType())
 	 */
 	@Raw
-	private void setTerrainType(int[][][] terrainType) 
-			throws IllegalArgumentException {
+	private void setTerrainType(int[][][] terrainType) throws IllegalArgumentException {
 		if (! isValidTerrainType(terrainType))
 			throw new IllegalArgumentException();
 		this.terrainType = terrainType;
 	}
 	
 	/**
-	 * returns true if the terrain at position is AIR or WORKSHOP
+	 * returns true if the terrain at position is passable
 	 * 
 	 * @param position
-	 * @return
-	 * @throws IllegalArgumentException
+	 * @return false if it is not a valid position in this world
+	 * 			| if !this.isValidWorldPosition(position)
+	 * 			|	then result = false
+	 * 			Else, check if the cube is passable
+	 * 			| this.getCubeType(position).isPassable()
 	 */
-	public boolean isPassableTerrain(int[] position)throws IllegalArgumentException{
+	public boolean isPassableTerrain(int[] position) {
 		if (! this.isValidWorldPosition(position))
 			return false;
 		
-		if(this.getCubeType(position[0], position[1], position[2]).isPassable()){
-			return true;
-		}
-		return false;	
+		return this.getCubeType(position[0], position[1], position[2]).isPassable();
+				
 	}
 	
 	/**
@@ -232,6 +238,7 @@ public class World {
 	 * @param 	position
 	 * 			the position to check
 	 * @return	return true if position falls within the borders of this world
+	 * 
 	 */
 	public boolean isValidWorldPosition(int[] position){
 		if((this.getNbCubesX()-1 >= position[0])&&(0 <= position[0])&&
@@ -244,8 +251,19 @@ public class World {
 	
 	/**
 	 * Returns true if the cube below the given position is solid.
+	 * 
+	 * @return true if the given y-position is zero
+	 * 			| if position[2] == 0
+	 * 			|		result = true
+	 * 			else, true if belowposition is not passable
+	 * 			| result = (!this.isPassableTerrain(position + {0,0,-1}))
+	 * @throws IllegalArgumentException
+	 * 			the given posiiton is not valid in this world
+	 * 			| !this.isValidWorldPosition(position)
 	 */
-	public boolean hasSolidBelow(int[] position){
+	public boolean hasSolidBelow(int[] position) throws IllegalArgumentException{
+		if(!this.isValidWorldPosition(position))
+			throw new IllegalArgumentException("not a valid position");
 		if (position[2] == 0){
 			return true;
 		}
@@ -261,8 +279,23 @@ public class World {
 	 * Returns true if the given position is neighbouring a solid cube
 	 * @param 	position
 	 * 			the position to check.
+	 * @returns true if a solid is underneath
+	 *     		| if this.hasSolidBelow(position)
+	 *     		| then result = true
+	 *     		else, check in every direction
+	 *     		| for direction in DIRECTLYNEIGHBOURING
+	 *       	| 	if !getCubeType(position + direction).isPassable
+	 *       	|		result = true
+	 *       	| result = false
+	 *
+	 * @throws IllegalArgumentException
+	 * 			if the position is not a valid position in this world
+	 * 			| !this.isValidWorldPosition(position)
 	 */
-	public boolean isNeighbouringSolid(int[] position){
+	public boolean isNeighbouringSolid(int[] position) throws IllegalArgumentException{
+		if(!this.isValidWorldPosition(position)){
+			throw new IllegalArgumentException("not a valid position");
+		}
 		if(this.hasSolidBelow(position)){
 			return true;
 		}
@@ -308,35 +341,71 @@ public class World {
 	/**
 	 * return the cubeType at the position
 	 * @param x
+	 * 			| the x-coordinate of the cubetype
 	 * @param y
+	 * 			| the y-coordinate of the cubetype
 	 * @param z
-	 * @return
+	 * 			| the z-coordinate of the cubetype
+	 * @return the cubetype at that coordinate
+	 * 			| result = cubetype
+	 * 			| where cubetype.getNumber == this.getTerrainType()[x][y][z]
+	 * @throws IllegalArgumentException
+	 * 			the given posiiton is not valid in this world
+	 * 			| !this.isValidWorldPosition({x,y,z})
 	 */
-	public CubeType getCubeType(int x, int y, int z){
+	public CubeType getCubeType(int x, int y, int z) throws IllegalArgumentException{
+		if(!this.isValidWorldPosition(new int[] {x,y,z}))
+			throw new IllegalArgumentException("not a valid position");
 		int typeInt = this.getTerrainType()[x][y][z];
 		return CubeType.getCubeType(typeInt);
 	}
 	
 	/**
-	 * Set the cubeType at the given position to the given value
+	 * Set the cubeType at the given position to the given value.
+	 * If other terrain becomes disconnected, their value will be set to air,
+	 * and will drop a boulder or a log.
+	 * 
 	 * @param x
+	 * 		  | x-coordinate of the cube
 	 * @param y
+	 * 		  | y-coordinate of the cube
 	 * @param z
+	 * 		  | z-coordinate of the cube
 	 * @param value
+	 * 		  | the new cubetype
+	 * 
+	 * @post the cubetype at the given position is the given cubetype.
+	 * 		  | this.getCubeType(x,y,z).getNumber() == value
+	 * @post there are no solid cubes that are not connected to a border
+	 * 		  | this.getConnectedToBorder.isSolidConnectedToBorder(x,y,z)
+	 * 		  |  for every x, y and z < this.getNbCubesX/Y/Z
+	 * 		  |  	&& getCubeType(x,y,z).isSollid
+	 * @effect the path of every unit is reset
+	 * 		  | for unit in this.getUnits
+	 * 		  | 	do	unit.resetPath()
+	 * 
+	 * @throws IllegalArgumentException
+	 * 	  		if the position is not a valid position in this world, or
+	 * 			the given value is not a valid value for a cubetype
+	 * 			| !this.isValidWorldPosition({x,y,z}) || CubeType.getCubeType(value) == null
+	 * 
 	 */
-	@Raw 
-	public void setCubeType(int x, int y, int z, int value) 
-			throws IllegalArgumentException{
+	//@Raw 
+	public void setCubeType(int x, int y, int z, int value) throws IllegalArgumentException{
 		CubeType cubeType = CubeType.getCubeType(value);
+		
 		if(cubeType == null)
 			throw new IllegalArgumentException("wrong value");
+		
 		int[] position = {x, y, z};
+		
 		if(!this.isValidWorldPosition(position))
 			throw new IllegalArgumentException("invalid position");
+		
 		this.getTerrainType()[x][y][z] = value;
 		this.getTerrainChangeListener().notifyTerrainChanged(x, y, z);
 		
-		if(cubeType == CubeType.AIR){
+		if(cubeType.isPassable()){
 			List<int[]> changedTerrain = this.getConnectedToBorder().changeSolidToPassable(x, y, z);
 			for(int[] changedPosition: changedTerrain){
 				int otherX = changedPosition[0];
@@ -346,12 +415,12 @@ public class World {
 				this.getTerrainType()[otherX][otherY][otherZ] = 0;
 				this.getTerrainChangeListener().notifyTerrainChanged(otherX, otherY, otherZ);
 				
-				if((type == CubeType.ROCK)&&(random.nextDouble()<=0.25)){
+				if((type == CubeType.ROCK)&&(new Random().nextDouble()<=0.25)){
 					Boulder boulder = new Boulder(changedPosition,this);
 					this.addBoulder(boulder);
 				}
 				
-				if((type == CubeType.TREE)&&(random.nextDouble()<= 0.25)){
+				if((type == CubeType.TREE)&&(new Random().nextDouble()<= 0.25)){
 					Log log = new Log(changedPosition, this);
 					this.addLog(log);
 				}
@@ -406,8 +475,7 @@ public class World {
 	 *       |     then canHaveAsLog(log) &&
 	 *       |          (log.getWorld() == this)
 	 */
-	@SuppressWarnings("unused")
-	private boolean hasProperLogs() {
+	public boolean hasProperLogs() {
 		for (Log log : logs) {
 			if (!canHaveAsLog(log))
 				return false;
@@ -466,13 +534,16 @@ public class World {
 	public void removeLog(Log log) throws IllegalArgumentException{
 		if( !this.hasAsLog(log))
 			throw new IllegalArgumentException("can't remove log!");
-		
 		logs.remove(log);
 	}
 	
 	/**
 	 * Return the set of all logs in this world
 	 * 
+	 * @return the logs in this world
+	 * 		| result = Set<Log> logs
+	 * 		| where for log in logs
+	 *  	|		this.hasAsLog(log)
 	 */
 	public Set<Log> getLogs(){
 		Set<Log> allLogs = new HashSet<Log>();
@@ -565,16 +636,17 @@ public class World {
 	 * 
 	 * @param  boulder
 	 *         The Boulder to be added.
-	 * @pre    The given Boulder is effective and already references
-	 *         this World.
-	 *       | (boulder != null) && (boulder.getWorld() == this)
+	 * @throws IllegalArgumentException  
+	 * 		   The given Boulder is effective, already references
+	 *         this World and this World can have it as one of its boulders
+	 *         . Else, throw exception
+	 *       | ((boulder == null) || (boulder.getWorld() != this) || 
+	 *       |   !this.canHaveAsBoulder(boulder))
 	 * @post   This World has the given Boulder as one of its Boulders.
 	 *       | new.hasAsBoulder(boulder)
 	 */
 	public void addBoulder(@Raw Boulder boulder) throws IllegalArgumentException, NullPointerException {
-		if (boulder == null)
-			throw new NullPointerException("log can't be null");
-		if ((boulder.getWorld() != this)||(!this.canHaveAsBoulder(boulder)))
+		if ((boulder == null) || (boulder.getWorld() != this)||(!this.canHaveAsBoulder(boulder)))
 			throw new IllegalArgumentException("invalid log");
 		boulders.add(boulder);
 	}
@@ -602,6 +674,10 @@ public class World {
 	/**
 	 * Return the set of all boulders in this world
 	 * 
+	 * @return the boulders in this world
+	 * 		| result = Set<Boulder> boulders
+	 * 		| where for boulder in boulders
+	 *  	|		this.hasAsBoulder(boulder)
 	 */
 	public Set<Boulder> getBoulders(){
 		Set<Boulder> allBoulders = new HashSet<Boulder>();
@@ -694,16 +770,15 @@ public class World {
 	 * 
 	 * @param  unit
 	 *         The Unit to be added.
-	 * @pre    The given Unit is effective and already references
-	 *         this World.
-	 *       | (unit != null) && (unit.getWorld() == this)
+	 * @throws IllegalArgumentException
+	 * 		   The given Unit is effective and already references
+	 *         this World. else, throw exception
+	 *       | (unit == null) || (unit.getWorld() != this)
 	 * @post   This World has the given Unit as one of its Units.
 	 *       | new.hasAsUnit(unit)
 	 */
 	public void addUnit(@Raw Unit unit) {
-		if(unit == null)
-			throw new NullPointerException("can't add null as unit");
-		if(unit.getWorld()!= this)
+		if((unit == null) || (unit.getWorld()!= this))
 			throw new IllegalArgumentException("unit has other world");
 		units.add(unit);
 	}
@@ -713,18 +788,20 @@ public class World {
 	 * 
 	 * @param  unit
 	 *         The Unit to be removed.
-	 * @pre    This World has the given Unit as one of
+	 * @throws IllegalArgumentException
+	 * 	       This World has the given Unit as one of
 	 *         its Units, and the given Unit does not
-	 *         reference any World.
-	 *       | this.hasAsUnit(unit) &&
-	 *       | (unit.getWorld() == null)
+	 *         reference any World. Else, throw exception
+	 *       | !this.hasAsUnit(unit) ||
+	 *       | (unit.getWorld() != null)
 	 * @post   This World no longer has the given Unit as
 	 *         one of its Units.
 	 *       | ! new.hasAsUnit(unit)
 	 */
 	@Raw
-	public void removeUnit(Unit unit) {
-		assert this.hasAsUnit(unit) && (unit.getWorld() == null);
+	public void removeUnit(Unit unit) throws IllegalArgumentException {
+		if(!this.hasAsUnit(unit) || (unit.getWorld() != null))
+			throw new IllegalArgumentException("can't remove unit");
 		units.remove(unit);
 	}
 	
@@ -806,7 +883,7 @@ public class World {
 	 * Return the number of Factions associated with this World.
 	 *
 	 * @return  The total number of Factions collected in this World.
-	 *        | result ==
+	 *        | result =
 	 *        |   card({faction:Faction | hasAsFaction({faction)})
 	 */
 	public int getNbFactions() {
@@ -815,19 +892,23 @@ public class World {
 	
 	/**
 	 * Return the number of Factions with one or more unit.
+	 * 
+	 * @return the amount of active factions
+	 * 			| result = this.getActiveFactions.size()
 	 */
 	public int getNbActiveFactions(){
-		int i = 0;
-		
-		for(Faction faction: factions){
-			if (faction.getNbUnits() > 0){
-				i += 1;
-			}
-		}
-		
-		return i;
+		return this.getActiveFactions().size();
 	}
 	
+	
+	/**
+	 * returns all factions with 1 or more units
+	 * 
+	 * @return a set of all active factions 
+	 * 			| Set<Faction> factions
+	 * 			| where for every faction in factions
+	 * 			|	faction.getNbUnits > 0 && faction.getWorld == this
+	 */
 	public Set<Faction> getActiveFactions(){
 		Set<Faction> activeFactions = new HashSet<Faction>();
 		for(Faction faction: this.factions){
@@ -840,11 +921,16 @@ public class World {
 	
 	/** 
 	 * Returns the smallest active faction
-	 * @return
+	 * 
+	 * @return the smallest faction with 1 or more units
+	 * 	       | result = faction
+	 * 		   | where faction.getNbUnits > 0 &&
+	 * 		   | 	faction.getNbUnits >= otherFaction.getNbUnits
+	 * 		   | 	with otherFaction any Faction with otherFaction.getWorld == this
 	 */
-	public Faction getSmallestFaction(){
+	private Faction getSmallestFaction(){
 		Faction smallestSoFar = null;
-		int NbUnitsSmallest = 9999;
+		int NbUnitsSmallest = Integer.MAX_VALUE;
 		for(Faction faction: factions){
 			if(faction.getNbUnits() < NbUnitsSmallest){
 				smallestSoFar = faction;
@@ -860,14 +946,16 @@ public class World {
 	 * 
 	 * @param  faction
 	 *         The Faction to be added.
-	 * @pre    The given Faction is effective and already references
-	 *         this World.
-	 *       | (faction != null) && (faction.getWorld() == this)
+	 * @throws IllegalArgumentException
+	 * 			The given Faction is effective and already references
+	 *         this World. Else, throw exception
+	 *       | (faction == null) || (faction.getWorld() != this)
 	 * @post   This World has the given Faction as one of its Factions.
 	 *       | new.hasAsFaction(faction)
 	 */
 	public void addFaction(@Raw Faction faction) {
-		assert (faction != null) && (faction.getWorld() == this);
+		if((faction == null) || (faction.getWorld() != this))
+			throw new IllegalArgumentException("not a valid faction for this world");
 		factions.add(faction);
 	}
 
@@ -876,18 +964,20 @@ public class World {
 	 * 
 	 * @param  faction
 	 *         The Faction to be removed.
-	 * @pre    This World has the given Faction as one of
+	 * @throws IllegalArgumentException
+	 * 		   This World has the given Faction as one of
 	 *         its Factions, and the given Faction does not
-	 *         reference any World.
-	 *       | this.hasAsFaction(faction) &&
-	 *       | (faction.getWorld() == null)
+	 *         reference any World. Else, throw exception
+	 *       | !this.hasAsFaction(faction) ||
+	 *       | (faction.getWorld() != null)
 	 * @post   This World no longer has the given Faction as
 	 *         one of its Factions.
 	 *       | ! new.hasAsFaction(faction)
 	 */
 	@Raw
-	public void removeFaction(Faction faction) {
-		assert this.hasAsFaction(faction) && (faction.getWorld() == null);
+	private void removeFaction(Faction faction) throws IllegalArgumentException{
+		if (!this.hasAsFaction(faction) || (faction.getWorld() != null))
+			throw new IllegalArgumentException("not a valid faction to removes");
 		factions.remove(faction);
 	}
 
@@ -905,9 +995,8 @@ public class World {
 	 */
 	private final Set<Faction> factions = new HashSet<Faction>();
 	
-	Random random = new Random();
 	
-	/**
+	/** TODO
 	 * add a new unit to this world, with random (valid) attributes and position.
 	 * the defaultbehaviour of this new unit is set to enabledefaultbehaviour
 	 * 
@@ -918,21 +1007,21 @@ public class World {
 			throw new IllegalStateException("max units reached");
 		}
 		
-		int strength = random.nextInt(76) + 25;
-		int agility = random.nextInt(76) + 25;
-		int toughness = random.nextInt(76) + 25;
+		int strength = new Random().nextInt(76) + 25;
+		int agility = new Random().nextInt(76) + 25;
+		int toughness = new Random().nextInt(76) + 25;
 		int minimumWeight = (strength + agility)/2;
-		int weight = random.nextInt(100-minimumWeight) + minimumWeight;
+		int weight = new Random().nextInt(100-minimumWeight) + minimumWeight;
 		
 		int[] position = new int[3];
-		position[0] = random.nextInt(this.getNbCubesX()+1);
-		position[1] = random.nextInt(this.getNbCubesY()+1);
-		position[2] = random.nextInt(this.getNbCubesZ()+1);
+		position[0] = new Random().nextInt(this.getNbCubesX()+1);
+		position[1] = new Random().nextInt(this.getNbCubesY()+1);
+		position[2] = new Random().nextInt(this.getNbCubesZ()+1);
 		
 		while(!(this.isPassableTerrain(position) && this.hasSolidBelow(position))){
-			position[0] = random.nextInt(this.getNbCubesX());
-			position[1] = random.nextInt(this.getNbCubesY());
-			position[2] = random.nextInt(this.getNbCubesZ());
+			position[0] = new Random().nextInt(this.getNbCubesX());
+			position[1] = new Random().nextInt(this.getNbCubesY());
+			position[2] = new Random().nextInt(this.getNbCubesZ());
 		}
 
 		Faction faction = null;
@@ -987,30 +1076,6 @@ public class World {
 		}
 		return null;
 	}
-	
-//	/**
-//	 * Returns the GameItem at the given position, if there is one. returns null otherwise.
-//	 * 
-//	 * @param 	position
-//	 * 			| the position at which the GameItem should be
-//	 * @return	the gameItem at the given position, otherwise null
-//	 * 			| result = GameItem : GameItem.getCubePosition == position
-//	 */
-//	public GameItem gameItemAtPosition(int[] position){
-//		for(Boulder boulder: this.boulders){
-//			if(Arrays.equals(boulder.getCubePosition(), position)){
-//				return boulder;
-//			}
-//		}
-//		
-//		for(Log log: this.logs){
-//			if(Arrays.equals(log.getCubePosition(), position)){
-//				return log;
-//			}
-//		}
-//		
-//		return null;
-//	}
 	
 	/**
 	 * advance the time for all the gameobjects currently in this world

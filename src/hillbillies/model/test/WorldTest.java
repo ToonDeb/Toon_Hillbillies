@@ -22,7 +22,7 @@ public class WorldTest {
 	
 	private World testWorld;
 	private Faction faction1;
-	private Faction faction2;
+//	private Faction faction2;
 //	private Faction faction3;
 //	private Faction faction4;
 //	private Faction faction5;
@@ -302,12 +302,12 @@ public class WorldTest {
 		assertTrue(factions.size()==1);
 	}
 	
-	@Test
-	public void testGetSmallestFaction(){
-		faction2 = new Faction(this.testWorld);
-		this.testWorld.addFaction(faction2);
-		assertEquals(this.testWorld.getSmallestFaction(),faction2);
-	}
+//	@Test
+//	public void testGetSmallestFaction(){
+//		faction2 = new Faction(this.testWorld);
+//		this.testWorld.addFaction(faction2);
+//		assertEquals(this.testWorld.getSmallestFaction(),faction2);
+//	}
 	
 	@Test
 	public void testSpawnUnit(){

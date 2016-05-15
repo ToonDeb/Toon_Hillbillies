@@ -457,6 +457,7 @@ public class Task implements Comparable<Task>{
 	 private boolean isTerminated = false;
 	 
 	
+	@SuppressWarnings("unchecked")
 	public void advanceTime(double deltaT){
 		double taskTime = deltaT;
 		while (taskTime > 0){
@@ -497,6 +498,7 @@ public class Task implements Comparable<Task>{
 				}
 				else if(statement instanceof Assignment){
 					Assignment assignStatement = (Assignment)statement;
+					assignStatement.getReadVariable().setEvaluatedExpression(null);
 					//Assignment previousAssignment = this.getAssignedVariables().get(assignStatement.getVariableName());
 					//if((previousAssignment != null) && 
 					//		(previousAssignment.getExpression().getClass().isInstance(assignStatement.getExpression()))){
