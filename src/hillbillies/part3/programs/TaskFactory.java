@@ -153,6 +153,11 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	@Override
 	public MyExpression createReadVariable(String variableName, SourceLocation sourceLocation) {
 		Assignment assignment = this.assignmentmap.get(variableName);
+		if(assignment.getReadVariable() != null){
+			return assignment.getReadVariable();
+		}
+		else{
+		
 		MyExpression<?> expression = assignment.getExpression();
 		
 		TerrainChangeListener modelListener = new DefaultTerrainChangeListener();
@@ -161,19 +166,28 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 		world.spawnUnit(false); //to have an enemy unit
 		Unit unit = (Unit) world.getUnits().toArray()[0];
 		Faction faction = unit.getFaction();
+		@SuppressWarnings("unused")
 		Unit newunit = new Unit("Steegmans", new int[] {0, 0, 0}, 50, 50, 50, 50, world, faction, false);
 		
+		
 		if(expression.evaluateExpression(unit) instanceof Unit){
-			return new ReadUnitVariable(variableName, sourceLocation);
+			ReadUnitVariable var = new ReadUnitVariable(variableName, sourceLocation);
+			assignment.setReadVariable(var);
+			return var;
 		}
 		else if(expression.evaluateExpression(unit) instanceof int[]){
-			return new ReadPositionVariable(variableName, sourceLocation);
+			ReadPositionVariable var = new ReadPositionVariable(variableName, sourceLocation);
+			assignment.setReadVariable(var);
+			return var;
 		}
 		else if(expression.evaluateExpression(unit) instanceof Boolean){
-			return new ReadBooleanVariable(variableName, sourceLocation);
+			ReadBooleanVariable var = new ReadBooleanVariable(variableName, sourceLocation);
+			assignment.setReadVariable(var);
+			return var;
 		}
 		else
 			throw new IllegalArgumentException();
+		}
 	}
 
 	/* (non-Javadoc)

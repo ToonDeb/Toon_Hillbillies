@@ -910,6 +910,7 @@ public class World {
 	/**
 	 * add a new unit to this world, with random (valid) attributes and position.
 	 * the defaultbehaviour of this new unit is set to enabledefaultbehaviour
+	 * 
 	 * @param enableDefaultBehavior
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
@@ -957,7 +958,8 @@ public class World {
 	 * @param 	position
 	 * 			| the position at which the log should be
 	 * @return	the log at the given position, otherwise null
-	 * 			| result = log : log.getCubePosition == position
+	 * 			| result = log 
+	 * 			| where log.getCubePosition == position
 	 */
 	public Log logAtPosition(int[] position){
 		for(Log log: this.logs){
@@ -974,7 +976,8 @@ public class World {
 	 * @param 	position
 	 * 			| the position at which the boulder should be
 	 * @return	the boulder at the given position, otherwise null
-	 * 			| result = boulder : boulder.getCubePosition == position
+	 * 			| result = boulder 
+	 * 			| where boulder.getCubePosition == position
 	 */
 	public Boulder boulderAtPosition(int[] position){
 		for(Boulder boulder: this.boulders){
@@ -1011,21 +1014,37 @@ public class World {
 	
 	/**
 	 * advance the time for all the gameobjects currently in this world
+	 * 
 	 * @param dt
+	 * 		  The amount of time advanced
+	 * 
+	 * @effect advance the time for every boulder by dt
+	 * 			| for(Boudler boulder in this.getBoulders())
+	 * 			|	do boulder.advanceTime(dt)
+	 * @effect advance the time for every log by dt
+	 * 			| for(Log log in this.getLogs())
+	 * 			|	do log.advanceTime(dt)
+	 * @effect advance the time for every Unit by dt
+	 * 			| for(Unit unit in this.getUnits())
+	 * 			|	do unit.advanceTime(dt)
+	 * 
+	 * @post the set toRemove is empty TODO: nodig?
+	 * 		| new.toRemove.size == 0
 	 */
 	public void advanceTime(double dt){
-		for(Boulder boulder: boulders){
+		for(Boulder boulder: this.getBoulders()){
 			boulder.advanceTime(dt);
 		}
-		for(Log log: logs){
+		for(Log log: this.getLogs()){
 			log.advanceTime(dt);
 		}
-		for(Unit unit: units){
+		for(Unit unit: this.getUnits()){
 			unit.advanceTime(dt);
 		}
 		
 		for(Unit unit: toRemove){
 			this.removeUnit(unit);
+			unit.setWorld(null);
 		}
 		this.toRemove = new HashSet<Unit>();
 	}
@@ -1034,38 +1053,47 @@ public class World {
 	 * return a random workshop in this world
 	 * 
 	 * @return The location of a workshop in this world
+	 * 			| result = position
+	 * 			| where this.getCubeType(position) == CubeType.WORKSHOP
 	 */
 	public int[] getWorkshopLocation(){
 		int random = new Random().nextInt(this.workshopLocations.length);
 		return this.workshopLocations[random];
 	}
 	
-//	/**
-//	 * 
-//	 */
-//	public void searchWorkshopLocations(){
-//		List<int[]> workshopLocations = new ArrayList<int[]>();
-//		for(int x = 0; x < this.getNbCubesX(); x++){
-//			for (int y = 0; y < this.getNbCubesY(); y++){
-//				for (int z = 0; z < this.getNbCubesZ(); z++){
-//					if(this.getCubeType(x, y, z) == CubeType.WORKSHOP){
-//						int[] position = {x, y, z};
-//						workshopLocations.add(position);
-//					}
-//				}
-//			}
-//		}
-//		
-//	}
-	
 	/**
 	 * A variable containing the location of every workshop in this world.
 	 */
 	private int[][] workshopLocations;
 	
-	public void scheduleToRemove(Unit unit){
+	
+	/**
+	 * Schedule a unit to be removed
+	 * 
+	 * @param unit
+	 * 		  The unit to be removed at the end of advancetime
+	 * 
+	 * @post unit is part of the toRemove set
+	 * 		 | new.toRemove.contains(unit) == true
+	 * 
+	 * @throws NullPointerException
+	 * 		   Unit can't be null
+	 * 			| unit == null
+	 * @throws IllegalStateException
+	 * 		   Unit must be terminated to remove
+	 * 			| !unit.isTerminated
+	 */
+	public void scheduleToRemove(Unit unit) throws NullPointerException, IllegalStateException{
+		if(unit == null)
+			throw new NullPointerException("can't remove null");
+		if(!unit.isTerminated()){
+			throw new IllegalStateException("unit must be terminated to remove from world");
+		}
 		toRemove.add(unit);
 	}
 	
+	/**
+	 * A set containing all units, terminated during advanceTime.
+	 */
 	private Set<Unit> toRemove = new HashSet<Unit>();
 }	

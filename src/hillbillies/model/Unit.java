@@ -1042,12 +1042,18 @@ public class Unit extends GameObject {
 	 *          | other == null
 	 */
 	private boolean canAttack(Unit other) throws NullPointerException {
+		System.out.println(other);
 		if (other == null)
 			throw new NullPointerException("can't attack null");
-		if (other.isFalling())
+		if (other.isFalling()){
+			System.out.println("falling");
 			return false;
-		if (other.getFaction()==this.getFaction())
+		}
+			
+		if (other.getFaction()==this.getFaction()){
+			System.out.println("faction");
 			return false;
+		}
 		return (this.getCubePosition()[2] == other.getCubePosition()[2])
 				&& (Math.abs(this.getCubePosition()[0] - other.getCubePosition()[0]) < 2)
 				&& (Math.abs(this.getCubePosition()[1] - other.getCubePosition()[1]) < 2);
@@ -2334,6 +2340,9 @@ public class Unit extends GameObject {
 		// check all status
 		if (this.isFalling()){
 			this.updateFall(deltaT);
+			if(this.isTerminated){
+				return;
+			}
 		}
 		else if(this.getWorld().isPassableTerrain(belowPosition)&&
 				!this.getWorld().isNeighbouringSolid(this.getCubePosition())){
@@ -2343,9 +2352,15 @@ public class Unit extends GameObject {
 		}
 		else if (this.getStatus() == UnitStatus.DODGING) {
 			this.dodge();
+			if(this.isTerminated){
+				return;
+			}
 		}
 		else if (this.getStatus() == UnitStatus.DEFENDING) {
 			this.setStatus(UnitStatus.IDLE);
+			if(this.isTerminated){
+				return;
+			}
 		}
 		else if (this.isAttacking()) {
 			this.advanceAttackTime(deltaT);
@@ -2365,6 +2380,9 @@ public class Unit extends GameObject {
 			}	
 			else
 				this.updatePosition(deltaT);
+		}
+		if(this.isTerminated){
+			return;
 		}
 
 		if (Util.fuzzyGreaterThanOrEqualTo(this.rest3MinTime, 3 * 60) 
@@ -2459,21 +2477,16 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	public void terminate() {
-		System.out.println("Unit being terminated");
 		this.isTerminated = true;
-		System.out.println("isterminated");
 		this.getWorld().scheduleToRemove(this);
-		System.out.println("world remove");
 		this.dropItem();
-		System.out.println("item dropped");
 		this.setStatus(UnitStatus.IDLE);
-		System.out.println("status set");
-		this.setWorld(null);
-		System.out.println("world set");
+		//this.setWorld(null);
+	
 		this.getFaction().removeUnit(this);
-		System.out.println("removed from faction");
+		
 		this.setFaction(null);
-		System.out.println("faction set to null");
+		
 	}
 
 	/**
@@ -2614,7 +2627,7 @@ public class Unit extends GameObject {
 	*/
 	public static boolean isValidFaction(Faction faction) {
 		if(faction == null)
-			return false;
+			return true;
 		return (faction.getNbUnits() <= MAX_NB_UNITS_IN_FACTION);
 	}
 
@@ -2632,10 +2645,9 @@ public class Unit extends GameObject {
 	 *       | ! isValidFaction(getFaction())
 	 */
 	@Raw
-	private void setFaction(Faction faction) 
-			throws IllegalArgumentException {
+	private void setFaction(Faction faction) throws IllegalArgumentException {
 		if (! isValidFaction(faction))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("not a valid faction");
 		this.faction = faction;
 	}
 

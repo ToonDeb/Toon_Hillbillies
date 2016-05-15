@@ -8,6 +8,7 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
+import hillbillies.part3.programs.expression.ReadVariable;
 
 /**
  * A class of ...
@@ -34,6 +35,16 @@ public class Assignment extends MyStatement {
 	
 	private final MyExpression expression;
 	private final String variableName;
+	
+	public void setReadVariable(ReadVariable readVariable){
+		this.readVariable = readVariable;
+	}
+	
+	public ReadVariable getReadVariable(){
+		return this.readVariable;
+	}
+	
+	private ReadVariable readVariable;
 	
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.statement.MyStatement#iterator()

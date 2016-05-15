@@ -152,7 +152,6 @@ public class Task implements Comparable<Task>{
 		if (! isValidPriority(priority))
 			throw new IllegalArgumentException();
 		this.priority = priority;
-		System.out.println("setpriority");
 		for(Scheduler scheduler: this.getSchedulers()){
 			scheduler.sortTasks();
 		}
@@ -466,10 +465,13 @@ public class Task implements Comparable<Task>{
 				MyStatement statement = this.getStatement();
 				if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
+					
 					try{
 						actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
+						System.out.println("succes");
 					}
 					catch(Exception e){
+						System.out.println("failure");
 						this.interrupt();
 					}
 					this.getUnit().startAction();
@@ -489,8 +491,6 @@ public class Task implements Comparable<Task>{
 			}
 			if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
-				System.out.println(statement);
-				//this.lastStatement = statement;
 			
 				if (statement instanceof NullStatement){
 					taskTime += 0.001;
@@ -510,6 +510,8 @@ public class Task implements Comparable<Task>{
 				}
 				else if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
+					System.out.print("trying action: ");
+					System.out.println(actionStatement);
 					try{
 						actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
 					}
