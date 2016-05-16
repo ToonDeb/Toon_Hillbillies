@@ -14,7 +14,7 @@ import hillbillies.part3.programs.expression.MyExpression;
 import hillbillies.part3.programs.expression.ReadBooleanVariable;
 import hillbillies.part3.programs.expression.ReadPositionVariable;
 import hillbillies.part3.programs.expression.ReadUnitVariable;
-import hillbillies.part3.programs.expression.logic.AndExpression;
+import hillbillies.part3.programs.expression.logic.*;
 import hillbillies.part3.programs.expression.logic.FalseExpression;
 import hillbillies.part3.programs.expression.logic.IsAlive;
 import hillbillies.part3.programs.expression.logic.IsCarryingItem;

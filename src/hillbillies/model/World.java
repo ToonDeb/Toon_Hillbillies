@@ -1120,8 +1120,9 @@ public class World {
 		}
 		
 		for(Unit unit: toRemove){
-			this.removeUnit(unit);
 			unit.setWorld(null);
+			this.removeUnit(unit);
+			
 		}
 		this.toRemove = new HashSet<Unit>();
 	}
