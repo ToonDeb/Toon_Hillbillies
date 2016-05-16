@@ -2361,7 +2361,7 @@ public class Unit extends GameObject {
 		if(!this.isFollowing())
 			this.followUnit = null;
 		
-		if(this.getTask() != null && this.hasFinishedAction()){
+		if(this.getTask() != null && this.hasFinishedAction() && !this.isTerminated){
 			this.getTask().advanceTime(deltaT);
 		}
 		

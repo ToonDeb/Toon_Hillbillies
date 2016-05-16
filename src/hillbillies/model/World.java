@@ -1050,6 +1050,7 @@ public class World {
 		}
 		
 		unit.setFaction(faction);
+		faction.addUnit(unit);
 	}
 	
 	/**

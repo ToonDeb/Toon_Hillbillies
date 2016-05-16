@@ -429,9 +429,11 @@ public class Task implements Comparable<Task>{
 	 *       | ...
 	 */
 	 public void terminate() {
-		 
+		 if(this.isTerminated)
+			 return;
 		 this.isTerminated = true;
 		 this.getUnit().setTask(null);
+		 
 		 this.setUnit(null);
 		 
 		 for(Scheduler scheduler: this.schedulers){
@@ -459,6 +461,8 @@ public class Task implements Comparable<Task>{
 	
 	@SuppressWarnings("unchecked")
 	public void advanceTime(double deltaT){
+		if(this.isTerminated)
+			throw new IllegalStateException("can't advance time when terminated");
 		double taskTime = deltaT;
 		while (taskTime > 0){
 			taskTime -= 0.001;
@@ -469,28 +473,28 @@ public class Task implements Comparable<Task>{
 					
 					try{
 						actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
-						System.out.println("succes");
+						this.getUnit().startAction();
 					}
 					catch(Exception e){
-						System.out.println("failure");
 						this.interrupt();
 					}
-					this.getUnit().startAction();
+					
 					this.terminate();
-					//return;
+					return;
 				}
 				else if (statement instanceof Print){
 					Print printStatement = (Print)statement;
 					printStatement.execute(this.getUnit());
 					this.terminate();
-					//return;
+					return;
 				}
 				else{
 					this.terminate();
+					return;
 				}
 				//all other cases, no influence
 			}
-			if (this.getStatementIterator().hasNext()){
+			else if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
 			
 				if (statement instanceof NullStatement){

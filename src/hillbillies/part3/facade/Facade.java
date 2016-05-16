@@ -13,7 +13,7 @@ import hillbillies.model.Scheduler;
 import hillbillies.model.Task;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
-import hillbillies.part2.listener.DefaultTerrainChangeListener;
+
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.TaskFactory;

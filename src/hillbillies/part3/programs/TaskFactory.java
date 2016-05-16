@@ -166,8 +166,9 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 		world.spawnUnit(false); //to have an enemy unit
 		Unit unit = (Unit) world.getUnits().toArray()[0];
 		Faction faction = unit.getFaction();
-		@SuppressWarnings("unused")
-		Unit newunit = new Unit("Steegmans", new int[] {0, 0, 0}, 50, 50, 50, 50, world, faction, false);
+		Unit newunit = new Unit("Steegmans", new int[] {0, 0, 0}, 50, 50, 50, 50, false);
+		world.addUnit(newunit);
+		newunit.setFaction(faction);
 		
 		
 		if(expression.evaluateExpression(unit) instanceof Unit){
@@ -299,7 +300,7 @@ public class TaskFactory implements ITaskFactory<MyExpression, MyStatement, Task
 	 */
 	@Override
 	public MyExpression createSelectedPosition(SourceLocation sourceLocation) {
-		return null;
+		return new HerePosition(sourceLocation);
 	}
 
 	/* (non-Javadoc)

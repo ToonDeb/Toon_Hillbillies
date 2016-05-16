@@ -27,7 +27,9 @@ public class Facade implements IFacade{
 		int[][][] terrain = {{{0}}};
 		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
 		World world = new World(terrain, defaultListener);
-		return new Unit(name, initialPosition, weight, agility, strength, toughness, world, null, enableDefaultBehavior);
+		Unit unit = new Unit(name, initialPosition, weight, agility, strength, toughness,/* world, null,*/ enableDefaultBehavior);
+		world.addUnit(unit);
+		return unit;
 	}
 
 	@Override
