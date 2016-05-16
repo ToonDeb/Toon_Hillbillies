@@ -14,13 +14,15 @@ public class Boulder extends GameItem {
 	
 	/** 
 	 * initialize the Boulder. 
-	 * The Boulder has a given position and world
 	 * 
-	 * @param  world
-	 *         The World for this new Boulder.
- 	 * @effect The World of this new Boulder is set to
- 	 *         the given World.
- 	 *       | this.setWorld(world)
+	 * @param position
+	 * 		  The position of this new Boulder
+	 * @param world
+	 * 		  The world of this new Boulder
+	 *         
+ 	 *  @post The Boulder has the given Position and World 
+	 * 		 | new.getCubePosition() == position
+	 * 		 | new.getWorld() == world
 	 */
 	public Boulder(int[] position, World world) throws IllegalArgumentException{
 		super(position, world);

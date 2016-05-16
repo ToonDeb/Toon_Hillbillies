@@ -1,29 +1,21 @@
 package hillbillies.model;
 
-//import static hillbillies.model.Constants.MAX_X_POSITION;
-//import static hillbillies.model.Constants.MAX_Y_POSITION;
-//import static hillbillies.model.Constants.MAX_Z_POSITION;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_WORLD;
-//import static hillbillies.model.Constants.AIR;
-//import static hillbillies.model.Constants.TREE;
-//import static hillbillies.model.Constants.ROCK;
-//import static hillbillies.model.Constants.WORKSHOP;
-//import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
-//import static hillbillies.model.Constants.NEIGHBOURINGLIST;
-
 import javax.vecmath.*;
-
 import be.kuleuven.cs.som.annotate.*;
 import ogp.framework.util.Util;
 
 /**
  * A class of GameObjects
+ * 
  * @invar  The position of each GameObject must be a valid position for any
  *         GameObject.
  *       | isValidPosition(getPosition())
+ *       
  * @invar  The fallDestination of each GameObject must be a valid fallDestination for any
  *         GameObject.
  *       | isValidFallDestination(getFallDestination())
+ *       
  * @invar  The fallTimer of each GameObject must be a valid fallTimer for any
  *         GameObject.
  *       | isValidFallTimer(getFallTimer())
@@ -31,6 +23,9 @@ import ogp.framework.util.Util;
  * @invar  The fallDepth of each GameObject must be a valid fallDepth for any
  *         GameObject.
  *       | isValidFallDepth(getFallDepth())
+ *       
+ * @invar The world of each GameObject must be a valid World for any GameObject
+ * 		 | isValidWorld(getWorld())
  *
  * @author  Toon Deburchgrave
  * @version 1.0
@@ -43,9 +38,11 @@ public abstract class GameObject {
 	 *
 	 * @param  position
 	 *         The position for this new GameObject.
-	 * @effect The position of this new GameObject is set to
+	 *         
+	 * @post The position of this new GameObject is set to
 	 *         the given position
-	 *       | this.setAtPosition(position)
+	 *       | new.getCubePosition == position
+	 *       
 	 * @throws	IllegalArgumentException
 	 * 			The given position is not a valid position for any unit, in this world.
 	 * 			| !world.isValidWorldPosition(position) ||
@@ -53,14 +50,14 @@ public abstract class GameObject {
 	 * 
 	 * @param 	world
 	 * 			The world of this new GameObject.
-	 * @effect 	The world of this new GameObject is set to the given World
-	 * 			| this.setWorld(world)
+	 * 
+	 * @post 	The world of this new GameObject is set to the given World
+	 * 			| new.getWorld == world
 	 * @throws	NullPointerException
 	 * 			The given world may not be null
 	 * 			| world == null
 	 */
-	public GameObject(int[] position, World world)
-			throws IllegalArgumentException {
+	public GameObject(int[] position, World world) throws IllegalArgumentException {
 		if(world == null)
 			throw new NullPointerException("World can't be null");
 	
@@ -84,38 +81,37 @@ public abstract class GameObject {
 	/**
 	 * Check whether the given position is a valid position for
 	 * any GameObject.
+	 * 
+	 * @return (position != null) && (world.isValidWorldPosition(toCubePosition(position)))
 	*/
 	public static boolean isValidPosition(Vector3d position, World world) {
-		if(position == null){
-			throw new NullPointerException();
-		}
-		
-//		if(world == null){
-//			return true;
-//		}
-		
-		if(world.isValidWorldPosition(toCubePosition(position)))
-				return true;
-		else
+		if(position == null)
 			return false;
+		return world.isValidWorldPosition(toCubePosition(position));
 	}
 	
 	/**
-	 * transform position from vector3d to int[]
+	 * transform position from vector3d to int[],
+	 * rounding to the lowest whole number.
+	 * 
+	 * @return the int[] of the number
+	 * 		   | result = {(int)position.x,(int)position.y,(int)position.z}
 	 */
 	public static int[] toCubePosition(Vector3d position){
-		int[] cubePosition = {(int)position.x,(int)position.y,(int)position.z};
-		return cubePosition;
+		return new int[] {(int)position.x,(int)position.y,(int)position.z};
 	}
 	
 	/**
 	 * transform position from int[] to vector3d, in the middle of the cube
+	 * 
 	 * @param position
-	 * @return
+	 *        the position to transform
+	 * @return the position in Vector3d
+	 * 		  | result = 
+	 *        |  Vector3d(position[0] + 0.5, position[1] + 0.5, position[2] + 0.5)
 	 */
 	public static Vector3d toVectorPosition(int[]position){
-		Vector3d vector = new Vector3d(position[0] + 0.5, position[1] + 0.5, position[2] + 0.5);
-		return vector;
+		return new Vector3d(position[0] + 0.5, position[1] + 0.5, position[2] + 0.5);
 	}
 	
 	/**
@@ -126,8 +122,13 @@ public abstract class GameObject {
 	 * 		  the cube of the new location
 	 * @post  the cubeposition of the GameObject is equal to the given cubeposition
 	 * 		  | new.getCubePosition == cubePosition
+	 * @throws IllegalArgumentException
+	 * 		  the position is not a valid position for this gameObject
+	 * 		  | (cubePosition == null) || (!this.getWorld.isValidWorldPosition(cubePosition))
 	 */
-	public void setAtPosition(int[] cubePosition){
+	public void setAtPosition(int[] cubePosition) throws IllegalArgumentException{
+		if((cubePosition == null) || (!this.getWorld().isValidWorldPosition(cubePosition)))
+			throw new IllegalArgumentException("not a valid position for this world");
 		this.setPosition(toVectorPosition(cubePosition));
 	}
 
@@ -145,8 +146,7 @@ public abstract class GameObject {
 	 *       | ! isValidPosition(getPosition())
 	 */
 	@Raw
-	public void setPosition(Vector3d position) 
-			throws IllegalArgumentException {
+	public void setPosition(Vector3d position) throws IllegalArgumentException {
 		if (! isValidPosition(position, this.getWorld()))
 			throw new IllegalArgumentException();
 		this.position = position;
@@ -164,10 +164,28 @@ public abstract class GameObject {
 		return toCubePosition(this.getPosition());
 	}
 	
-	/**
+	/** 
 	 * Update the position of the falling gameobject
+	 * 
+	 * @param dt
+	 * 		  The amount of time to advance
+	 * @post  If the FallTimer reaches 0, set the GameObject
+	 * 		  at the FallDestination and set IsFalling to false
+	 * 		  | if getFallTimer - dt <= 0
+	 * 		  |	 	then new.isFalling == false
+	 * 		  | 	new.getPosition = this.getFallDestination
+	 * @effect If the FallTimer reaches 0, take FallDamage
+	 * 		  | if getFallTimer - dt <= 0
+	 * 		  | 	do this.takeFallDamage(this.fallDepth)
+	 * @post  In all other cases, update position and falltimer
+	 * 		  | else
+	 * 		  |  	new.getPosition = this.getPosition + dt*(0,0,-3)
+	 * 		  |     new.getFallTimer = this.getFallTimer - dt
+	 * @throws IllegalArgumentException
+	 * 		   if the given time is not a valid time
+	 * 		   | !Unit.isValidTime(dt)
 	 */
-	public void updateFall(double dt){
+	public void updateFall(double dt) throws IllegalArgumentException{
 		if(!Unit.isValidTime(dt))
 			throw new IllegalArgumentException("invalid time!");
 		
@@ -222,8 +240,7 @@ public abstract class GameObject {
 	 *       | ! isValidFallDepth(getFallDepth())
 	 */
 	@Raw
-	public void setFallDepth(int fallDepth) 
-			throws IllegalArgumentException {
+	public void setFallDepth(int fallDepth) throws IllegalArgumentException {
 		if (! isValidFallDepth(fallDepth))
 			throw new IllegalArgumentException();
 		this.fallDepth = fallDepth;
@@ -237,13 +254,27 @@ public abstract class GameObject {
 	
 	/**
 	 * an abstract method that gets called when stopped falling.
+	 * 
 	 * @param 	fallDepth
 	 * 			the amount of cubes this gameobject has fallen
 	 */
 	public abstract void takeFallDamage(int fallDepth);
 	
 	/**
-	 * Set fallDestination to the cube above a solid cube.
+	 * Start the fall of this GameObject
+	 * 
+	 * @post this GameObject is falling
+	 * 		 | new.isFalling == true
+	 * @post the FallDestination of this GameObject is set
+	 * 		 the first cube above a solid cube, below its current
+	 * 		 position
+	 * 		 | this.getWorld.hasSolidBelow(new.getFallDestination)
+	 * 		 | for position between new.getFallDestination and this.getCubePosition
+	 * 		 | 		where this.getWorld.getCubeType(position).isPassable()
+	 * @post The FallDepth of this GameObject is the length between it's current position
+	 * 		 And the falldestination.
+	 * 		 | new.getFallDepth == new.getCubePosition[2] - new.getFallDestination[2]
+	 * 		 
 	 */
 	public void startFall(){
 		this.isFalling = true;
@@ -263,12 +294,14 @@ public abstract class GameObject {
 	
 	/**
 	 * return true if the gameobject is currently falling
-	 * @return
 	 */
 	public boolean isFalling(){
 		return this.isFalling;
 	}
 	
+	/**
+	 * Variable registering whether a GameObject is currently falling
+	 */
 	private boolean isFalling;
 	
 	/**
@@ -346,8 +379,7 @@ public abstract class GameObject {
 	 *       | ! isValidFallTimer(getFallTimer())
 	 */
 	@Raw
-	public void setFallTimer(double fallTimer) 
-			throws IllegalArgumentException {
+	public void setFallTimer(double fallTimer) throws IllegalArgumentException {
 		if (! isValidFallTimer(fallTimer))
 			throw new IllegalArgumentException();
 		this.fallTimer = fallTimer;
@@ -357,23 +389,6 @@ public abstract class GameObject {
 	 * Variable registering the fallTimer of this GameObject.
 	 */
 	private double fallTimer = 0;
-	
-
-
-///**
-// * Initialize this new GameObject with given fallDestination.
-// *
-// * @param  fallDestination
-// *         The fallDestination for this new GameObject.
-// * @effect The fallDestination of this new GameObject is set to
-// *         the given fallDestination.
-// *       | this.setFallDestination(fallDestination)
-// */
-//public GameObject(Vector3d fallDestination)
-//		throws IllegalArgumentException {
-//	this.setFallDestination(fallDestination);
-//}
-
 
 	/**
 	 * Return the fallDestination of this GameObject.
@@ -397,8 +412,7 @@ public abstract class GameObject {
 	 *       | ! isValidFallDestination(getFallDestination())
 	 */
 	@Raw
-	public void setFallDestination(int[] fallDestination) 
-			throws IllegalArgumentException {
+	public void setFallDestination(int[] fallDestination) throws IllegalArgumentException {
 		if (! this.getWorld().isValidWorldPosition(fallDestination))
 			throw new IllegalArgumentException("fallDestination is not in world");
 		this.fallDestination = fallDestination;
@@ -421,18 +435,25 @@ public abstract class GameObject {
 	/** 
 	 * Check whether the given World is a valid World for
 	 * this GameObject.
+	 * 
+	 * @return True if world == null
+	 * 		   | if (world == null)
+	 * 		   |  	result = true
+	 * 		   True if this is a unit, and the amount of units in
+	 * 		   the world is below the max number of units
+	 * 		   | if this instanceof Unit
+	 * 		   | 	result = (world.getNbUnits() <= MAX_NB_UNITS_IN_WORLD
+	 * 		   else return true
+	 * 		   | else 
+	 * 		   | 	result = true
+	 * 
 	 */
 	public boolean isValidWorld(World world) {
 		if (world == null){
 			return true;
 		}
 		if (this instanceof Unit){
-			if (world.getNbUnits() <= MAX_NB_UNITS_IN_WORLD){
-				return true;
-			}
-			else{
-				return false;
-			}
+			return (world.getNbUnits() <= MAX_NB_UNITS_IN_WORLD);
 		}
 		return true;
 	}
@@ -451,8 +472,7 @@ public abstract class GameObject {
 	 *       | ! isValidWorld(getWorld())
 	 */
 	@Raw
-	public void setWorld(World world) 
-			throws IllegalArgumentException {
+	public void setWorld(World world) throws IllegalArgumentException {
 		if (! isValidWorld(world))
 			throw new IllegalArgumentException();
 		this.world = world;

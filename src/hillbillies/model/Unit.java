@@ -20,22 +20,22 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * A class for Units
  * 
  * @author Toon Deburchgrave CWS-ELT
- *          
- *
- * @invar The position of each Unit must be a valid position for any Unit. 
- * 		  | isValidPosition(getPosition())
  *
  * @invar The weight of each Unit must be a valid weight for any Unit. 
  * 		  | isValidWeight(getWeight())
+ * 
  * @invar The strength of each Unit must be a valid strength for any Unit. 
  * 		  | isValidUnitAttribute(getStrength())
+ * 
  * @invar The agility of each Unit must be a valid agility for any Unit. 
  * 		  | isValidUnitAttribute(getAgility())
+ * 
  * @invar The toughness of each Unit must be a valid toughness for any Unit. 
  * 		  | isValidUnitAttribute(getToughness())
  *
  * @invar The hitpoints of each Unit must be a valid hitpoints for this Unit. 
  * 		  | isValidHP(getHP())
+ * 
  * @invar The stamina of each Unit must be a valid stamina for any Unit. 
  * 		  | isValidStamina(getStamina())
  *
@@ -58,11 +58,14 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * @invar The defaultBoolean of each Unit must be a valid defaultBoolean for any
  *        Unit. 
  *        | isValidDefaultBoolean(getDefaultBoolean())
+ *        
  * @invar The orientation of each unit must be a valid orientation for any unit.
  *        | isValidOrientation(getOrientation())
+ *        
  * @invar The adjacentDestination of each unit must be a valid
  *        adjacentDestination for any unit.
  *        | isValidAdjacentDestination(getAdjacentDestination())
+ *        
  * @invar The finalDestination of each unit must be a valid finalDestination for
  *        any unit. 
  *        | isValidFinalDestination(getFinalDestination())
@@ -88,10 +91,6 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * @invar  The workTarget of each Unit must be a valid workTarget for any
  *         Unit.
  *       | isValidWorkTarget(getWorkTarget())
- *       
- * @invar  The pathIndex of each Unit must be a valid pathIndex for any
- *         Unit.
- *       | isValidPathIndex(getPathIndex())
  *       
  * @invar  The Task of each	 Unit must be a valid Task for any
  *         Unit.	
@@ -222,12 +221,13 @@ public class Unit extends GameObject {
 				throws IllegalArgumentException, NullPointerException {
 		// null is given as the default world
 		super(position, world);
-	
-		if(!faction.canHaveAsUnit(this))
-			throw new IllegalArgumentException("not a valid faction for this unit!");
 		
-		if(!world.canHaveAsUnit(this))
-			throw new IllegalArgumentException("not a valid world for this unit!");
+		if(faction!= null)
+			if(!faction.canHaveAsUnit(this))
+				throw new IllegalArgumentException("not a valid faction for this unit!");
+		if(world != null)
+			if(!world.canHaveAsUnit(this))
+				throw new IllegalArgumentException("not a valid world for this unit!");
 		
 		
 		if (!isValidStartAttribute(strength))
@@ -244,8 +244,7 @@ public class Unit extends GameObject {
 		setToughness(toughness);
 		this.setHP(this.getMaxHP());
 		this.setStamina(this.getMaxStamina());
-		
-		//this.setPosition(position);
+	
 		this.setName(name);
 
 		this.setStatus(UnitStatus.IDLE);
@@ -255,9 +254,11 @@ public class Unit extends GameObject {
 
 		this.setOrigin(position);
 		
-		world.addUnit(this);
+		if(world != null)
+			world.addUnit(this);
 		this.setFaction(faction);
-		faction.addUnit(this);
+		if(faction != null)
+			faction.addUnit(this);
 	
 		if (defaultBehaviour)
 			this.startDefaultBehaviour();
@@ -273,14 +274,18 @@ public class Unit extends GameObject {
 	 * @effect 	The units status is set to WALKING, if the unit is not currently sprinting
 	 * 			| if (!this.isSprinting())
 	 * 			|	this.setStatus(UnitStatus.WALKING); 
+	 * 
 	 * @effect 	The units adjacentDestination is set to adjacentDestination
 	 *         	| this.setAdjacentDestination(adjacentDestination);
+	 *         
 	 * @effect	If the Unit is currently at its final destination, set
 	 * 			finalDestination to the given adjacentDestination
 	 * 			| if(this.getPosition == this.getFinalDestination)
 	 * 			| 		then this.setFinalDestination(adjacentDestination)
+	 * 
 	 * @effect	The origin of this Unit is set to its current position
 	 * 			| this.setOrigin(this.getCubePosition())
+	 * 
 	 * @effect	The walkTimer is initiated
 	 * 			| this.initiateWalktimer(adjacentDestination)
 	 * 
@@ -300,14 +305,12 @@ public class Unit extends GameObject {
 		
 		if(!this.isSprinting() && !this.isFollowing())
 			this.setStatus(UnitStatus.WALKING);
-
-		if (Arrays.equals(this.getCubePosition(), this.getFinalDestination())) {
-			this.setAdjacentDestination(adjacentDestination);
+		
+		if (Arrays.equals(this.getCubePosition(), this.getFinalDestination()))
 			this.setFinalDestination(adjacentDestination);
-			
-		} 
-		else
-			this.setAdjacentDestination(adjacentDestination);
+		
+		
+		this.setAdjacentDestination(adjacentDestination);
 		this.setOrigin(this.getCubePosition());
 		
 		this.initiateWalkTimer(adjacentDestination);
@@ -326,15 +329,20 @@ public class Unit extends GameObject {
 	 * @effect	The moveTo method is called, with the position of the targeted cube as argument.
 	 * 			| destination = this.getcubePosition + {dx, dy, dz}
 	 * 			| this.moveTo(destination)
+	 * 
 	 * @throws 	IllegalArgumentException
 	 * 			The given arguments are more than 1 away.
 	 * 			| (dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
 	 */
-	public void newMoveToAdjacent(int dx, int dy, int dz){
+	public void newMoveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException{
 		if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
 			throw new IllegalArgumentException("more than 1 away!");
-		int[] destination = {this.getCubePosition()[0] + dx,
-				this.getCubePosition()[1] + dy, this.getCubePosition()[2] + dz};
+		
+		int[] destination = {
+				this.getCubePosition()[0] + dx,
+				this.getCubePosition()[1] + dy, 
+				this.getCubePosition()[2] + dz};
+		
 		this.moveTo(destination);
 	}
 
@@ -344,11 +352,19 @@ public class Unit extends GameObject {
 	 * 
 	 * @param 	finalDestination
 	 *          The final destination for this unit.
+	 * 
+	 * @effect	If the current position is equal to the given destination
+	 * 		    do nothing
+	 * 			| if this.getCubePosition == finalDestination
+	 * 			| 		return;
+	 * 
 	 * @effect 	The units finalDestination is set to finalDestination, 
 	 *         	| this.setFinalDestination(finalDestination);      	
+	 *         
 	 * @effect	the unit will execute moveToAdjacent, with as argument the destination
 	 *         	selected with findPath 
 	 * 			| this.moveToAdjacent(this.findPath)
+	 * 
 	 * @throws 	IllegalArgumentException
 	 *          The given finalDestination is not a valid finalDestination
 	 *          | ! isValidFinalDestination(finalDestination)
@@ -381,7 +397,23 @@ public class Unit extends GameObject {
 		this.moveToAdjacent(this.findPath());
 	}
 	
-	public void startFollowing(Unit otherUnit){
+	/**
+	 * Start following the given Unit
+	 * 
+	 * @param 	otherUnit
+	 * 			The Unit to follow
+	 * 
+	 * @post	The status of this unit is "following"
+	 * 			| new.getStatus == UnitStatus.FOLLOWING
+	 * 
+	 * @effect	Move to the current position of the unit
+	 * 		    | this.moveTo(otherUnit.getCubePosition)
+	 * 
+	 * @throws	NullPointerException
+	 * 			if otherUnit is null
+	 * 			| (otherUnit == null)
+	 */
+	public void startFollowing(Unit otherUnit) throws NullPointerException{
 		if (otherUnit == null)
 			throw new NullPointerException("no other unit given!");
 		this.followUnit = otherUnit;
@@ -2464,14 +2496,12 @@ public class Unit extends GameObject {
 	 *
 	 * @post 	This Unit is terminated. 
 	 * 			| new.isTerminated()
-	 * @post	This unit has no world
-	 * 			| new.getWorld == null
+	 * @effect	This unit is scheduled for removal
+	 * 			| this.getWorld.scheduleToRemove(this)
 	 * @post	This unit status is idle
 	 * 			| new.getStatus == IDLE
 	 * @post	this unit has no faction
 	 * 			| new.getFaction == null
-	 * @effect	this unit is not present in world
-	 * 			| this.getWorld.removeUnit(this)
 	 * @effect 	this unit is not present in faction
 	 * 			| this.getFaction.removeUnit(this)
 	 * 
@@ -2482,10 +2512,10 @@ public class Unit extends GameObject {
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
 		//this.setWorld(null);
-	
+		this.setFaction(null);
 		this.getFaction().removeUnit(this);
 		
-		this.setFaction(null);
+		
 		
 	}
 

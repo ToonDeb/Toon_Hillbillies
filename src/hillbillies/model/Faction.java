@@ -1,9 +1,7 @@
 package hillbillies.model;
 
 import java.util.*;
-
 import be.kuleuven.cs.som.annotate.*;
-
 import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
 
 /**
@@ -13,10 +11,12 @@ import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
  *         Faction.
  *       | isValidWorld(getWorld())
  *       
- * @invar  The Scheduler of each Faction must be a valid Scheduler for any
- *         Faction.	
- *       | isValidScheduler(getScheduler())
- *
+ * @invar  The Units of each Faction must be valid Units.
+ * 		 | this.hasProperUnits()
+ * 
+ * @invar  A Faction always has a Scheduler
+ * 		 | this.getScheduler != null
+ * 		   
  * @author  Toon Deburchgrave
  * @version 1.0
  */
@@ -30,15 +30,13 @@ public class Faction {
 	 * @effect The World of this new Faction is set to
 	 *         the given World.
 	 *       | this.setWorld(world)
-	 *       
- 	 * @param  scheduler
-	 *         The Scheduler for this new Faction.
-	 * @effect The Scheduler of this new Faction is set to
-	 *         the given Scheduler.
-	 *       | this.setScheduler(scheduler)
+	 * @throws IllegalArgumentException
+	 * 		   The given world is not a valid world
+	 * 		 | !this.isValidWorld(world)
 	 */
-	public Faction(World world)
-			throws IllegalArgumentException {
+	public Faction(World world) throws IllegalArgumentException {
+		if(!this.isValidWorld(world))
+			throw new IllegalArgumentException("not a valid world for this faction");
 		this.setWorld(world);
 	}
 
@@ -59,12 +57,10 @@ public class Faction {
 		if (this.getNbUnits() == 0){
 			return true;
 		}
-		else if (world.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
-			return true;
-		}
 		else{
-			return false;
+			return (world.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS);
 		}
+		
 	}
 	
 	/**
@@ -81,8 +77,7 @@ public class Faction {
 	 *       | ! isValidWorld(getWorld())
 	 */
 	@Raw
-	public void setWorld(World world) 
-			throws IllegalArgumentException {
+	public void setWorld(World world) throws IllegalArgumentException {
 		if (! isValidWorld(world))
 			throw new IllegalArgumentException();
 		this.world = world;
@@ -178,18 +173,20 @@ public class Faction {
 	 * 
 	 * @param  unit
 	 *         The Unit to be removed.
-	 * @pre    This Faction has the given Unit as one of
+	 * @throws IllegalArgumentException
+	 * 	       This Faction has the given Unit as one of
 	 *         its Units, and the given Unit does not
-	 *         reference any Faction.
-	 *       | this.hasAsUnit(unit) &&
-	 *       | (unit.getFaction() == null)
+	 *         reference any Faction. Else, throw exception.
+	 *       | !this.hasAsUnit(unit) ||
+	 *       | (unit.getFaction() != null)
 	 * @post   This Faction no longer has the given Unit as
 	 *         one of its Units.
 	 *       | ! new.hasAsUnit(unit)
 	 */
 	@Raw
 	public void removeUnit(Unit unit) {
-		//assert this.hasAsUnit(unit) && (unit.getFaction() == null);
+		if(!this.hasAsUnit(unit) || (unit.getFaction() != null))
+			throw new IllegalArgumentException("unit can't be removed");
 		units.remove(unit);
 		System.out.println("unit removed");
 	}
@@ -198,7 +195,9 @@ public class Faction {
 	 * return the set of all units belonging to this faction
 	 */
 	public Set<Unit> getUnitsOfFaction(){
-		return this.units;
+		Set<Unit> allUnits = new HashSet<Unit>();
+		allUnits.addAll(this.units);
+		return allUnits;
 	}
 	
 	/**
@@ -223,39 +222,6 @@ public class Faction {
 	public Scheduler getScheduler() {
 		return this.scheduler;
 	}
-
-//	/**
-//	 * Check whether the given Scheduler is a valid Scheduler for
-//	 * any Faction.
-//	 *  
-//	 * @param  scheduler
-//	 *         The Scheduler to check.
-//	 * @return 
-//	 *       | result == (scheduler != null)
-//	*/
-//	public static boolean isValidScheduler(Scheduler scheduler) {
-//		return (scheduler != null);
-//	}
-
-//	/**
-//	 * Set the Scheduler of this Faction to the given Scheduler.
-//	 * 
-//	 * @param  scheduler
-//	 *         The new Scheduler for this Faction.
-//	 * @post   The Scheduler of this new Faction is equal to
-//	 *         the given Scheduler.
-//	 *       | new.getScheduler() == scheduler
-//	 * @throws IllegalArgumentException
-//	 *         The given Scheduler is not a valid Scheduler for any
-//	 *         Faction.
-//	 *       | ! isValidScheduler(getScheduler())
-//	 */
-//	@Raw
-//	public void setScheduler(Scheduler scheduler) throws IllegalArgumentException {
-//		if (! isValidScheduler(scheduler))
-//			throw new IllegalArgumentException();
-//		this.scheduler = scheduler;
-//	}
 
 	/**
 	 * Variable registering the Scheduler of this Faction.
