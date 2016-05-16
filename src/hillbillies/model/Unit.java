@@ -217,17 +217,16 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	public Unit(String name, int[] position, int weight, int strength, int agility, 
-			int toughness, World world, Faction faction, boolean defaultBehaviour)
+			int toughness, /*World world, Faction faction,*/ boolean defaultBehaviour)
 				throws IllegalArgumentException, NullPointerException {
-		// null is given as the default world
-		super(position, world);
+		super(position);
 		
-		if(faction!= null)
-			if(!faction.canHaveAsUnit(this))
-				throw new IllegalArgumentException("not a valid faction for this unit!");
-		if(world != null)
-			if(!world.canHaveAsUnit(this))
-				throw new IllegalArgumentException("not a valid world for this unit!");
+//		if(faction!= null)
+//			if(!faction.canHaveAsUnit(this))
+//				throw new IllegalArgumentException("not a valid faction for this unit!");
+//		if(world != null)
+//			if(!world.canHaveAsUnit(this))
+//				throw new IllegalArgumentException("not a valid world for this unit!");
 		
 		
 		if (!isValidStartAttribute(strength))
@@ -248,17 +247,18 @@ public class Unit extends GameObject {
 		this.setName(name);
 
 		this.setStatus(UnitStatus.IDLE);
-		
+		System.out.println("status set");
 		this.setAdjacentDestination(position);
+		System.out.println("adjacent set");
 		this.setFinalDestination(position);
 
 		this.setOrigin(position);
-		
-		if(world != null)
-			world.addUnit(this);
-		this.setFaction(faction);
-		if(faction != null)
-			faction.addUnit(this);
+		System.out.println("origin set");
+//		if(world != null)
+//			world.addUnit(this);
+//		this.setFaction(faction);
+//		if(faction != null)
+//			faction.addUnit(this);
 	
 		if (defaultBehaviour)
 			this.startDefaultBehaviour();
@@ -1146,8 +1146,8 @@ public class Unit extends GameObject {
 	 *         | else return true
 	 */
 	private boolean isValidAdjacentDestination(int[] adjacentDestination) {
-//		if(this.getWorld()==null)
-//			return true;
+		if(this.getWorld()==null)
+			return true;
 		
 		int[] thisPos = this.getCubePosition();
 		for (int i = 0; i<3;i++){
@@ -2675,7 +2675,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidFaction(getFaction())
 	 */
 	@Raw
-	private void setFaction(Faction faction) throws IllegalArgumentException {
+	public void setFaction(Faction faction) throws IllegalArgumentException {
 		if (! isValidFaction(faction))
 			throw new IllegalArgumentException("not a valid faction");
 		this.faction = faction;

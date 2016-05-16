@@ -65,11 +65,12 @@ public abstract class GameObject {
 			throw new IllegalArgumentException("not a valid position in this world");
 		this.setWorld(world);
 		this.setAtPosition(position);
-		
-		
 	}
 
-
+	public GameObject(int[] position){
+		this.setAtPosition(position);
+	}
+	
 	/**
 	 * Return the position of this GameObject.
 	 */
@@ -127,8 +128,10 @@ public abstract class GameObject {
 	 * 		  | (cubePosition == null) || (!this.getWorld.isValidWorldPosition(cubePosition))
 	 */
 	public void setAtPosition(int[] cubePosition) throws IllegalArgumentException{
-		if((cubePosition == null) || (!this.getWorld().isValidWorldPosition(cubePosition)))
-			throw new IllegalArgumentException("not a valid position for this world");
+		if(this.getWorld() != null){
+			if((cubePosition == null) || (!this.getWorld().isValidWorldPosition(cubePosition)))
+				throw new IllegalArgumentException("not a valid position for this world");
+		}
 		this.setPosition(toVectorPosition(cubePosition));
 	}
 
@@ -147,8 +150,9 @@ public abstract class GameObject {
 	 */
 	@Raw
 	public void setPosition(Vector3d position) throws IllegalArgumentException {
-		if (! isValidPosition(position, this.getWorld()))
-			throw new IllegalArgumentException();
+		if(this.getWorld() != null)
+			if (! isValidPosition(position, this.getWorld()))
+				throw new IllegalArgumentException();
 		this.position = position;
 	}
 
