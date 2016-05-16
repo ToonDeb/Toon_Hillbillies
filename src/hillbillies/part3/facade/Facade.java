@@ -140,7 +140,6 @@ public class Facade implements IFacade {
 	@Override
 	public void addUnit(Unit unit, World world) throws ModelException {
 		try{
-			System.out.println("unti added to world");
 			unit.setWorld(world);
 			world.addUnit(unit);
 		}
