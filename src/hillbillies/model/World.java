@@ -765,7 +765,7 @@ public class World {
 		return units.size();
 	}
 
-	/**
+	/** TODO
 	 * Add the given Unit to the set of Units of this World.
 	 * 
 	 * @param  unit
@@ -778,8 +778,10 @@ public class World {
 	 *       | new.hasAsUnit(unit)
 	 */
 	public void addUnit(@Raw Unit unit) {
-		if((unit == null) || (unit.getWorld()!= this))
-			throw new IllegalArgumentException("unit has other world");
+		if((unit == null))
+			throw new IllegalArgumentException("unit can't be null");
+		this.assignFactionTo(unit);
+		unit.setWorld(this);
 		units.add(unit);
 	}
 
@@ -1023,7 +1025,17 @@ public class World {
 			position[1] = new Random().nextInt(this.getNbCubesY());
 			position[2] = new Random().nextInt(this.getNbCubesZ());
 		}
-
+		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness,/* this, faction, */enableDefaultBehavior);
+		this.addUnit(unit);
+		return unit;
+		
+	}
+	
+	/**
+	 * TODO
+	 * @param unit
+	 */
+	public void assignFactionTo(Unit unit){
 		Faction faction = null;
 		if(this.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
 			faction = new Faction(this);
@@ -1036,9 +1048,9 @@ public class World {
 		if(faction.getNbUnits() > MAX_NB_UNITS_IN_FACTION){
 			throw new IllegalStateException("No faction available!");
 		}
-		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness, this, faction, enableDefaultBehavior);
-		return unit;
 		
+		unit.setFaction(faction);
+		faction.addUnit(unit);
 	}
 	
 	/**
@@ -1108,8 +1120,9 @@ public class World {
 		}
 		
 		for(Unit unit: toRemove){
-			this.removeUnit(unit);
 			unit.setWorld(null);
+			this.removeUnit(unit);
+			
 		}
 		this.toRemove = new HashSet<Unit>();
 	}

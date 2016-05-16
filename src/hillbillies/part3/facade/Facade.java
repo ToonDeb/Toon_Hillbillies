@@ -13,7 +13,7 @@ import hillbillies.model.Scheduler;
 import hillbillies.model.Task;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
-import hillbillies.part2.listener.DefaultTerrainChangeListener;
+
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.part3.programs.ITaskFactory;
 import hillbillies.part3.programs.TaskFactory;
@@ -275,11 +275,7 @@ public class Facade implements IFacade {
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
-		int[][][] terrain = {{{0}}};
-		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
-		World world = new World(terrain, defaultListener);
-		return new Unit(name, initialPosition, weight, agility, strength, toughness,
-				world, null, enableDefaultBehavior);
+		return new Unit(name, initialPosition, weight, agility, strength, toughness, enableDefaultBehavior);
 	}
 
 	/* (non-Javadoc)
