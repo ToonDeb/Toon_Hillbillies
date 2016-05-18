@@ -426,6 +426,9 @@ public class Unit extends GameObject {
 		}
 	}
 	
+	/**
+	 * TODO
+	 */
 	public void follow(){
 		if(!this.isNeighbouringCube(followUnit.getCubePosition())){
 			this.moveTo(followUnit.getCubePosition());
@@ -439,10 +442,19 @@ public class Unit extends GameObject {
 		}
 	}
 	
+	/**
+	 * check if this unit is currently following another unit
+	 * 
+	 * @return 
+	 * 		|(this.getStatus == FOLLOWING)
+	 */
 	public boolean isFollowing(){
 		return this.getStatus() == UnitStatus.FOLLOWING;
 	}
 	
+	/**
+	 * The Unit this unit is currently following
+	 */
 	private Unit followUnit;
 	
 	/**
@@ -801,7 +813,6 @@ public class Unit extends GameObject {
 	 *       	| 	new.getOrientation == newOrientation
 	 */
 	private void updateOrientation() {
-
 		Vector3d velocity = this.getVelocity();
 		double vy = velocity.y;
 		double vx = velocity.x;
@@ -1044,8 +1055,8 @@ public class Unit extends GameObject {
 		
 		while (counter < 10000) {
 			// Returns a double between -1 and +1
-			double xJump = 2 * random.nextDouble() - 1;
-			double yJump = 2 * random.nextDouble() - 1;
+			double xJump = 2 * new Random().nextDouble() - 1;
+			double yJump = 2 * new Random().nextDouble() - 1;
 
 			newPosition.set(thisX + xJump, thisY + yJump, thisZ);
 			counter++;
@@ -1107,6 +1118,9 @@ public class Unit extends GameObject {
 	 * @effect Call the moveTo method, and give a random, valid position in the gameworld
 	 * 			with passable terrain, and neighbouring a solid cube
 	 *         | this.moveTo(randomPosition)
+	 *         | where	(this.getWorld().isValidWorldPosition(randomPosition)
+	 *		   |			&&(this.getWorld().isPassableTerrain(randomPosition))
+	 *		   |			&& (this.getWorld().isNeighbouringSolid(randomPosition))
 	 * 
 	 */
 	private void moveToRandom(){
@@ -1115,9 +1129,9 @@ public class Unit extends GameObject {
 		int[] position = {-1,-1,-1};
 		while (counter < 1000) {
 			// Returns a double between -1 and +1
-			position[0] = random.nextInt(this.getWorld().getNbCubesX());
-			position[1] = random.nextInt(this.getWorld().getNbCubesY());
-			position[2] = random.nextInt(this.getWorld().getNbCubesZ());
+			position[0] = new Random().nextInt(this.getWorld().getNbCubesX());
+			position[1] = new Random().nextInt(this.getWorld().getNbCubesY());
+			position[2] = new Random().nextInt(this.getWorld().getNbCubesZ());
 
 			counter++;
 			// in this way, because ispassableterrain requires a valid position
@@ -1234,7 +1248,7 @@ public class Unit extends GameObject {
 	}
 
 
-	/**
+	/** TODO
 	 * Set the finalDestination of this unit to the given finalDestination.
 	 * 
 	 * @param 	finalDestination
@@ -1288,7 +1302,8 @@ public class Unit extends GameObject {
 	 *         		(this.getStrength() + this.getAgility())/2))
 	 */
 	private boolean isValidWeight(int weight) {
-		return ((1 < weight) && (weight < 200));
+		return ((1 < weight) && (weight < 200) && 
+				(weight >= (this.getStrength() + this.getAgility()) / 2));
 	}
 
 	/**
@@ -1301,7 +1316,8 @@ public class Unit extends GameObject {
 	 *         	(this.getStrength() + this.getAgility())/2))
 	 */
 	private boolean isValidStartWeight(int weight) {
-		return ((25 <= weight) && (weight <= 100) && (weight >= (this.getStrength() + this.getAgility()) / 2));
+		return ((25 <= weight) && (weight <= 100) && 
+				(weight >= (this.getStrength() + this.getAgility()) / 2));
 	}
 
 	/**
@@ -2102,7 +2118,6 @@ public class Unit extends GameObject {
 		double newAttackTime = this.getAttackCountDown() - time;
 		if (Util.fuzzyLessThanOrEqualTo(newAttackTime, 0)) {
 			this.increaseExperience(20);
-			//this.setAttackCountDown(0);
 			this.setStatus(UnitStatus.IDLE);
 		} else
 			this.setAttackCountDown(newAttackTime);
@@ -2112,8 +2127,6 @@ public class Unit extends GameObject {
 	 * Variable registering the attackCountDown of this Unit.
 	 */
 	private double attackCountDown = 0;
-
-	Random random = new Random();
 
 	/**
 	 * This Unit is attacked by the other Unit, and can take damage because of
@@ -2169,7 +2182,7 @@ public class Unit extends GameObject {
 	 */
 	private boolean dodgeSuccesfull(Unit other) {
 		double dodgeChance = (0.2d * this.getAgility()) / other.getAgility();
-		return (Util.fuzzyLessThanOrEqualTo(random.nextDouble(), dodgeChance));
+		return (Util.fuzzyLessThanOrEqualTo(new Random().nextDouble(), dodgeChance));
 	}
 
 	/**
@@ -2185,12 +2198,12 @@ public class Unit extends GameObject {
 	private boolean blockChance(Unit other) {
 		double blockChance = (0.25d * (this.getStrength() + this.getAgility()))
 				/ (other.getStrength() + other.getAgility());
-		return (Util.fuzzyLessThanOrEqualTo(random.nextDouble(), blockChance));
+		return (Util.fuzzyLessThanOrEqualTo(new Random().nextDouble(), blockChance));
 
 	}
 
 	/** 
-	 * Initiate the rest status for this unit.
+	 * Initiate the rest status for this unit. TODO
 	 *
 	 * @pre 	The Unit is not attacking 
 	 * 			| this.status != UnitStatus.ATTACKING
@@ -2450,11 +2463,6 @@ public class Unit extends GameObject {
 			this.rest3MinTime = this.rest3MinTime + deltaT;
 		}
 
-
-//		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted){
-//			this.isInterrupted = false;
-//			this.getTask().redoLastStatement();
-//		}
 		if(this.getStatus() == UnitStatus.IDLE && !this.hasFinishedAction()){
 			this.hasFinishedAction = true;
 			return;
@@ -2472,7 +2480,7 @@ public class Unit extends GameObject {
 	}
 
 	/**
-	 * Check if the unit can still sprint
+	 * Check if the unit can still sprint TODO
 	 * 
 	 * @param 	deltaT
 	 * 			The time to advance
@@ -2496,7 +2504,10 @@ public class Unit extends GameObject {
 	}
 
 	private double rest3MinTime;
-
+	
+	/**
+	 * Variable registering the amount of time left in this sprint
+	 */
 	private double sprintTime;
 
 	/**
@@ -2533,12 +2544,8 @@ public class Unit extends GameObject {
 		this.getWorld().scheduleToRemove(this);
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
-		//this.setWorld(null);
 		this.setFaction(null);
 		this.getFaction().removeUnit(this);
-		
-		
-		
 	}
 
 	/**
@@ -2575,31 +2582,20 @@ public class Unit extends GameObject {
 	 */
 	public void stopDefaultBehaviour() {
 		this.setDefaultBoolean(false);
-		//this.setStatus(UnitStatus.IDLE);
 	}
 
 	/**
-	 * Determine the next behaviour
+	 * Determine the next behaviour TODO
 	 * 
 	 * @throws 	IllegalStateException
 	 *          The unit is not in defaultbehaviour 
 	 *          | ! this.getDefaultBoolean()
-	 * @effect 	1/3 of the times this method is called, the unit will work 
-	 * 			| if (RandomNumberBetween0And1 <= 1/3) 
-	 * 			|		then this.workAt(this.getCubePosition)
-	 * @effect 	1/3 of the time this method is called, the unit will rest 
-	 * 			| if (1/3 < RandomNumberBetween0And1 <= 2/3) 
-	 * 			| 		then this.rest()
-	 * @effect 	1/3 of the time this method is called, the unit will walk to a
-	 *         	random location 
-	 *         	| if (2/3 < RandomNumberBetween0And1) 
-	 *         	|		then this.moveToRandom()
 	 */
 	private void defaultBehaviour() throws IllegalStateException {
 		if (!this.getDefaultBoolean())
 			throw new IllegalStateException();
 
-		double chance = random.nextDouble();
+		double chance = new Random().nextDouble();
 		SourceLocation loc = new SourceLocation(0, 0);
 		
 		if (Util.fuzzyLessThanOrEqualTo(chance, 0.25d)) {
@@ -2607,7 +2603,6 @@ public class Unit extends GameObject {
 			MyExpression<int[]> expre = new NextToPosition(here, loc);
 			Action<int[]> statement = new Work(expre, loc);
 			statement.execute(this.getWorld(), this);
-			this.workAt(this.getCubePosition());
 		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.50d)) {
 			this.rest();
 		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.75d)) {
@@ -2616,6 +2611,8 @@ public class Unit extends GameObject {
 			follow.execute(this.getWorld(), this);
 		} else {
 			this.moveToRandom();
+			if(Util.fuzzyLessThanOrEqualTo(chance, 0.875d) && (this.getStamina()>1))
+				this.startSprint();
 		}
 	}
 	
@@ -2757,19 +2754,44 @@ public class Unit extends GameObject {
 	}
 	
 	/**
-	 * TODO: increaseExperience documentation
-	 * @param experience
+	 * Increase the experince by the given amount. If the 
+	 * total experience is more then 10, increase a random attribute
+	 * for every 10 experience points this unit has.
+	 * 
+	 * @param amount
+	 * 		  The amount of experience this unit gains.
+	 * @effect If all attributes have their maximum value,
+	 * 		   do nothing and return
+	 * 		   | if ((this.getAgility() == 200)&&
+	 * 		   |		(this.getStrength()==200)&&(this.getToughness()==200))
+	 *		   |	return;
+	 *		   Else, the following things apply: 
+	 * @post   For every 10 experience left, increase a random attribute by one,
+	 * 		   but never more then the maximum value.
+	 * 		   | this.getAgility + this.getStrength + 
+	 * 		   | 	this.getToughness + (amount + this.getExperience)/10
+	 * 		   | ==
+	 * 		   | new.getAgility + new.getStrength + new.getToughness
+	 * @post   The new Experience of this unit, is the total experience modulo 10
+	 * 		   | new.getExperience = (this.getExperience + amount) % 10
+	 * @post   The weight is a valid weigth, if it became to small due to the 
+	 * 		   increase of the strength and agility
+	 * 	 	   | isValidWeight(new.getWeight)
 	 * @throws IllegalArgumentException
+	 * 		   The amount can not be negative
+	 * 		   | amount < 0	
 	 */
 	private void increaseExperience(int amount) throws IllegalArgumentException{
+		if(amount < 0)
+			throw new IllegalArgumentException("can't give negative experience!");
 		// if all atributes have the maximum value, do nothing
 		if ((this.getAgility() == 200)&&(this.getStrength()==200)&&(this.getToughness()==200))
 			return;
-		
+		int counter = 0;
 		int newExperience = this.getExperience() + amount;
-		while(newExperience >= 10){
+		while((newExperience >= 10) && (counter < 50)){
 			newExperience = newExperience - 10;
-			int randomInt = random.nextInt(3);
+			int randomInt = new Random().nextInt(3);
 			if ((randomInt == 0) && isValidUnitAttribute(this.getAgility()+1)){
 				this.setAgility(this.getAgility()+1);
 			}
@@ -2780,10 +2802,14 @@ public class Unit extends GameObject {
 				this.setToughness(this.getToughness()+1);
 			}
 			else{
+				counter += 1;
 				newExperience = newExperience + 10;
 			}
 		}
-		this.setExperience(newExperience);
+		
+		if (!this.isValidWeight(this.getWeight()))
+			this.setWeight(-1);
+		this.setExperience(newExperience % 10);
 	}
 
 	/**
@@ -2792,7 +2818,11 @@ public class Unit extends GameObject {
 	private int experience = 0;
 	
 	/**
-	 * TODO
+	 * Interrupt the task currently executed by this unit
+	 * 
+	 * @effect Interrupt if currently executing a Task
+	 * 		   | if this.getTask != null
+	 * 		   | 	do this.getTask.interrupt
 	 */
 	public void interruptTask(){
 		if(this.getTask() != null)
@@ -2814,10 +2844,10 @@ public class Unit extends GameObject {
 	 * @param  Task
 	 *         The Task to check.
 	 * @return 
-	 *       | result == true
+	 *       | result == (task.getUnit() == null)
 	*/
 	public static boolean isValidTask(Task task) {
-		return true;
+		return (task.getUnit() == null);
 	}
 
 	/**
@@ -2834,8 +2864,7 @@ public class Unit extends GameObject {
 	 *       | ! isValidTask(getTask())
 	 */
 	@Raw
-	public void setTask(Task task) 
-			throws IllegalArgumentException {
+	public void setTask(Task task) throws IllegalArgumentException {
 		if (! isValidTask(task))
 			throw new IllegalArgumentException();
 		this.task = task;
@@ -2845,15 +2874,19 @@ public class Unit extends GameObject {
 	 * Variable registering the Task of this Unit.
 	 */
 	private Task task;
-
+	
+	/**
+	 * Set the hasFinishedAction variable to false
+	 * 
+	 * @post this unit has not finished the action
+	 * 		 | this.hasFinishedAction() == false;
+	 */
 	public void startAction(){
 		this.hasFinishedAction = false;
 	}
 	
 	/**
-	 * return hasFinishedAction
-	 * @return
-	 * 			| this.hasFinishedAction
+	 * Return true if this unit has finished an action,
 	 */
 	public boolean hasFinishedAction(){
 		return this.hasFinishedAction;
