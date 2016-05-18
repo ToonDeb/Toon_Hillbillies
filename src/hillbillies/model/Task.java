@@ -2,7 +2,6 @@ package hillbillies.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import be.kuleuven.cs.som.annotate.*;
@@ -31,9 +30,6 @@ import hillbillies.part3.programs.statement.action.Action;
  *         Task.
  *       | isValidAssignedVariables(getAssignedVariables())
  *       
- * @invar  The statementIterator of each Task must be a valid statementIterator for any
- *         Task.
- *       | isValidStatementIterator(getStatementIterator())
  *       
  * @invar   Each Task must have proper Schedulers.
  *        | hasProperSchedulers()
@@ -101,7 +97,7 @@ public class Task implements Comparable<Task>{
 	 *       | result == (name != null)
 	*/
 	@Raw
-	public static boolean canHaveAsName(String name) {
+	private static boolean canHaveAsName(String name) {
 		return (name != null);
 	}
 	
@@ -133,7 +129,7 @@ public class Task implements Comparable<Task>{
 	 * 		 |    do scheduler.sortTasks()
 	 */
 	@Raw
-	public void setPriority(int priority)throws IllegalArgumentException {
+	private void setPriority(int priority)throws IllegalArgumentException {
 		this.priority = priority;
 		for(Scheduler scheduler: this.getSchedulers()){
 			scheduler.sortTasks();
@@ -162,7 +158,7 @@ public class Task implements Comparable<Task>{
 	 * @return 
 	 *       | result == (statement != null)
 	*/
-	public static boolean isValidStatement(MyStatement statement) {
+	private static boolean isValidStatement(MyStatement statement) {
 		return (statement != null);
 	}
 
@@ -175,7 +171,7 @@ public class Task implements Comparable<Task>{
 	 * Return the AssignedVariables of this Task.
 	 */
 	@Basic @Raw
-	public HashMap<String, Assignment> getAssignedVariables() {
+	private HashMap<String, Assignment> getAssignedVariables() {
 		return this.assignedVariable;
 	}
 	
@@ -196,18 +192,6 @@ public class Task implements Comparable<Task>{
 	 * Variable registering the AssignedVariables of this Task.
 	 */
 	private HashMap<String, Assignment> assignedVariable = new HashMap<String, Assignment>();
-	
-	/**
-	 * Returns the iterator over the statement of this Task
-	 * 
-	 * @return The iterator of the statment
-	 * 		   | result == this.getStatement().iterator(this.getUnit.getWorld, this.getUnit)
-	 */
-	public Iterator<MyStatement> iterator(){
-		if(this.getUnit()==null)
-			throw new IllegalStateException("task is not assigned to a unit!");
-		return this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit());
-	}
 
 	/**
 	 * Return the Unit of this Task.
@@ -275,21 +259,8 @@ public class Task implements Comparable<Task>{
 	 * Return the statementIterator of this Task.
 	 */
 	@Basic @Raw
-	public StatementIterator getStatementIterator() {
+	private StatementIterator getStatementIterator() {
 		return this.iterator;
-	}
-
-	/**
-	 * Check whether the given statementIterator is a valid statementIterator for
-	 * any Task.
-	 *  
-	 * @param  statementIterator
-	 *         The statementIterator to check.
-	 * @return 
-	 *       | result == (iterator != null)
-	*/
-	public static boolean isValidStatementIterator(StatementIterator iterator) {
-		return (iterator != null);
 	}
 
 	/**
@@ -304,7 +275,7 @@ public class Task implements Comparable<Task>{
 	 *       | ! isValidStatementIterator(getStatementIterator())
 	 */
 	@Raw
-	public void setStatementIterator() throws IllegalArgumentException {
+	private void setStatementIterator() throws IllegalArgumentException {
 		if (this.getUnit() == null)
 			throw new IllegalStateException("no assigned unit");
 		this.iterator = this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit());
@@ -335,10 +306,9 @@ public class Task implements Comparable<Task>{
 	 * 		  | this.isTerminated
 	 */
 	 public void terminate() throws IllegalStateException{
-		 if(this.isTerminated){
+		 if(this.isTerminated)
 			 throw new IllegalStateException("task already terminated");
-//			 return;
-		 }
+		 
 		 this.isTerminated = true;
 		 this.getUnit().setTask(null);
 		 
@@ -365,12 +335,26 @@ public class Task implements Comparable<Task>{
 	 
 	
 	 /**
+	  * Go through the different statements of a task.
+	  * 
 	  * 
 	  * @param deltaT
+	  * 	   The amount of time that has passed
+	  * @throws IllegalStateException
+	  * 		This task is terminated or it is not assigned to a unit
+	  * 		|(this.isTerminated) || (!this.isAssigned)
+	  * 
+	  * @effect For every 0.001 deltaT, an action-, assignment- or print-
+	  * 		statement from the statementIterator
+	  * 		is executed.
+	  * 		if the statement is terminal (i.e. an action or print statement
+	  * 		If the action can not be executed by the unit, the task is interrupted
+	  * 		If an action is executed, the task stops going through the statements.
+	  * 		If all statements have been executed/reviewed, this task is terminated.
 	  */
 	@SuppressWarnings("unchecked")
 	public void advanceTime(double deltaT) throws IllegalStateException{
-		if((this.isTerminated) || (this.getUnit() == null))
+		if((this.isTerminated) || (!this.isAssigned()))
 			throw new IllegalStateException("can't advance time when terminated");
 		double taskTime = deltaT;
 		while (taskTime > 0){
@@ -405,21 +389,28 @@ public class Task implements Comparable<Task>{
 			}
 			else if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
-				System.out.println(statement);
 				if (statement instanceof NullStatement){
 					taskTime += 0.001;
 				}
 				else if(statement instanceof Assignment){
 					Assignment assignStatement = (Assignment)statement;
-					assignStatement.getReadVariable().setEvaluatedExpression(null);
+					if(assignStatement.getReadVariable() != null)
+						assignStatement.getReadVariable().setEvaluatedExpression(null);
 					Assignment previousAssignment = this.getAssignedVariables().get(assignStatement.getVariableName());
+					Unit unit = this.getUnit();
 					if(previousAssignment == null){
 						this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
-					}
-					else if	(previousAssignment.getExpression().getClass().isInstance(assignStatement.getExpression())){
+					} //check if previous was same type.
+					else if((assignStatement.getExpression().evaluateExpression(unit) instanceof Unit &&
+							   previousAssignment.getExpression().evaluateExpression(unit) instanceof Unit) ||
+						   (assignStatement.getExpression().evaluateExpression(unit) instanceof int[] &&
+							   previousAssignment.getExpression().evaluateExpression(unit) instanceof int[]) ||
+						   (assignStatement.getExpression().evaluateExpression(unit) instanceof Boolean &&
+							   previousAssignment.getExpression().evaluateExpression(unit) instanceof Boolean)){
 						this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
 					}
 					else{
+						this.terminate();
 						throw new IllegalArgumentException("wrong type of assigned variable");
 					}
 					
@@ -553,7 +544,7 @@ public class Task implements Comparable<Task>{
 	 */
 	public void addScheduler(@Raw Scheduler scheduler) {
 		if (scheduler == null)
-			throw new IllegalArgumentException("scheduler can't be null");// && (scheduler.hasAsTask(this));
+			throw new IllegalArgumentException("scheduler can't be null");
 		schedulers.add(scheduler);
 	}
 
@@ -571,7 +562,6 @@ public class Task implements Comparable<Task>{
 	 * 	       This Task has the given Scheduler as one of
 	 *         its Schedulers. Else, throw Exception
 	 *       | ! this.hasAsScheduler(scheduler)
-	 * 
 	 */
 	@Raw
 	public void removeScheduler(Scheduler scheduler) {

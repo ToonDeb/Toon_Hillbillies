@@ -1,0 +1,7 @@
+name: "test some things" 
+priority : 1000
+activities:
+	w := enemy;
+	w := here;
+	attack w;
+	
