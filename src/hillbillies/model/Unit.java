@@ -3,6 +3,14 @@ package hillbillies.model;
 import hillbillies.model.UnitStatus;
 import hillbillies.model.pathfinding.AStarPathFinder;
 import hillbillies.model.pathfinding.Path;
+import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.expression.MyExpression;
+import hillbillies.part3.programs.expression.position.HerePosition;
+import hillbillies.part3.programs.expression.position.NextToPosition;
+import hillbillies.part3.programs.expression.unit.Enemy;
+import hillbillies.part3.programs.statement.action.Action;
+import hillbillies.part3.programs.statement.action.Follow;
+import hillbillies.part3.programs.statement.action.Work;
 
 import java.util.Arrays;
 
@@ -219,15 +227,7 @@ public class Unit extends GameObject {
 	public Unit(String name, int[] position, int weight, int strength, int agility, 
 			int toughness, /*World world, Faction faction,*/ boolean defaultBehaviour)
 				throws IllegalArgumentException, NullPointerException {
-		super(position);
-		
-//		if(faction!= null)
-//			if(!faction.canHaveAsUnit(this))
-//				throw new IllegalArgumentException("not a valid faction for this unit!");
-//		if(world != null)
-//			if(!world.canHaveAsUnit(this))
-//				throw new IllegalArgumentException("not a valid world for this unit!");
-		
+		super(position);	
 		
 		if (!isValidStartAttribute(strength))
 			strength = 25;
@@ -254,11 +254,7 @@ public class Unit extends GameObject {
 
 		this.setOrigin(position);
 		System.out.println("origin set");
-//		if(world != null)
-//			world.addUnit(this);
-//		this.setFaction(faction);
-//		if(faction != null)
-//			faction.addUnit(this);
+
 	
 		if (defaultBehaviour)
 			this.startDefaultBehaviour();
@@ -298,6 +294,10 @@ public class Unit extends GameObject {
 	 * 			| this.isfalling()
 	 */
 	private void moveToAdjacent(int[] adjacentDestination) throws IllegalArgumentException {
+		if(adjacentDestination == null){
+			this.setFinalDestination(this.getCubePosition());
+			return;
+		}
 		if (!isValidAdjacentDestination(adjacentDestination))
 			throw new IllegalArgumentException("Invalid adjacentDestination!");
 		if(this.isFalling())
@@ -334,7 +334,7 @@ public class Unit extends GameObject {
 	 * 			The given arguments are more than 1 away.
 	 * 			| (dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
 	 */
-	public void newMoveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException{
+	public void facadeMoveToAdjacent(int dx, int dy, int dz) throws IllegalArgumentException{
 		if(dx > 1 || dx < -1 || dy > 1 || dy < -1 || dz > 1 || dz < -1)
 			throw new IllegalArgumentException("more than 1 away!");
 		
@@ -418,7 +418,12 @@ public class Unit extends GameObject {
 			throw new NullPointerException("no other unit given!");
 		this.followUnit = otherUnit;
 		this.setStatus(UnitStatus.FOLLOWING);
-		this.moveTo(otherUnit.getCubePosition());
+		try {
+			this.moveTo(otherUnit.getCubePosition());
+		} catch (Exception e) {
+			this.followUnit = null;
+			this.setStatus(UnitStatus.IDLE);
+		}
 	}
 	
 	public void follow(){
@@ -427,7 +432,10 @@ public class Unit extends GameObject {
 		}
 		else{
 			this.setStatus(UnitStatus.IDLE);
+			Unit follow = this.followUnit;
 			this.followUnit = null;
+			if(defaultBoolean)
+				this.attack(follow);
 		}
 	}
 	
@@ -538,6 +546,8 @@ public class Unit extends GameObject {
 			this.setPath(pathFinder.findPath(this, sx, sy, sz, tx, ty, tz));
 			this.setPathIndex(1);
 		}
+		if(this.getPath() == null)
+			return null;
 		
 		return this.getPath().getStepInt(this.getPathIndex());
 	}
@@ -1099,24 +1109,30 @@ public class Unit extends GameObject {
 	 *         | this.moveTo(randomPosition)
 	 * 
 	 */
-//	private void moveToRandom(){
-//		int counter = 0;
-//		int[] position = {-1,-1,-1};
-//		while (counter < 10000) {
-//			// Returns a double between -1 and +1
-//			position[0] = random.nextInt(this.getWorld().getNbCubesX());
-//			position[1] = random.nextInt(this.getWorld().getNbCubesY());
-//			position[2] = random.nextInt(this.getWorld().getNbCubesZ());
-//
-//			counter++;
-//			// in this way, because ispassableterrain requires a valid position
-//			if(this.getWorld().isValidWorldPosition(position))
-//				if(this.getWorld().isPassableTerrain(position))
-//					if(this.getWorld().isNeighbouringSolid(position))
-//						break;
-//		}
-//		this.moveTo(position);
-//	}
+	private void moveToRandom(){
+		this.resetPath();
+		int counter = 0;
+		int[] position = {-1,-1,-1};
+		while (counter < 1000) {
+			// Returns a double between -1 and +1
+			position[0] = random.nextInt(this.getWorld().getNbCubesX());
+			position[1] = random.nextInt(this.getWorld().getNbCubesY());
+			position[2] = random.nextInt(this.getWorld().getNbCubesZ());
+
+			counter++;
+			// in this way, because ispassableterrain requires a valid position
+			if(this.getWorld().isValidWorldPosition(position))
+				if(this.getWorld().isPassableTerrain(position))
+					if(this.getWorld().isNeighbouringSolid(position)){
+						this.setFinalDestination(position);
+						int[] nextpos = this.findPath();
+						if(nextpos != null)
+							break;
+					}
+		}
+		this.setFinalDestination(this.getCubePosition());
+		this.moveTo(position);
+	}
 	
 
 	/**
@@ -2407,7 +2423,13 @@ public class Unit extends GameObject {
 			if(this.isSprinting())
 				this.updateSprint(deltaT);
 			else if(this.isFollowing()){
-				this.follow();
+				try{
+					this.follow();
+				}
+				catch (Exception e){
+					this.setStatus(UnitStatus.IDLE);
+					this.followUnit = null;
+				}
 				this.updatePosition(deltaT);
 			}	
 			else
@@ -2428,10 +2450,7 @@ public class Unit extends GameObject {
 			this.rest3MinTime = this.rest3MinTime + deltaT;
 		}
 
-//		if ((this.getStatus() == UnitStatus.IDLE) && (this.getDefaultBoolean() == true)) {
-//			this.defaultBehaviour();
-//		}
-		
+
 //		if(this.getStatus() == UnitStatus.IDLE && this.isInterrupted){
 //			this.isInterrupted = false;
 //			this.getTask().redoLastStatement();
@@ -2446,7 +2465,10 @@ public class Unit extends GameObject {
 			scheduler.assignNextTaskTo(this);
 		}
 		
-
+		if ((this.getStatus() == UnitStatus.IDLE) && (this.getDefaultBoolean() == true)) {
+			this.defaultBehaviour();
+		}
+		
 	}
 
 	/**
@@ -2573,24 +2595,30 @@ public class Unit extends GameObject {
 	 *         	| if (2/3 < RandomNumberBetween0And1) 
 	 *         	|		then this.moveToRandom()
 	 */
-//	private void defaultBehaviour() throws IllegalStateException {
-//		if (!this.getDefaultBoolean())
-//			throw new IllegalStateException();
-//
-//		double chance = random.nextDouble();
-		
-//		
-//		if (Util.fuzzyLessThanOrEqualTo(chance, 0.333333d)) {
-//			this.workAt(this.getCubePosition());
-//			return;
-//		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.666666d)) {
-//			this.rest();
-//			return;
-//		} else {
-//			this.moveToRandom();
-//		}
+	private void defaultBehaviour() throws IllegalStateException {
+		if (!this.getDefaultBoolean())
+			throw new IllegalStateException();
 
-	//}
+		double chance = random.nextDouble();
+		SourceLocation loc = new SourceLocation(0, 0);
+		
+		if (Util.fuzzyLessThanOrEqualTo(chance, 0.25d)) {
+			MyExpression<int[]> here = new HerePosition(loc);
+			MyExpression<int[]> expre = new NextToPosition(here, loc);
+			Action<int[]> statement = new Work(expre, loc);
+			statement.execute(this.getWorld(), this);
+			this.workAt(this.getCubePosition());
+		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.50d)) {
+			this.rest();
+		} else if (Util.fuzzyLessThanOrEqualTo(chance, 0.75d)) {
+			MyExpression<Unit> expr = new Enemy(loc);
+			Action<Unit> follow = new Follow(expr, loc);
+			follow.execute(this.getWorld(), this);
+		} else {
+			this.moveToRandom();
+		}
+	}
+	
 
 	/**
 	 * Return the defaultBoolean of this Unit.

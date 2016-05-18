@@ -1,0 +1,3 @@
+name: "goto (2, 6, 9)"
+priority : 100
+activities : moveTo (2, 6, 9);

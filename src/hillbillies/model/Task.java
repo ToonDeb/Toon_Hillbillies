@@ -31,10 +31,6 @@ import hillbillies.part3.programs.statement.action.Action;
  *         Task.
  *       | isValidAssignedVariables(getAssignedVariables())
  *       
- * @invar  The Unit of each Task must be a valid Unit for any
- *         Task.
- *       | isValidUnit(getUnit())
- *       
  * @invar  The statementIterator of each Task must be a valid statementIterator for any
  *         Task.
  *       | isValidStatementIterator(getStatementIterator())
@@ -42,8 +38,8 @@ import hillbillies.part3.programs.statement.action.Action;
  * @invar   Each Task must have proper Schedulers.
  *        | hasProperSchedulers()
  *       
- * @author  ...
- * @version 1.0
+ * @author  Toon Deburchgrave
+ * @version 2.01
  */
 public class Task implements Comparable<Task>{
 	
@@ -67,22 +63,25 @@ public class Task implements Comparable<Task>{
  	 *       
  	 * @param  statement
  	 *         The Statement for this new Task.
- 	 * @effect The Statement of this new Task is set to
+ 	 * @post   The Statement of this new Task is set to
  	 *         the given Statement.
- 	 *       | this.setStatement(statement)
+ 	 *       | new.getStatement = statement
+ 	 * @throws IllegalArgumentException
+ 	 * 		   The statement is not a valid statement for any Task
+ 	 * 		 | ! isValidStatement(statement)
  	 *       
  	 * @post   This new Task has no Schedulers yet.
 	 *       | new.getNbSchedulers() == 0
+	 *       
 	 */
 	public Task(String name, int priority, MyStatement statement) throws IllegalArgumentException {
 		if (! canHaveAsName(name))
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("invalid name");
+		if (! isValidStatement(statement))
+			throw new IllegalArgumentException("invalid statement");
 		this.name = name;
-		
 		this.setPriority(priority);
-		this.setStatement(statement); //mss immutable?
-		
-		this.setAssignedVariables(new HashMap<String, Assignment>());
+		this.statement = statement;
 	}
 	
 	/**
@@ -102,7 +101,7 @@ public class Task implements Comparable<Task>{
 	 *       | result == (name != null)
 	*/
 	@Raw
-	public boolean canHaveAsName(String name) {
+	public static boolean canHaveAsName(String name) {
 		return (name != null);
 	}
 	
@@ -121,19 +120,6 @@ public class Task implements Comparable<Task>{
 	}
 	
 	/**
-	 * Check whether the given priority is a valid priority for
-	 * any Task.
-	 *  
-	 * @param  priority
-	 *         The priority to check.
-	 * @return 
-	 *       | result == true
-	*/
-	public static boolean isValidPriority(int priority) {
-		return true;
-	}
-	
-	/**
 	 * Set the priority of this Task to the given priority.
 	 * 
 	 * @param  priority
@@ -141,16 +127,13 @@ public class Task implements Comparable<Task>{
 	 * @post   The priority of this new Task is equal to
 	 *         the given priority.
 	 *       | new.getPriority() == priority
-	 * @throws IllegalArgumentException
-	 *         The given priority is not a valid priority for any
-	 *         Task.
-	 *       | ! isValidPriority(getPriority())
+	 * @effect Sort the tasks in all the schedulers that
+	 * 		   contain this task.
+	 * 		 | for scheduler in this.getSchedulers
+	 * 		 |    do scheduler.sortTasks()
 	 */
 	@Raw
-	public void setPriority(int priority) 
-			throws IllegalArgumentException {
-		if (! isValidPriority(priority))
-			throw new IllegalArgumentException();
+	public void setPriority(int priority)throws IllegalArgumentException {
 		this.priority = priority;
 		for(Scheduler scheduler: this.getSchedulers()){
 			scheduler.sortTasks();
@@ -184,49 +167,9 @@ public class Task implements Comparable<Task>{
 	}
 
 	/**
-	 * Set the Statement of this Task to the given Statement.
-	 * 
-	 * @param  statement
-	 *         The new Statement for this Task.
-	 * @post   The Statement of this new Task is equal to
-	 *         the given Statement.
-	 *       | new.getStatement() == statement
-	 * @throws IllegalArgumentException
-	 *         The given Statement is not a valid Statement for any
-	 *         Task.
-	 *       | ! isValidStatement(getStatement())
-	 */
-	@Raw
-	public void setStatement(MyStatement statement) 
-			throws IllegalArgumentException {
-		if (! isValidStatement(statement))
-			throw new IllegalArgumentException();
-		this.statement = statement;
-	}
-
-	/**
 	 * Variable registering the Statement of this Task.
 	 */
-	private MyStatement statement;
-	
-	
-	
-
-
-	///**
-	// * Initialize this new Task with given AssignedVariables.
-	// *
-	// * @param  assignedVariable
-	// *         The AssignedVariables for this new Task.
-	// * @effect The AssignedVariables of this new Task is set to
-	// *         the given AssignedVariables.
-	// *       | this.setAssignedVariables(assignedVariable)
-	// */
-	//public Task(HashMap<String, MyExpression> assignedVariable)
-	//		throws IllegalArgumentException {
-	//	this.setAssignedVariables(assignedVariable);
-	//}
-
+	private final MyStatement statement;
 
 	/**
 	 * Return the AssignedVariables of this Task.
@@ -235,48 +178,15 @@ public class Task implements Comparable<Task>{
 	public HashMap<String, Assignment> getAssignedVariables() {
 		return this.assignedVariable;
 	}
-
-	/** TODO: isValidAssignedVariable
-	 * Check whether the given AssignedVariables is a valid AssignedVariables for
-	 * any Task.
-	 *  
-	 * @param  AssignedVariables
-	 *         The AssignedVariables to check.
-	 * @return 
-	 *       | result == 
-	*/
-	public static boolean isValidAssignedVariables(HashMap<String, Assignment> assignedVariable) {
-		return true;
-	}
-
-	/** TODO: assignedVariable zetten op de uitkomst van de expression, niet op de expression zelf
-	 * Set the AssignedVariables of this Task to the given AssignedVariables.
-	 * 
-	 * @param  assignedVariable
-	 *         The new AssignedVariables for this Task.
-	 * @post   The AssignedVariables of this new Task is equal to
-	 *         the given AssignedVariables.
-	 *       | new.getAssignedVariables() == assignedVariable
-	 * @throws IllegalArgumentException
-	 *         The given AssignedVariables is not a valid AssignedVariables for any
-	 *         Task.
-	 *       | ! isValidAssignedVariables(getAssignedVariables())
-	 */
-	@Raw
-	public void setAssignedVariables(HashMap<String, Assignment> assignedVariable) 
-			throws IllegalArgumentException {
-		if (! isValidAssignedVariables(assignedVariable))
-			throw new IllegalArgumentException();
-		this.assignedVariable = assignedVariable;
-	}
 	
 	/**
 	 * Returns the expression assigned to the given variableName
 	 * 
 	 * @param variableName
 	 * 		  The name of the expression to search for
-	 * @return 
-	 * 			| return this.getAssignedVariables().get(variableName)
+	 * @return The assignment in this Task with as name variableName
+	 * 		  | result == assignment
+	 * 		  | 	where assignment.getVariableName == variableName
 	 */
 	public Assignment getAssignment(String variableName){
 		return this.getAssignedVariables().get(variableName);
@@ -285,16 +195,18 @@ public class Task implements Comparable<Task>{
 	/**
 	 * Variable registering the AssignedVariables of this Task.
 	 */
-	private HashMap<String, Assignment> assignedVariable;
+	private HashMap<String, Assignment> assignedVariable = new HashMap<String, Assignment>();
 	
 	/**
-	 * TODO: task iterator documententatie
-	 * @return
+	 * Returns the iterator over the statement of this Task
+	 * 
+	 * @return The iterator of the statment
+	 * 		   | result == this.getStatement().iterator(this.getUnit.getWorld, this.getUnit)
 	 */
 	public Iterator<MyStatement> iterator(){
 		if(this.getUnit()==null)
 			throw new IllegalStateException("task is not assigned to a unit!");
-		return this.getStatement().iterator(this.unit.getWorld(), this.unit);
+		return this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit());
 	}
 
 	/**
@@ -306,19 +218,6 @@ public class Task implements Comparable<Task>{
 	}
 
 	/**
-	 * Check whether the given Unit is a valid Unit for
-	 * any Task.
-	 *  
-	 * @param  Unit
-	 *         The Unit to check.
-	 * @return 
-	 *       | result == true
-	*/
-	public static boolean isValidUnit(Unit unit) {
-		return true;
-	}
-
-	/**
 	 * Set the Unit of this Task to the given Unit.
 	 * 
 	 * @param  unit
@@ -326,15 +225,12 @@ public class Task implements Comparable<Task>{
 	 * @post   The Unit of this new Task is equal to
 	 *         the given Unit.
 	 *       | new.getUnit() == unit
-	 * @throws IllegalArgumentException
-	 *         The given Unit is not a valid Unit for any
-	 *         Task.
-	 *       | ! isValidUnit(getUnit())
+	 * @effect If the unit is not null, set the statementIterator
+	 * 		 | if (unit != null)
+	 * 		 |	do this.setStatementIterator();
 	 */
 	@Raw
 	public void setUnit(Unit unit) throws IllegalArgumentException {
-		if (! isValidUnit(unit))
-			throw new IllegalArgumentException();
 		this.unit = unit;
 		
 		if(unit != null){
@@ -343,10 +239,28 @@ public class Task implements Comparable<Task>{
 		
 	}
 	
+	/**
+	 * Return whether the Task is assigned to a unit
+	 * 
+	 * @return true if this task has a unit
+	 * 			| result == (this.getUnit() != null)
+	 */
 	public boolean isAssigned(){
 		return(this.getUnit() != null);
 	}
 	
+	
+	/**
+	 * Assign this task to the given Unit
+	 * 
+	 * @param unit
+	 * 		  The unit to be assigned this task
+	 * 
+	 * @post  the Unit of this Task is the given unit
+	 * 		  | new.getUnit() == unit
+	 * @post  The Task of the given unit is this Task
+	 * 		  | (new unit).getTask == new
+	 */
 	public void assignTo(Unit unit){
 		unit.setTask(this);
 		this.setUnit(unit);
@@ -356,26 +270,6 @@ public class Task implements Comparable<Task>{
 	 * Variable registering the Unit of this Task.
 	 */
 	private Unit unit;
-	
-//	public void removeFromSchedulers(){
-//		
-//	}
-
-
-///**
-// * Initialize this new Task with given statementIterator.
-// *
-// * @param  iterator
-// *         The statementIterator for this new Task.
-// * @effect The statementIterator of this new Task is set to
-// *         the given statementIterator.
-// *       | this.setStatementIterator(iterator)
-// */
-//public Task(StatementIterator iterator)
-//		throws IllegalArgumentException {
-//	this.setStatementIterator(iterator);
-//}
-
 
 	/**
 	 * Return the statementIterator of this Task.
@@ -392,10 +286,10 @@ public class Task implements Comparable<Task>{
 	 * @param  statementIterator
 	 *         The statementIterator to check.
 	 * @return 
-	 *       | result == 
+	 *       | result == (iterator != null)
 	*/
 	public static boolean isValidStatementIterator(StatementIterator iterator) {
-		return true;
+		return (iterator != null);
 	}
 
 	/**
@@ -403,7 +297,8 @@ public class Task implements Comparable<Task>{
 	 * 
 	 * @post   The statementIterator of this new Task is equal to the 
 	 * 			statemeIterator of the statement.
-	 *       | new.getStatementIterator() == this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit())
+	 *       | new.getStatementIterator() == 
+	 *       |     this.getStatement().iterator(this.getUnit().getWorld(), this.getUnit())
 	 * @throws IllegalStateException
 	 *         The Task is not assigned to a unit.
 	 *       | ! isValidStatementIterator(getStatementIterator())
@@ -425,23 +320,33 @@ public class Task implements Comparable<Task>{
 	 *
 	 * @post   This Task  is terminated.
 	 *       | new.isTerminated()
-	 * @post   ...
-	 *       | ...
+	 * @post   The Task of the Unit of this Task, is null
+	 *       | this.getUnit = unit
+	 *       | (new unit).getTask = null
+	 * @post the Unit of this Task is null
+	 * 		 | new.getUnit == null
+	 * @effect This task is removed from all schedulers, and
+	 * 		   vice versa
+	 * 		 | for scheduler in this.getSchedulers
+	 * 		 |	do this.removeScheduler(scheduler)
+	 * 
+	 * @throws IllegalStateException
+	 * 		   When this task is already terminated
+	 * 		  | this.isTerminated
 	 */
-	 public void terminate() {
-		 if(this.isTerminated)
-			 return;
+	 public void terminate() throws IllegalStateException{
+		 if(this.isTerminated){
+			 throw new IllegalStateException("task already terminated");
+//			 return;
+		 }
 		 this.isTerminated = true;
 		 this.getUnit().setTask(null);
 		 
 		 this.setUnit(null);
 		 
-		 for(Scheduler scheduler: this.schedulers){
-			 //scheduler.removeTask(this);
+		 for(Scheduler scheduler: this.getSchedulers()){
 			 this.removeScheduler(scheduler);
 		 }
-		 //delete from unit
-		 //delete from scheduler
 	 }
 	 
 	 /**
@@ -459,9 +364,13 @@ public class Task implements Comparable<Task>{
 	 private boolean isTerminated = false;
 	 
 	
+	 /**
+	  * 
+	  * @param deltaT
+	  */
 	@SuppressWarnings("unchecked")
-	public void advanceTime(double deltaT){
-		if(this.isTerminated)
+	public void advanceTime(double deltaT) throws IllegalStateException{
+		if((this.isTerminated) || (this.getUnit() == null))
 			throw new IllegalStateException("can't advance time when terminated");
 		double taskTime = deltaT;
 		while (taskTime > 0){
@@ -496,28 +405,28 @@ public class Task implements Comparable<Task>{
 			}
 			else if (this.getStatementIterator().hasNext()){
 				MyStatement statement = this.getStatementIterator().next();
-			
+				System.out.println(statement);
 				if (statement instanceof NullStatement){
 					taskTime += 0.001;
 				}
 				else if(statement instanceof Assignment){
 					Assignment assignStatement = (Assignment)statement;
 					assignStatement.getReadVariable().setEvaluatedExpression(null);
-					//Assignment previousAssignment = this.getAssignedVariables().get(assignStatement.getVariableName());
-					//if((previousAssignment != null) && 
-					//		(previousAssignment.getExpression().getClass().isInstance(assignStatement.getExpression()))){
+					Assignment previousAssignment = this.getAssignedVariables().get(assignStatement.getVariableName());
+					if(previousAssignment == null){
 						this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
-					//}
-					//else{
-					//	throw new IllegalArgumentException("wrong type of assigned variable");
-					//}
+					}
+					else if	(previousAssignment.getExpression().getClass().isInstance(assignStatement.getExpression())){
+						this.getAssignedVariables().put(assignStatement.getVariableName(), assignStatement);
+					}
+					else{
+						throw new IllegalArgumentException("wrong type of assigned variable");
+					}
 					
 					
 				}
 				else if(statement instanceof Action){
 					Action<?> actionStatement = (Action<?>)statement;
-					System.out.print("trying action: ");
-					System.out.println(actionStatement);
 					try{
 						actionStatement.execute(this.getUnit().getWorld(), this.getUnit());
 					}
@@ -543,10 +452,23 @@ public class Task implements Comparable<Task>{
 		}
 	}
 	
+	
 	/**
+	 * The task is interrupted, and becomes available again
 	 * 
+	 * @post   The Task of the Unit of this Task, is null
+	 *       | this.getUnit = unit
+	 *       | (new unit).getTask = null
+	 * @post the Unit of this Task is null
+	 * 		 | new.getUnit == null
+	 * @effect The priority of this Task is reduced
+	 * 		 | this.setPriority(this.getPriority -1);
+	 * 
+	 * @throws IllegalStateException
+	 * 		   The Task is not being excecuted at the moment
+	 * 		 | this.getUnit == null
 	 */
-	public void interrupt(){
+	public void interrupt() throws IllegalStateException{
 		if(this.getUnit() == null)
 			throw new IllegalStateException("not being executed!");
 		this.getUnit().setTask(null);
@@ -554,11 +476,6 @@ public class Task implements Comparable<Task>{
 		this.setPriority(this.getPriority()-1);
 	}
 	
-//	public void redoLastStatement(){
-//		executeStatement(this.lastStatement);
-//	}
-//	
-//	private MyStatement lastStatement;
 
 	/**
 	 * Check whether this Task has the given Scheduler as one of its
@@ -628,14 +545,15 @@ public class Task implements Comparable<Task>{
 	 * 
 	 * @param  scheduler
 	 *         The Scheduler to be added.
-	 * @pre    The given Scheduler is effective and already references
-	 *         this Task.
-	 *       | (scheduler != null) && (scheduler.getTask() == this)
 	 * @post   This Task has the given Scheduler as one of its Schedulers.
 	 *       | new.hasAsScheduler(scheduler)
+	 * @throws IllegalArgumentException  
+	 * 		   The given Scheduler is effective. Else, throw exception
+	 *       | (scheduler == null)      
 	 */
 	public void addScheduler(@Raw Scheduler scheduler) {
-		assert (scheduler != null); // && (scheduler.hasAsTask(this));
+		if (scheduler == null)
+			throw new IllegalArgumentException("scheduler can't be null");// && (scheduler.hasAsTask(this));
 		schedulers.add(scheduler);
 	}
 
@@ -644,24 +562,28 @@ public class Task implements Comparable<Task>{
 	 * 
 	 * @param  scheduler
 	 *         The Scheduler to be removed.
-	 * @pre    This Task has the given Scheduler as one of
-	 *         its Schedulers, and the given Scheduler does not
-	 *         reference any Task.
-	 *       | this.hasAsScheduler(scheduler)
 	 * @post   This Task no longer has the given Scheduler as
 	 *         one of its Schedulers.
 	 *       | ! new.hasAsScheduler(scheduler)
 	 * @post   The (former) scheduler does not have this Task as Task
 	 * 		 | ! ((new) scheduler).hasAsTask(this)
+	 * @throws IllegalArgumentException
+	 * 	       This Task has the given Scheduler as one of
+	 *         its Schedulers. Else, throw Exception
+	 *       | ! this.hasAsScheduler(scheduler)
+	 * 
 	 */
 	@Raw
 	public void removeScheduler(Scheduler scheduler) {
-		assert this.hasAsScheduler(scheduler);
+		if (!this.hasAsScheduler(scheduler))
+			throw new IllegalArgumentException("scheduler is not in this task");
 		scheduler.removeTask(this);
 		schedulers.remove(scheduler);
 	}
 	
-	
+	/**
+	 * Return a set of all schedulers of this Task.
+	 */
 	public Set<Scheduler> getSchedulers(){
 		Set<Scheduler> newSet = new HashSet<Scheduler>();
 		for(Scheduler scheduler: this.schedulers){

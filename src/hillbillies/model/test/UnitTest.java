@@ -166,19 +166,19 @@ public class UnitTest {
 	
 	@Test
 	public void testNewMoveToAdjacent$LegalCase(){
-		testUnit.newMoveToAdjacent(1, 0, 0);
+		testUnit.facadeMoveToAdjacent(1, 0, 0);
 		assertTrue(testUnit.isMoving());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testNewMoveToAdjacent$IllegalArgumentCase(){
-		testUnit.newMoveToAdjacent(0, 0, 2);
+		testUnit.facadeMoveToAdjacent(0, 0, 2);
 		fail("Exception Expected!");
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
 	public void testNewMoveToAdjacent$IllegalNewPositionCase(){
-		testUnit.newMoveToAdjacent(0, 0, -1);
+		testUnit.facadeMoveToAdjacent(0, 0, -1);
 		fail("Exception Expected!");
 	}
 	
@@ -221,7 +221,7 @@ public class UnitTest {
 	
 	@Test
 	public void testGetSpeed$MovingCase(){
-		testUnit.newMoveToAdjacent(0, 1, 0);
+		testUnit.facadeMoveToAdjacent(0, 1, 0);
 		assertTrue(Util.fuzzyEquals(testUnit.getSpeed(), 1.5));
 	}
 	
@@ -229,7 +229,7 @@ public class UnitTest {
 	public void testGetSpeed$MovingUpCase(){
 		int[] position = {1,1,1};
 		Unit unit = new Unit("TestSubject", position, 50,50,50,50, world, faction1, true);
-		unit.newMoveToAdjacent(0, 0, 1);
+		unit.facadeMoveToAdjacent(0, 0, 1);
 		assertTrue(Util.fuzzyEquals(unit.getSpeed(), 0.75));
 	}
 	
@@ -237,20 +237,20 @@ public class UnitTest {
 	public void testGetSpeed$MovingDownCase(){
 		int[] position = {1,1,2};
 		Unit unit = new Unit("TestSubject", position, 50,50,50,50, world, faction1, false);
-		unit.newMoveToAdjacent(0, 0, -1);
+		unit.facadeMoveToAdjacent(0, 0, -1);
 		assertTrue(Util.fuzzyEquals(unit.getSpeed(), 1.8));
 	}
 	
 	@Test
 	public void testGetSpeed$SpringtingCase(){
-		testUnit.newMoveToAdjacent(0, 1, 0);
+		testUnit.facadeMoveToAdjacent(0, 1, 0);
 		testUnit.startSprint();
 		assertTrue(Util.fuzzyEquals(testUnit.getSpeed(), 3));
 	}
 	
 	@Test
 	public void testStartSprint$LegalCase(){
-		testUnit.newMoveToAdjacent(0, 1, 0);
+		testUnit.facadeMoveToAdjacent(0, 1, 0);
 		testUnit.startSprint();
 		assertTrue(testUnit.isSprinting());
 	}
@@ -263,7 +263,7 @@ public class UnitTest {
 	
 	@Test
 	public void testStopSprint$LegalCase(){
-		testUnit.newMoveToAdjacent(0, 1, 0);
+		testUnit.facadeMoveToAdjacent(0, 1, 0);
 		testUnit.startSprint();
 		testUnit.stopSprint();
 		assertFalse(testUnit.isSprinting());
