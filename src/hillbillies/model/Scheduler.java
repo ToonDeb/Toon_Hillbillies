@@ -219,7 +219,7 @@ public class Scheduler {
 	 *       | (task == null) || (task.getScheduler() != this) ||
 	 *       | (this.hasAsTask(task))
 	 */
-	public void addTask(@Raw Task task) {
+	private void addTask(@Raw Task task) {
 		if ((task == null) || (!task.hasAsScheduler(this)) && (this.hasAsTask(task))){
 			throw new IllegalArgumentException("task is not valid for this scheduler");
 		}
@@ -227,8 +227,22 @@ public class Scheduler {
 		Collections.sort(tasks);
 	}
 	
-	
+	/**
+	 * add this task to the scheduler
+	 * 
+	 * @param task
+	 * 		  The task to be added
+	 * @effect Add this scheduler to task
+	 * 		   | task.addScheduler(this)
+	 * @effect Add the task to this Scheduler
+	 * 		   | this.addTask(task)
+	 * @thows IllegalArgumentException
+	 * 		  task can't be null
+	 * 		  | task == null
+	 */
 	public void scheduleTask(Task task){
+		if(task == null)
+			throw new IllegalArgumentException("task can't be null");
 		task.addScheduler(this);
 		this.addTask(task);
 	}
@@ -250,7 +264,6 @@ public class Scheduler {
 
 	/**
 	 * Remove the given Task from the list of Tasks of this Scheduler.
-	 * TODO: herzien throw exception
 	 * 
 	 * @param  task
 	 *         The Task to be removed.
@@ -360,6 +373,17 @@ public class Scheduler {
 		this.addTask(replacement);
 	}
 	
+	/**
+	 * Check if the given tasks are part of this Scheduler
+	 * 
+	 * @param tasks
+	 * 		  The tasks to check
+	 * @return true if all tasks are part of this scheduler
+	 * 		   false otherwise
+	 * 		   | result == true if (for task in tasks,
+	 * 		   |  		this.hasAsTask(task))
+	 * 		
+	 */
 	public boolean arePartOf(Collection<Task> tasks){
 		for(Task task: tasks){
 			if(!this.hasAsTask(task))
@@ -368,7 +392,9 @@ public class Scheduler {
 		return true;
 	}
 	
-	
+	/**
+	 * Return an iterator over all tasks in this scheduler
+	 */
 	public Iterator<Task> iterator(){
 		return new Iterator<Task>(){
 
@@ -388,6 +414,18 @@ public class Scheduler {
 		};
 	}
 	
+	/**
+	 * Return the task with the highest priority, 
+	 * which is not being executed by a Unit at the moment
+	 * 
+	 * @return The next available task
+	 * 			| result == task
+	 * 			| where this.hasAsTask(task) &&
+	 * 			| 		!task.isAssigned &&
+	 * 			|		task.getPriority > otherTask.getPriority
+	 * 			|		where this.hasAsTask(otherTask) && 
+	 * 			|			!otherTask.isAssigned
+	 */
 	public Task getNextAvailableTask(){
 		Iterator<Task> iterator = this.iterator();
 		while(iterator.hasNext()){
@@ -400,10 +438,7 @@ public class Scheduler {
 	}
 	
 	/**
-	 * returns all tasks of this scheduler as a list
-	 * 
-	 * @return a list of all tasks
-	 * 		   | result == this.tasks
+	 * Returns all tasks of this scheduler as a list
 	 */
 	public List<Task> getAllTasks(){
 		List<Task> list = new ArrayList<Task>();
@@ -412,16 +447,41 @@ public class Scheduler {
 		return list;
 	}
 	
+	/**
+	 * interrupt the task being executed by this unit
+	 * 
+	 * @param unit
+	 * 		  The unit executing the task
+	 * @effect interrupt the task being executed
+	 * 			| unit.interruptTask()
+	 */
 	public void interruptTaskOf(Unit unit){
 		unit.interruptTask();
 	}
 	
+	/**
+	 * Assign the next available task to the given unit
+	 * 
+	 * @param unit
+	 * 		  the unit to assign a task to.
+	 * @effect assign the next available task to unit
+	 * 		   this.getNextAvailableTask.assignTo(unit)
+	 * @throws IllegalArgumentException
+	 * 		   The faction of the unit and the Faction of
+	 * 		   this scheduler are not the same
+	 * 		   | this.getFaction != unit.getFaction
+	 */
 	public void assignNextTaskTo(Unit unit){
+		if(unit.getFaction() != this.getFaction())
+			throw new IllegalArgumentException("wrong unit");
 		Task task = this.getNextAvailableTask();
 		if(task != null)
 			task.assignTo(unit);
 	}
 	
+	/**
+	 * Sort the tasks in this scheduler according to priority.
+	 */
 	public void sortTasks(){
 		Collections.sort(this.tasks);
 	}
