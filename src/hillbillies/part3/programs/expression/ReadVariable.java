@@ -40,8 +40,6 @@ public abstract class ReadVariable<T> extends MyExpression<T>{
 	public T evaluateExpression(Unit unit) {
 		if (this.getEvaluatedExpression() == null)
 			this.setEvaluatedExpression((T) unit.getTask().getAssignment(this.getName()).getExpression().evaluateExpression(unit));
-		System.out.print("evaluates to: ");
-		System.out.println(this.getEvaluatedExpression());
 		return this.getEvaluatedExpression();
 	}
 	

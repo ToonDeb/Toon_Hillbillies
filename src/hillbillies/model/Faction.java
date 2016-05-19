@@ -188,7 +188,6 @@ public class Faction {
 		if(!this.hasAsUnit(unit) || (unit.getFaction() != null))
 			throw new IllegalArgumentException("unit can't be removed");
 		units.remove(unit);
-		System.out.println("unit removed");
 	}
 	
 	/**
