@@ -217,7 +217,7 @@ public class Unit extends GameObject {
 	 * 
 	 */
 	public Unit(String name, int[] position, int weight, int strength, int agility, 
-			int toughness, /*World world, Faction faction,*/ boolean defaultBehaviour)
+			int toughness, boolean defaultBehaviour)
 				throws IllegalArgumentException, NullPointerException {
 		super(position);	
 		
@@ -638,7 +638,7 @@ public class Unit extends GameObject {
 	 */
 	private int pathIndex;
 	
-	/**
+	/** TODO LISKOV
 	 * Reduce the hp of this unit, and  set its status to idle
 	 * implementation of the takeFallDamage method in GameObject
 	 * 
@@ -648,10 +648,19 @@ public class Unit extends GameObject {
 	 * 			| this.takeDamage(10*fallDepth)
 	 * @post	the status of the unit will be IDLE
 	 * 			| new.getStatus == IDLE
+	 * @throws 	IllegalStateException
+	 * 			The unit is not currently falling
+	 * 			| !this.isFalling
+	 * @throws	IllegalArgumentException
+	 * 			fallDepth can't be negative
+	 * 			| fallDepth <= 0
 	 */
-	public void takeFallDamage(int fallDepth){
+	public void takeFallDamage(int fallDepth)
+			throws IllegalArgumentException, IllegalStateException{
 		if(!this.isFalling())
 			throw new IllegalStateException("Unit is not Falling");
+		if(fallDepth <= 0)
+			throw new IllegalArgumentException("can't fall negative distance!");
 		this.setStatus(UnitStatus.IDLE);
 		this.takeDamage(fallDepth * 10);		
 	}
@@ -2208,6 +2217,7 @@ public class Unit extends GameObject {
 	public void rest() {
 		if ((this.isAttacking())||
 				(this.getStatus() == UnitStatus.DEFENDING)||
+				(this.getStatus() == UnitStatus.DODGING) ||
 				(this.isFalling()))
 			throw new IllegalStateException("Can't rest now");
 		this.setRestTime(0);
@@ -2554,8 +2564,9 @@ public class Unit extends GameObject {
 		this.getWorld().scheduleToRemove(this);
 		this.dropItem();
 		this.setStatus(UnitStatus.IDLE);
-		this.setFaction(null);
+		
 		this.getFaction().removeUnit(this);
+		this.setFaction(null);
 	}
 
 	/**
@@ -2689,6 +2700,7 @@ public class Unit extends GameObject {
 	 *         The Faction to check.
 	 * @return 
 	 *       | result == (faction.getNbUnits <= max_NB_Units_in_Faction)
+	 *       |			|| (faction == null)
 	*/
 	public static boolean isValidFaction(Faction faction) {
 		if(faction == null)

@@ -177,15 +177,14 @@ public class Faction {
 	 * 	       This Faction has the given Unit as one of
 	 *         its Units, and the given Unit does not
 	 *         reference any Faction. Else, throw exception.
-	 *       | !this.hasAsUnit(unit) ||
-	 *       | (unit.getFaction() != null)
+	 *       | !this.hasAsUnit(unit)
 	 * @post   This Faction no longer has the given Unit as
 	 *         one of its Units.
 	 *       | ! new.hasAsUnit(unit)
 	 */
 	@Raw
 	public void removeUnit(Unit unit) {
-		if(!this.hasAsUnit(unit) || (unit.getFaction() != null))
+		if(!this.hasAsUnit(unit) )
 			throw new IllegalArgumentException("unit can't be removed");
 		units.remove(unit);
 	}

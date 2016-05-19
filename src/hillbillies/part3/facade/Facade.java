@@ -20,7 +20,7 @@ import hillbillies.part3.programs.TaskFactory;
 import ogp.framework.util.ModelException;
 
 /**
- * A class of ...
+ * A class of Facade
  *
  * @author  ...
  * @version 1.0
@@ -46,7 +46,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getNbCubesX(World world) throws ModelException {
-		return world.getNbCubesX();
+		try {
+			return world.getNbCubesX();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -54,7 +58,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getNbCubesY(World world) throws ModelException {
-		return world.getNbCubesY();
+		try {
+			return world.getNbCubesY();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -62,7 +70,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getNbCubesZ(World world) throws ModelException {
-		return world.getNbCubesZ();
+		try {
+			return world.getNbCubesZ();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -125,11 +137,10 @@ public class Facade implements IFacade {
 	@Override
 	public Unit spawnUnit(World world, boolean enableDefaultBehavior) throws ModelException {
 		try{
-			Unit unit = world.spawnUnit(enableDefaultBehavior);
-			return unit;
+			return world.spawnUnit(enableDefaultBehavior);
 		}
 		catch(Exception e){
-			return null;
+			throw new ModelException(e);
 		}
 	}
 
@@ -139,8 +150,6 @@ public class Facade implements IFacade {
 	@Override
 	public void addUnit(Unit unit, World world) throws ModelException {
 		try{
-			System.out.println("unit added");
-			unit.setWorld(world);
 			world.addUnit(unit);
 		}
 		catch (Exception e){
@@ -154,7 +163,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Unit> getUnits(World world) throws ModelException {
-		return world.getUnits();
+		try {
+			return world.getUnits();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -162,7 +175,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isCarryingLog(Unit unit) throws ModelException {
-		return unit.isCarryingLog();
+		try {
+			return unit.isCarryingLog();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -170,7 +187,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isCarryingBoulder(Unit unit) throws ModelException {
-		return unit.isCarryingBoulder();
+		try {
+			return unit.isCarryingBoulder();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -178,7 +199,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isAlive(Unit unit) throws ModelException {
-		return !unit.isTerminated();
+		try {
+			return !unit.isTerminated();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -186,7 +211,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getExperiencePoints(Unit unit) throws ModelException {
-		return unit.getExperience();
+		try {
+			return unit.getExperience();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -209,7 +238,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Faction getFaction(Unit unit) throws ModelException {
-		return unit.getFaction();
+		try {
+			return unit.getFaction();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -217,7 +250,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Unit> getUnitsOfFaction(Faction faction) throws ModelException {
-		return faction.getUnitsOfFaction();
+		try {
+			return faction.getUnitsOfFaction();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -238,9 +275,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double[] getPosition(Boulder boulder) throws ModelException {
-		Vector3d vector = boulder.getPosition();
-		double[] position = {vector.x, vector.y, vector.z};
-		return position;
+		try {
+			Vector3d vector = boulder.getPosition();
+			double[] position = {vector.x, vector.y, vector.z};
+			return position;
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -248,7 +289,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Boulder> getBoulders(World world) throws ModelException {
-		return world.getBoulders();
+		try {
+			return world.getBoulders();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -256,9 +301,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double[] getPosition(Log log) throws ModelException {
-		Vector3d vector = log.getPosition();
-		double[] position = {vector.x, vector.y, vector.z};
-		return position;
+		try {
+			Vector3d vector = log.getPosition();
+			double[] position = {vector.x, vector.y, vector.z};
+			return position;
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -266,7 +315,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Log> getLogs(World world) throws ModelException {
-		return world.getLogs();
+		try {
+			return world.getLogs();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -275,7 +328,11 @@ public class Facade implements IFacade {
 	@Override
 	public Unit createUnit(String name, int[] initialPosition, int weight, int agility, int strength, int toughness,
 			boolean enableDefaultBehavior) throws ModelException {
-		return new Unit(name, initialPosition, weight, agility, strength, toughness, enableDefaultBehavior);
+		try {
+			return new Unit(name, initialPosition, weight, agility, strength, toughness, enableDefaultBehavior);
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -283,9 +340,13 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double[] getPosition(Unit unit) throws ModelException {
-		Vector3d vector = unit.getPosition();
-		double[] position = {vector.x, vector.y, vector.z};
-		return position;
+		try {
+			Vector3d vector = unit.getPosition();
+			double[] position = {vector.x, vector.y, vector.z};
+			return position;
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -293,7 +354,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int[] getCubeCoordinate(Unit unit) throws ModelException {
-		return unit.getCubePosition();
+		try {
+			return unit.getCubePosition();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -301,7 +366,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public String getName(Unit unit) throws ModelException {
-		return unit.getName();
+		try {
+			return unit.getName();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -323,7 +392,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getWeight(Unit unit) throws ModelException {
-		return unit.getWeight();
+		try {
+			return unit.getWeight();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -331,7 +404,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setWeight(Unit unit, int newValue) throws ModelException {
-		unit.setWeight(newValue);
+		try {
+			unit.setWeight(newValue);
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -340,7 +417,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getStrength(Unit unit) throws ModelException {
-		return unit.getStrength();
+		try {
+			return unit.getStrength();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -348,7 +429,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setStrength(Unit unit, int newValue) throws ModelException {
-		unit.setWeight(newValue);
+		try {
+			unit.setWeight(newValue);
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 
 	}
 
@@ -357,7 +442,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getAgility(Unit unit) throws ModelException {
-		return unit.getAgility();
+		try {
+			return unit.getAgility();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -365,7 +454,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setAgility(Unit unit, int newValue) throws ModelException {
-		unit.setAgility(newValue);
+		try {
+			unit.setAgility(newValue);
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -373,7 +466,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getToughness(Unit unit) throws ModelException {
-		return unit.getToughness();
+		try {
+			return unit.getToughness();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -381,7 +478,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void setToughness(Unit unit, int newValue) throws ModelException {
-		unit.setToughness(newValue);
+		try {
+			unit.setToughness(newValue);
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -389,7 +490,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getMaxHitPoints(Unit unit) throws ModelException {
-		return unit.getMaxHP();
+		try {
+			return unit.getMaxHP();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -397,7 +502,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getCurrentHitPoints(Unit unit) throws ModelException {
-		return unit.getHP();
+		try {
+			return unit.getHP();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -405,7 +514,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getMaxStaminaPoints(Unit unit) throws ModelException {
-		return unit.getMaxStamina();
+		try {
+			return unit.getMaxStamina();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -413,7 +526,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getCurrentStaminaPoints(Unit unit) throws ModelException {
-		return unit.getStamina();
+		try {
+			return unit.getStamina();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -449,7 +566,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double getCurrentSpeed(Unit unit) throws ModelException {
-		return unit.getSpeed();
+		try {
+			return unit.getSpeed();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -457,7 +578,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isMoving(Unit unit) throws ModelException {
-		return unit.isMoving();
+		try {
+			return unit.isMoving();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -491,7 +616,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isSprinting(Unit unit) throws ModelException {
-		return unit.isSprinting();
+		try {
+			return unit.isSprinting();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -499,7 +628,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public double getOrientation(Unit unit) throws ModelException {
-		return unit.getOrientation();
+		try {
+			return unit.getOrientation();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -520,8 +653,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void work(Unit unit) throws ModelException {
-		// not used
-
+		try {
+			unit.workAt(unit.getCubePosition());
+		} catch (IllegalArgumentException e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -529,7 +665,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isWorking(Unit unit) throws ModelException {
-		return unit.isWorking();
+		try {
+			return unit.isWorking();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -550,7 +690,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isAttacking(Unit unit) throws ModelException {
-		return unit.isAttacking();
+		try {
+			return unit.isAttacking();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -571,7 +715,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isResting(Unit unit) throws ModelException {
-		return unit.isResting();
+		try {
+			return unit.isResting();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -595,7 +743,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public boolean isDefaultBehaviorEnabled(Unit unit) throws ModelException {
-		return unit.getDefaultBoolean();
+		try {
+			return unit.getDefaultBoolean();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -620,7 +772,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Scheduler getScheduler(Faction faction) throws ModelException {
-		return faction.getScheduler();
+		try {
+			return faction.getScheduler();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -628,7 +784,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public void schedule(Scheduler scheduler, Task task) throws ModelException {
-		scheduler.scheduleTask(task);
+		try {
+			scheduler.scheduleTask(task);
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -663,7 +823,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Iterator<Task> getAllTasksIterator(Scheduler scheduler) throws ModelException {
-		return scheduler.iterator();
+		try {
+			return scheduler.iterator();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -671,7 +835,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Set<Scheduler> getSchedulersForTask(Task task) throws ModelException {
-		return task.getSchedulers();
+		try {
+			return task.getSchedulers();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -679,7 +847,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Unit getAssignedUnit(Task task) throws ModelException {
-		return task.getUnit();
+		try {
+			return task.getUnit();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -687,7 +859,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public Task getAssignedTask(Unit unit) throws ModelException {
-		return unit.getTask();
+		try {
+			return unit.getTask();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -695,7 +871,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public String getName(Task task) throws ModelException {
-		return task.getName();
+		try {
+			return task.getName();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -703,7 +883,11 @@ public class Facade implements IFacade {
 	 */
 	@Override
 	public int getPriority(Task task) throws ModelException {
-		return task.getPriority();
+		try {
+			return task.getPriority();
+		} catch (Exception e) {
+			throw new ModelException(e);
+		}
 	}
 
 }

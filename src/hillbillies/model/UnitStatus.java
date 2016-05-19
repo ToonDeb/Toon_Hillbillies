@@ -6,7 +6,7 @@ import be.kuleuven.cs.som.annotate.*;
  * An enumeration introducing different states units can be in.
  *
  * @author  Toon Deburchgrave, Nathan Cornille
- * @version 1.2
+ * @version 3.5
  */
 @Value
 public enum UnitStatus {

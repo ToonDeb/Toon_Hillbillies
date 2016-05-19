@@ -782,6 +782,9 @@ public class World {
 	public void addUnit(@Raw Unit unit) throws IllegalArgumentException{
 		if((unit == null))
 			throw new IllegalArgumentException("unit can't be null");
+		if(!this.isValidWorldPosition(unit.getCubePosition()) || 
+				!this.isPassableTerrain(unit.getCubePosition()))
+			throw new IllegalArgumentException("unit is not in a valid location");
 		this.assignFactionTo(unit);
 		unit.setWorld(this);
 		units.add(unit);
@@ -1010,6 +1013,7 @@ public class World {
 	 * @post	A new Unit is created, with valid, semi-random properties.
 	 * 			The unit is then added to this world.
 	 * @return 	The spawned unit, who is in this world and has a valid faction.
+	 * 			If it is not possible to add a unit to this world, return null.
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
 		if(this.getNbUnits()== MAX_NB_UNITS_IN_WORLD){
@@ -1032,8 +1036,15 @@ public class World {
 			position[1] = new Random().nextInt(this.getNbCubesY());
 			position[2] = new Random().nextInt(this.getNbCubesZ());
 		}
-		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness,/* this, faction, */enableDefaultBehavior);
-		this.addUnit(unit);
+		Unit unit = new Unit("Hillbilly", position, weight, strength, agility, toughness, enableDefaultBehavior);
+		
+		try{
+			this.addUnit(unit);
+		}
+		catch(Exception e){
+			return null;
+		}
+		
 		return unit;
 		
 	}

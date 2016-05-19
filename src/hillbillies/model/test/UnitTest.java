@@ -1,6 +1,12 @@
 package hillbillies.model.test;
 
 import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+
 import org.junit.Test;
 
 import hillbillies.model.*;
@@ -35,10 +41,6 @@ public class UnitTest {
 			{1,0,0}}};
 		
 	private static World world;
-	private static Faction faction1;
-	private static Faction faction2;
-//	private Log log;
-//	private Boulder boulder;
 	private Unit testUnit, otherUnit, farUnit, otherFactionUnit;
 	
 	@BeforeClass
@@ -52,12 +54,6 @@ public class UnitTest {
 		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
 		world = new World(terrainType, defaultListener);
 		
-		faction1 = new Faction(world);
-		faction2 = new Faction(world);
-		world.addFaction(faction1);
-		world.addFaction(faction2);	
-		
-		
 		int[] position = {0,0,1};
 		Log log = new Log(position, world);
 		world.addLog(log);
@@ -65,30 +61,57 @@ public class UnitTest {
 		world.addBoulder(boulder);
 		
 		int[] unitPosition = {0,0,1};
-		testUnit = new Unit("TestUnit", unitPosition, 50,50,50,50, world, faction1, false);
+		testUnit = new Unit("TestUnit", unitPosition, 50,50,50,50, false);
 		world.addUnit(testUnit);
-		faction1.addUnit(testUnit);
-		
-		otherUnit = new Unit("OtherUnit", unitPosition, 50,50,50,50, world, faction1, false);
+
+		otherUnit = new Unit("OtherUnit", unitPosition, 50,50,50,50, false);
 		world.addUnit(otherUnit);
-		faction1.addUnit(otherUnit);
-		
+
 		int[] farPosition = {2,2,1};
-		farUnit = new Unit("TestUnit", farPosition, 50,50,50,50, world, faction2, false);
+		farUnit = new Unit("TestUnit", farPosition, 50,50,50,50, false);
 		world.addUnit(farUnit);
-		faction2.addUnit(farUnit);
+
 		
 		int[] besidesPosition = {1,0,1};
-		otherFactionUnit = new Unit("OtherFactionUnit", besidesPosition, 50,50,50,50, world, faction2, false);
+		otherFactionUnit = new Unit("OtherFactionUnit", besidesPosition, 50,50,50,50, false);
 		world.addUnit(otherFactionUnit);
+		
+		Iterator<Faction> factions = world.getActiveFactions().iterator();
+		Faction faction1 = factions.next();
+		Faction faction2 = factions.next();
+		
+		try{
+			testUnit.getFaction().removeUnit(testUnit);
+		}
+		catch (Exception e){
+			
+		}
+		testUnit.setFaction(faction1);
+		faction1.addUnit(testUnit);
+		try{
+			otherFactionUnit.getFaction().removeUnit(otherFactionUnit);
+		}
+		catch (Exception e){
+			
+		}
+		otherFactionUnit.setFaction(faction2);
 		faction2.addUnit(otherFactionUnit);
+		
+		try{
+			otherUnit.getFaction().removeUnit(otherUnit);
+		}
+		catch (Exception e){
+			
+		}
+		otherUnit.setFaction(faction1);
+		faction1.addUnit(otherUnit);
 	}
 	
 	@Test
 	public void testConstructorLegalCase(){
 		int[] position = {0, 0, 1};
 		Vector3d vectorPosition = new Vector3d(0.5,0.5,1.5);
-		Unit unit = new Unit("TestSubject", position, 50, 50, 50, 50, world, faction1, false);
+		Unit unit = new Unit("TestSubject", position, 50, 50, 50, 50, false);
 
 		
 		assertEquals(unit.getPosition(), vectorPosition);
@@ -103,7 +126,7 @@ public class UnitTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testConstructor$IllegalNameCase(){
 		int[] position = {1,1,1};
-		new Unit("testSubject", position, 50,50,50,50,world, faction1, false);
+		new Unit("testSubject", position, 50,50,50,50, false);
 		fail("Exception Expected!");
 	}
 	
@@ -111,58 +134,228 @@ public class UnitTest {
 	public void testConstructor$IllegalPositionCase()
 			throws IllegalArgumentException{
 		int[] position = {5,1,1};
-		new Unit("TestSubject", position, 50,50,50,50,world, faction1,false);
+		Unit unit = new Unit("TestSubject", position, 50,50,50,50,false);
+		world.addUnit(unit);
 		fail("Exception Expected!");
 	}
 	
 	@Test
 	public void testConstructor$IllegalStrengthCase(){
 		int[] position = {1,1,1};
-		Unit unit = new Unit("TestSubject", position, 50,24,50,50,world, faction1,false);
+		Unit unit = new Unit("TestSubject", position, 50,24,50,50,false);
 		assertEquals(unit.getStrength(), 25);
 	}
 	
 	@Test
 	public void testConstructor$IllegalAgilityCase(){
 		int[] position = {1,1,1};
-		Unit unit = new Unit("TestSubject", position, 50,50,102,50,world, faction1,false);
+		Unit unit = new Unit("TestSubject", position, 50,50,102,50,false);
 		assertEquals(unit.getAgility(), 25);
 	}
 	
 	@Test
 	public void testConstructor$IllegalToughnessCase(){
 		int[] position = {1,1,1};
-		Unit unit = new Unit("TestSubject", position, 50,50,50,0,world, faction1,false);
+		Unit unit = new Unit("TestSubject", position, 50,50,50,0,false);
 		assertEquals(unit.getToughness(), 25);
 	}
 	
 	@Test
 	public void testConstructor$IllegalWeightCase(){
 		int[] position = {1,1,1};
-		Unit unit = new Unit("TestSubject", position, 30,50,50,50,world, faction1,false);
+		Unit unit = new Unit("TestSubject", position, 30,50,50,50,false);
 		assertEquals(unit.getWeight(), 50);
-	}
-	
-	@Test(expected = IllegalArgumentException.class)
-	public void testConstructor$IllegalWorldCase(){
-		int[] position = {1,1,1};
-		new Unit("TestSubject", position, 50,50,50,50,null, faction1,false);
-		fail("Exception Expected!");
-	}
-	
-	@Test(expected = NullPointerException.class)
-	public void testConstructor$IllegalFactionCase(){
-		int[] position = {1,1,1};
-		new Unit("TestSubject", position, 50,50,50,50, world, null, false);
-		fail("Exception Expected!");
 	}
 	
 	@Test
 	public void testConstructor$DefaultBooleanTrue(){
 		int[] position = {1,1,1};
-		Unit unit = new Unit("TestSubject", position, 50,50,50,50, world, faction1, true);
+		Unit unit = new Unit("TestSubject", position, 50,50,50,50, true);
 		assertTrue(unit.getDefaultBoolean());
 	}
+	
+	/* 	Supertype GameObject tests	*/
+	
+	@Test 
+	public void testGetPosition(){
+		assertEquals(testUnit.getPosition(), new Vector3d(0.5,0.5,1.5));
+	}
+	
+	@Test
+	public void testIsValidPosition$TrueCase(){
+		Vector3d position = new Vector3d(1.5,1.5,0.5);
+		assertTrue(GameObject.isValidPosition(position, world));
+	}
+	
+	@Test
+	public void testIsValidPosition$FalseCase(){
+		Vector3d position = new Vector3d(-1.5,1.5,0.5);
+		assertFalse(GameObject.isValidPosition(position, world));
+	}
+	
+	@Test
+	public void testToCubePosition(){
+		Vector3d position = new Vector3d(2.9,1.1,3.5);
+		assertTrue(GameObject.toCubePosition(position)[0] == 2 &&
+				GameObject.toCubePosition(position)[1] == 1 &&
+				GameObject.toCubePosition(position)[2] == 3 );
+	}
+	
+	@Test
+	public void testToVectorPosition(){
+		int[] position = new int[] {2,1,3};
+		assertTrue(GameObject.toVectorPosition(position).x == 2.5d &&
+				GameObject.toVectorPosition(position).y == 1.5d &&
+				GameObject.toVectorPosition(position).z == 3.5d);
+	}
+	
+	@Test
+	public void testSetAtPosition$ValidCase(){
+		testUnit.setAtPosition(new int[] {1,1,1});
+		assertTrue(Arrays.equals(testUnit.getCubePosition(), new int[] {1,1,1}));
+		assertTrue(testUnit.getPosition().equals(new Vector3d(1.5,1.5,1.5)));
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testSetAtPosition$InvalidCase(){
+		testUnit.setAtPosition(new int[] {5,5,5});
+		fail("exception expected");
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testSetAtPosition$NullCase(){
+		testUnit.setAtPosition(null);
+		fail("exception expected");
+	}
+	
+	@Test
+	public void testSetPosition$ValidCase(){
+		testUnit.setPosition(new Vector3d(2.9,1.1,0.5));
+		assertTrue(Arrays.equals(testUnit.getCubePosition(), new int[] {2,1,0}));
+		assertTrue(testUnit.getPosition().equals(new Vector3d(2.9,1.1,0.5)));
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void testSetPosition$InvalidCase(){
+		testUnit.setPosition(new Vector3d(2.9,1.1,3.5));
+		fail("exception expected");
+	}
+	
+	@Test
+	public void testGetCubePosition(){
+		assertTrue(Arrays.equals(testUnit.getCubePosition(), new int[] {0,0,1}));
+	}
+	
+	@Test
+	public void testUpdateFall(){
+		testUnit.setAtPosition(new int[] {0,0,2});
+		world.advanceTime(0.0001);
+		assertTrue(testUnit.isFalling());
+		while(testUnit.isFalling()){
+			testUnit.updateFall(0.1);
+		}
+		assertTrue(testUnit.getHP() < testUnit.getMaxHP());
+		assertFalse(Arrays.equals(testUnit.getCubePosition(), new int[] {0,0,2}));
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testUpdateFall$InvalidCase(){
+		testUnit.updateFall(-0.01);
+		fail("exception expected");
+	}
+	
+//	@Test
+//	public void testGetFallDepth(){
+//		testUnit.setAtPosition(new int[] {0,0,2});
+//		world.advanceTime(0.0001);
+//		assertTrue(testUnit.getFallDepth() != 0);
+//	}
+	
+	@Test
+	public void testTakeFallDamage(){
+		testUnit.setAtPosition(new int[] {0,0,2});
+		world.advanceTime(0.0001);
+		testUnit.takeFallDamage(2);
+		assertTrue(testUnit.getHP() == testUnit.getMaxHP() - 20);
+		assertTrue(testUnit.getStatus() == UnitStatus.IDLE);
+	}
+	
+	@Test
+	public void testStartFall$ValidCase(){
+		testUnit.setAtPosition(new int[] {0,0,2});
+		testUnit.startFall();
+		assertTrue(testUnit.isFalling());
+	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void testStartFall$InvalidCase(){
+		testUnit.startFall();
+		fail("exception expected");
+	}
+	
+	@Test
+	public void testIsFalling$TrueCase(){
+		testUnit.setAtPosition(new int[] {0,0,2});
+		testUnit.startFall();
+		assertTrue(testUnit.isFalling());
+	}
+	
+	@Test
+	public void testIsFalling$FalseCase(){
+		assertFalse(testUnit.isFalling());
+	}
+	
+	@Test
+	public void testGetCubePositionBelow(){
+		int[] belowPos = testUnit.getCubePositionBelow();
+		assertTrue(Arrays.equals(belowPos, new int[] {0,0,0}));
+	}
+	
+	@Test
+	public void testIsNeighbouringCube$TrueCase(){
+		int[] belowPos = testUnit.getCubePositionBelow();
+		assertTrue(testUnit.isNeighbouringCube(belowPos));
+	}
+	
+	@Test
+	public void testIsNeighbouringCube$FalseCase(){
+		int[] pos = {2,2,2};
+		assertFalse(testUnit.isNeighbouringCube(pos));
+	}
+	
+	@Test
+	public void testIsNeighbouringCube$FalsePosCase(){
+		int[] pos = {3,2,2};
+		assertFalse(testUnit.isNeighbouringCube(pos));
+	}
+	
+	@Test
+	public void testGetWorld(){
+		assertTrue(testUnit.getWorld() == world);
+	}
+	
+	@Test
+	public void testIsValidWorld$TrueCase(){
+		assertTrue(testUnit.isValidWorld(null));
+		assertTrue(testUnit.isValidWorld(world));
+	}
+	
+	@Test
+	public void testIsValidWorld$FalseCase(){
+		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
+		World otherWorld = new World(terrainType, defaultListener);
+		int i = 0;
+		while(i < 100){
+			otherWorld.spawnUnit(false);
+			i+=1;
+			
+		}
+		System.out.println(otherWorld.getNbUnits());
+		assertFalse(testUnit.isValidWorld(otherWorld));
+	}
+	
+	
+	/* End Supertype GameObject tests */
 	
 	@Test
 	public void testNewMoveToAdjacent$LegalCase(){
@@ -228,7 +421,8 @@ public class UnitTest {
 	@Test
 	public void testGetSpeed$MovingUpCase(){
 		int[] position = {1,1,1};
-		Unit unit = new Unit("TestSubject", position, 50,50,50,50, world, faction1, true);
+		Unit unit = new Unit("TestSubject", position, 50,50,50,50, true);
+		world.addUnit(unit);
 		unit.facadeMoveToAdjacent(0, 0, 1);
 		assertTrue(Util.fuzzyEquals(unit.getSpeed(), 0.75));
 	}
@@ -236,7 +430,8 @@ public class UnitTest {
 	@Test
 	public void testGetSpeed$MovingDownCase(){
 		int[] position = {1,1,2};
-		Unit unit = new Unit("TestSubject", position, 50,50,50,50, world, faction1, false);
+		Unit unit = new Unit("TestSubject", position, 50,50,50,50, false);
+		world.addUnit(unit);
 		unit.facadeMoveToAdjacent(0, 0, -1);
 		assertTrue(Util.fuzzyEquals(unit.getSpeed(), 1.8));
 	}
@@ -336,7 +531,7 @@ public class UnitTest {
 		testUnit.setAgility(100);
 		testUnit.setStrength(100);
 		testUnit.setWeight(50);
-		assertEquals(testUnit.getWeight(), 50);
+		assertEquals(testUnit.getWeight(), 100);
 	}
 	
 	@Test
@@ -410,7 +605,8 @@ public class UnitTest {
 	public void testAttack$ValidCase(){
 		testUnit.attack(otherFactionUnit);
 		assertTrue(testUnit.isAttacking());
-		assertTrue(otherFactionUnit.getStatus() == UnitStatus.DEFENDING);
+		assertTrue((otherFactionUnit.getStatus() == UnitStatus.DEFENDING) ||
+				(otherFactionUnit.getStatus() == UnitStatus.DODGING));
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
@@ -515,12 +711,12 @@ public class UnitTest {
 	
 	@Test
 	public void testGetFaction(){
-		assertEquals(testUnit.getFaction(), faction1);
+		assertTrue(testUnit.getWorld().hasAsFaction(testUnit.getFaction()));
 	}
 	
 	@Test
 	public void testIsValidFaction$TrueCase(){
-		assertTrue(Unit.isValidFaction(faction1));
+		assertTrue(Unit.isValidFaction(testUnit.getFaction()));
 	}
 	//TODO: isvalidfaction, falsecase
 	

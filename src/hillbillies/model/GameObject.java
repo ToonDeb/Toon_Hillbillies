@@ -197,7 +197,7 @@ public abstract class GameObject {
 		
 		if (Util.fuzzyLessThanOrEqualTo(nextTime, 0)){
 			this.setAtPosition(this.getFallDestination());
-			this.takeFallDamage(this.fallDepth);
+			this.takeFallDamage(this.getFallDepth());
 			this.isFalling = false;
 		}
 		else{
@@ -213,7 +213,7 @@ public abstract class GameObject {
 	 * Return the fallDepth of this GameObject.
 	 */
 	@Basic @Raw
-	public int getFallDepth() {
+	private int getFallDepth() {
 		return this.fallDepth;
 	}
 
@@ -226,7 +226,7 @@ public abstract class GameObject {
 	 * @return 
 	 *       | result == (fallDepth > 0)
 	*/
-	public static boolean isValidFallDepth(int fallDepth) {
+	private static boolean isValidFallDepth(int fallDepth) {
 		return (fallDepth > 0);
 	}
 
@@ -244,7 +244,7 @@ public abstract class GameObject {
 	 *       | ! isValidFallDepth(getFallDepth())
 	 */
 	@Raw
-	public void setFallDepth(int fallDepth) throws IllegalArgumentException {
+	private void setFallDepth(int fallDepth) throws IllegalArgumentException {
 		if (! isValidFallDepth(fallDepth))
 			throw new IllegalArgumentException();
 		this.fallDepth = fallDepth;
@@ -261,6 +261,9 @@ public abstract class GameObject {
 	 * 
 	 * @param 	fallDepth
 	 * 			the amount of cubes this gameobject has fallen
+	 * @throws	IllegalArgumentException
+	 * 			fallDepth can't be negative
+	 * 			| fallDepth <= 0
 	 */
 	public abstract void takeFallDamage(int fallDepth);
 	
@@ -278,10 +281,14 @@ public abstract class GameObject {
 	 * @post The FallDepth of this GameObject is the length between it's current position
 	 * 		 And the falldestination.
 	 * 		 | new.getFallDepth == new.getCubePosition[2] - new.getFallDestination[2]
-	 * 		 
+	 * @throws IllegalStateException
+	 * 			The current position has a solid cube below it
+	 * 			| this.getWorld.hasSolidBelow(this.getCubePosition)
 	 */
-	public void startFall(){
+	public void startFall()throws IllegalStateException{
 		this.isFalling = true;
+		if(this.getWorld().hasSolidBelow(this.getCubePosition()))
+			throw new IllegalStateException("can't fall now");
 		
 		int[] belowPosition = this.getCubePosition();
 		int depth = 0;
@@ -352,7 +359,7 @@ public abstract class GameObject {
 	 * Return the fallTimer of this GameObject.
 	 */
 	@Basic @Raw
-	public double getFallTimer() {
+	private double getFallTimer() {
 		return this.fallTimer;
 	}
 
@@ -365,7 +372,7 @@ public abstract class GameObject {
 	 * @return 
 	 *       | result == (fallTimer >= 0)
 	*/
-	public static boolean isValidFallTimer(double fallTimer) {
+	private static boolean isValidFallTimer(double fallTimer) {
 		return (fallTimer >= 0);
 	}
 
@@ -383,7 +390,7 @@ public abstract class GameObject {
 	 *       | ! isValidFallTimer(getFallTimer())
 	 */
 	@Raw
-	public void setFallTimer(double fallTimer) throws IllegalArgumentException {
+	private void setFallTimer(double fallTimer) throws IllegalArgumentException {
 		if (! isValidFallTimer(fallTimer))
 			throw new IllegalArgumentException();
 		this.fallTimer = fallTimer;
@@ -398,7 +405,7 @@ public abstract class GameObject {
 	 * Return the fallDestination of this GameObject.
 	 */
 	@Basic @Raw
-	public int[] getFallDestination() {
+	private int[] getFallDestination() {
 		return this.fallDestination;
 	}
 
@@ -416,7 +423,7 @@ public abstract class GameObject {
 	 *       | ! isValidFallDestination(getFallDestination())
 	 */
 	@Raw
-	public void setFallDestination(int[] fallDestination) throws IllegalArgumentException {
+	private void setFallDestination(int[] fallDestination) throws IllegalArgumentException {
 		if (! this.getWorld().isValidWorldPosition(fallDestination))
 			throw new IllegalArgumentException("fallDestination is not in world");
 		this.fallDestination = fallDestination;
@@ -446,7 +453,7 @@ public abstract class GameObject {
 	 * 		   True if this is a unit, and the amount of units in
 	 * 		   the world is below the max number of units
 	 * 		   | if this instanceof Unit
-	 * 		   | 	result = (world.getNbUnits() <= MAX_NB_UNITS_IN_WORLD
+	 * 		   | 	result = (world.getNbUnits() < MAX_NB_UNITS_IN_WORLD
 	 * 		   else return true
 	 * 		   | else 
 	 * 		   | 	result = true
@@ -457,7 +464,7 @@ public abstract class GameObject {
 			return true;
 		}
 		if (this instanceof Unit){
-			return (world.getNbUnits() <= MAX_NB_UNITS_IN_WORLD);
+			return (world.getNbUnits() < MAX_NB_UNITS_IN_WORLD);
 		}
 		return true;
 	}
