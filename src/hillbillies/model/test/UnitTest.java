@@ -350,8 +350,28 @@ public class UnitTest {
 			i+=1;
 			
 		}
-		System.out.println(otherWorld.getNbUnits());
 		assertFalse(testUnit.isValidWorld(otherWorld));
+	}
+	
+	@Test
+	public void testSetWorld$ValidCase(){
+		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
+		World otherWorld = new World(terrainType, defaultListener);
+		testUnit.setWorld(otherWorld);
+		assertTrue(testUnit.getWorld() == otherWorld);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testSetWorld$InvalidCase(){
+		TerrainChangeListener defaultListener = new DefaultTerrainChangeListener();
+		World otherWorld = new World(terrainType, defaultListener);
+		int i = 0;
+		while(i < 100){
+			otherWorld.spawnUnit(false);
+			i+=1;
+		}
+		testUnit.setWorld(otherWorld);
+		fail("exception expected");
 	}
 	
 	
