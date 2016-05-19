@@ -765,7 +765,7 @@ public class World {
 		return units.size();
 	}
 
-	/** TODO
+	/** 
 	 * Add the given Unit to the set of Units of this World.
 	 * 
 	 * @param  unit
@@ -773,11 +773,13 @@ public class World {
 	 * @throws IllegalArgumentException
 	 * 		   The given Unit is effective and already references
 	 *         this World. else, throw exception
-	 *       | (unit == null) || (unit.getWorld() != this)
+	 *       | (unit == null)
 	 * @post   This World has the given Unit as one of its Units.
 	 *       | new.hasAsUnit(unit)
+	 * @effect The unit is assigned a valid faction
+	 * 		 | this.assignFactionTo(unit)
 	 */
-	public void addUnit(@Raw Unit unit) {
+	public void addUnit(@Raw Unit unit) throws IllegalArgumentException{
 		if((unit == null))
 			throw new IllegalArgumentException("unit can't be null");
 		this.assignFactionTo(unit);
@@ -998,11 +1000,16 @@ public class World {
 	private final Set<Faction> factions = new HashSet<Faction>();
 	
 	
-	/** TODO
+	/**
 	 * add a new unit to this world, with random (valid) attributes and position.
 	 * the defaultbehaviour of this new unit is set to enabledefaultbehaviour
 	 * 
-	 * @param enableDefaultBehavior
+	 * @param 	enableDefaultBehavior
+	 * 		  	Whether or not the defaultbehaviour of the new unit 
+	 * 		  	should be enabled
+	 * @post	A new Unit is created, with valid, semi-random properties.
+	 * 			The unit is then added to this world.
+	 * @return 	The spawned unit, who is in this world and has a valid faction.
 	 */
 	public Unit spawnUnit(boolean enableDefaultBehavior){
 		if(this.getNbUnits()== MAX_NB_UNITS_IN_WORLD){
@@ -1032,10 +1039,19 @@ public class World {
 	}
 	
 	/**
-	 * TODO
+	 * Assign a faction to a unit. If no viable factions are available,
+	 * and no new factions can be made, throw exception
+	 * 
 	 * @param unit
+	 * 		  The unit to assign a faction to
+	 * @post  The faction of the unit, was the faction with the smallest
+	 * 		  amount of units, or a new faction if the maximum amount
+	 * 		  of factions wasn't reached yet
+	 * @throws IllegalSateException
+	 * 		   If no valid factions are available, and no new factions can
+	 * 		   be created
 	 */
-	public void assignFactionTo(Unit unit){
+	public void assignFactionTo(Unit unit) throws IllegalStateException{
 		Faction faction = null;
 		if(this.getNbActiveFactions() < MAX_NB_ACTIVE_FACTIONS){
 			faction = new Faction(this);
@@ -1105,7 +1121,7 @@ public class World {
 	 * 			| for(Unit unit in this.getUnits())
 	 * 			|	do unit.advanceTime(dt)
 	 * 
-	 * @post the set toRemove is empty TODO: nodig?
+	 * @post the set toRemove is empty
 	 * 		| new.toRemove.size == 0
 	 */
 	public void advanceTime(double dt){

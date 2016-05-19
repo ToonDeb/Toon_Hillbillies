@@ -45,10 +45,23 @@ public enum CubeType {
 		}
 	};
 	
+	/**
+	 * Return whether the cubetype is passable
+	 */
 	public abstract boolean isPassable();
 	
+	/**
+	 * Return the number associated with the cubetype
+	 */
 	public abstract int getNumber();
 	
+	/**
+	 * Return the cubetype for the given number
+	 * @param 	number
+	 * 		 	The number to get the cubetype from
+	 * @return  The cubetype with the number given, 
+	 * 			if this doesn't exist return null
+	 */
 	public static CubeType getCubeType(int number){
 		for(CubeType type: CubeType.values()){
 			if (type.getNumber() == number){

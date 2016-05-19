@@ -130,7 +130,6 @@ public class Facade implements IFacade {
 		}
 		catch(Exception e){
 			return null;
-			//throw new ModelException(e);
 		}
 	}
 
@@ -140,6 +139,7 @@ public class Facade implements IFacade {
 	@Override
 	public void addUnit(Unit unit, World world) throws ModelException {
 		try{
+			System.out.println("unit added");
 			unit.setWorld(world);
 			world.addUnit(unit);
 		}
