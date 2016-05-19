@@ -417,9 +417,19 @@ public class Unit extends GameObject {
 	/**
 	 * Move to the current location of the unit this unit is following
 	 * 
-	 * @post If this unit is not neighbouring
+	 * @effect If this unit is not neighbouring the unit being followed,
+	 * 		 moveTo the location of the followUnit
+	 * 		 | if !this.isNeighbouringCube(followUnit.getCubePosition())
+	 *  	 |		this.moveTo(followUnit.getCubePosition());
+	 * @post If this unit is neighbouring the other unit, stop following
+	 * 		 | else
+	 * 		 | 		this.getStatus != FOLLOWING
+	 * @effect If this unit is in defaultmode, and has arribed next to a unit
+	 * 		   attack the other unit.
+	 * 		 | if(this.getDefaultBoolean)
+	 * 		 | 		this.attack(followUnit)
 	 */
-	public void follow(){
+	private void follow(){
 		if(!this.isNeighbouringCube(followUnit.getCubePosition())){
 			this.moveTo(followUnit.getCubePosition());
 		}
@@ -427,7 +437,7 @@ public class Unit extends GameObject {
 			this.setStatus(UnitStatus.IDLE);
 			Unit follow = this.followUnit;
 			this.followUnit = null;
-			if(defaultBoolean)
+			if(this.getDefaultBoolean())
 				this.attack(follow);
 		}
 	}
@@ -571,7 +581,7 @@ public class Unit extends GameObject {
 	/**
 	 * Return the path of this unit
 	 */
-	private Path getPath(){
+	public Path getPath(){
 		return this.path;
 	}
 	
@@ -2381,7 +2391,7 @@ public class Unit extends GameObject {
 	private UnitStatus status;
 
 	/**
-	 * update all timers and properties of this unit TODO
+	 * update all timers and properties of this unit
 	 */
 	public void advanceTime(double deltaT) {
 		if(!isValidTime(deltaT))
@@ -2868,7 +2878,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == true if (task == null) || (task.getUnit() == null) 
 	*/
-	public static boolean isValidTask(Task task) {
+	private static boolean isValidTask(Task task) {
 		if(task == null)
 			return true;
 		else

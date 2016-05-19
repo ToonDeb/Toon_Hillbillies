@@ -15,6 +15,9 @@ import ogp.framework.util.Util;
 
 import hillbillies.part2.listener.DefaultTerrainChangeListener;
 import hillbillies.part2.listener.TerrainChangeListener;
+import hillbillies.part3.programs.SourceLocation;
+import hillbillies.part3.programs.statement.MyStatement;
+import hillbillies.part3.programs.statement.NullStatement;
 
 import org.junit.*;
 
@@ -42,6 +45,7 @@ public class UnitTest {
 		
 	private static World world;
 	private Unit testUnit, otherUnit, farUnit, otherFactionUnit;
+	private Task task;
 	
 	@BeforeClass
 	public static void setUpBeforeClass(){
@@ -105,6 +109,9 @@ public class UnitTest {
 		}
 		otherUnit.setFaction(faction1);
 		faction1.addUnit(otherUnit);
+		SourceLocation sourceLocation = new SourceLocation(0, 0);
+		MyStatement statement = new NullStatement(sourceLocation);
+		task = new Task("name", 0, statement);
 	}
 	
 	@Test
@@ -378,19 +385,19 @@ public class UnitTest {
 	/* End Supertype GameObject tests */
 	
 	@Test
-	public void testNewMoveToAdjacent$LegalCase(){
+	public void testfacadeMoveToAdjacent$LegalCase(){
 		testUnit.facadeMoveToAdjacent(1, 0, 0);
 		assertTrue(testUnit.isMoving());
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
-	public void testNewMoveToAdjacent$IllegalArgumentCase(){
+	public void testfacadeMoveToAdjacent$IllegalArgumentCase(){
 		testUnit.facadeMoveToAdjacent(0, 0, 2);
 		fail("Exception Expected!");
 	}
 	
 	@Test(expected = IllegalArgumentException.class)
-	public void testNewMoveToAdjacent$IllegalNewPositionCase(){
+	public void testfacadeMoveToAdjacent$IllegalNewPositionCase(){
 		testUnit.facadeMoveToAdjacent(0, 0, -1);
 		fail("Exception Expected!");
 	}
@@ -401,7 +408,7 @@ public class UnitTest {
 		testUnit.moveTo(destination);
 		assertTrue(testUnit.isMoving());
 	}
-	
+
 	@Test(expected = IllegalArgumentException.class)
 	public void testMoveTo$IllegalDestinationCase(){
 		int[] destination = {1,5,1};
@@ -409,6 +416,28 @@ public class UnitTest {
 		fail("Exception Expected!");
 	}
 	
+	@Test
+	public void testStartFollowing$LegalCase(){
+		testUnit.startFollowing(farUnit);
+		assertTrue(testUnit.isFollowing());
+	}
+	
+	@Test (expected = NullPointerException.class)
+	public void testStartFollowing$NullCase(){
+		testUnit.startFollowing(null);
+		fail("exception expected");
+	}
+	
+	@Test
+	public void testIsFollowing$TrueCase(){
+		testUnit.startFollowing(farUnit);
+		assertTrue(testUnit.isFollowing());
+	}
+	
+	@Test
+	public void testIsFollowing$FalseCase(){
+		assertFalse(testUnit.isFollowing());
+	}
 	@Test
 	public void testIsMoving$TrueCase(){
 		int[] destination = {1,1,1};
@@ -419,6 +448,19 @@ public class UnitTest {
 	@Test
 	public void testIsMoving$FalseCase(){
 		assertFalse(testUnit.isMoving());
+	}
+	
+	@Test
+	public void testResetPath(){
+		testUnit.moveTo(farUnit.getCubePosition());
+		testUnit.resetPath();
+		assertTrue(testUnit.getPath() == null);
+	}
+	
+	@Test
+	public void testGetPath(){
+		testUnit.moveTo(farUnit.getCubePosition());
+		assertTrue(testUnit.getPath() != null);
 	}
 	
 	@Test(expected = IllegalStateException.class)
@@ -701,8 +743,13 @@ public class UnitTest {
 	
 	@Test
 	public void testTerminate(){
+		Faction faction = testUnit.getFaction();
 		testUnit.terminate();
 		assertTrue(testUnit.isTerminated());
+		assertFalse(testUnit.isCarryingItem());
+		assertTrue(testUnit.getStatus() == UnitStatus.IDLE);
+		assertTrue(testUnit.getFaction() == null);
+		assertFalse(faction.hasAsUnit(testUnit));
 	}
 	
 	@Test
@@ -738,10 +785,51 @@ public class UnitTest {
 	public void testIsValidFaction$TrueCase(){
 		assertTrue(Unit.isValidFaction(testUnit.getFaction()));
 	}
-	//TODO: isvalidfaction, falsecase
 	
 	@Test
 	public void testGetExperience(){
 		assertEquals(testUnit.getExperience(), 0);
 	}
+	
+	@Test
+	public void testInterruptTask(){
+		testUnit.getFaction().getScheduler().scheduleTask(task);
+		testUnit.advanceTime(0.001);
+		testUnit.interruptTask();
+		assertTrue(testUnit.getTask() == null);
+		assertTrue(task.getUnit() == null);
+	}
+	
+	@Test
+	public void testGetTask(){
+		testUnit.getFaction().getScheduler().scheduleTask(task);
+		testUnit.advanceTime(0.001);
+		assertTrue(testUnit.getTask() == task);
+	}
+	
+	@Test
+	public void testSetTask$ValidCase(){
+		testUnit.setTask(task);
+		task.setUnit(testUnit);
+		assertTrue(testUnit.getTask() == task);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testSetTask$InvalidCase(){
+		task.setUnit(testUnit);
+		testUnit.setTask(task);
+		fail("exception expected");
+	}
+	
+	@Test
+	public void testStartAction(){
+		testUnit.startAction();
+		assertFalse(testUnit.hasFinishedAction());
+	}
+	
+	@Test
+	public void testHasFinishedAction(){
+		assertTrue(testUnit.hasFinishedAction());
+	}
+	
 }

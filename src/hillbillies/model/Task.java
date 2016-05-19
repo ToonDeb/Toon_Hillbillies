@@ -200,6 +200,22 @@ public class Task implements Comparable<Task>{
 	public Unit getUnit() {
 		return this.unit;
 	}
+	
+	/**
+	 * Check whether the given Task is a valid Task for
+	 * any Unit.
+	 *  
+	 * @param  unit
+	 *         The Unit to check.
+	 * @return 
+	 *       | result == true if (unit == null) || (unit.getTask() != this) 
+	*/
+	private boolean isValidUnit(Unit unit) {
+		if(unit == null)
+			return true;
+		else
+			return (unit.getTask() == this);
+	}
 
 	/**
 	 * Set the Unit of this Task to the given Unit.
@@ -212,9 +228,14 @@ public class Task implements Comparable<Task>{
 	 * @effect If the unit is not null, set the statementIterator
 	 * 		 | if (unit != null)
 	 * 		 |	do this.setStatementIterator();
+	 * @throws IllegalArgumentException
+	 * 			the unit is not a valid unit for this task
+	 * 		 | !this.isValidUnit(unit)
 	 */
 	@Raw
 	public void setUnit(Unit unit) throws IllegalArgumentException {
+		if(!this.isValidUnit(unit))
+			throw new IllegalArgumentException();
 		this.unit = unit;
 		
 		if(unit != null){
