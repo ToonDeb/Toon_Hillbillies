@@ -22,7 +22,7 @@ import ogp.framework.util.ModelException;
 /**
  * A class of Facade
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class Facade implements IFacade {
@@ -224,8 +224,7 @@ public class Facade implements IFacade {
 	@Override
 	public void workAt(Unit unit, int x, int y, int z) throws ModelException {
 		try{ 
-			int[] target = {x, y, z};
-			unit.workAt(target);
+			unit.workAt(new int[] {x, y, z});
 		}
 		catch (Exception e){
 			throw new ModelException(e);

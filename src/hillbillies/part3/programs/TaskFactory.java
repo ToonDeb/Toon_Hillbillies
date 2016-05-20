@@ -43,9 +43,9 @@ import hillbillies.part3.programs.statement.action.Work;
 
 
 /**
- * A class of ...
+ * A class of TaskFactory implementation
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
