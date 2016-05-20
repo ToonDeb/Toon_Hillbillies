@@ -1,6 +1,5 @@
 package hillbillies.part3.programs.expression.position;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
@@ -11,7 +10,6 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-@Value
 public class HerePosition extends MyExpression<int[]>{
 	
 	public HerePosition(SourceLocation sourceLocation){

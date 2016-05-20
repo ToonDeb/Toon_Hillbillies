@@ -1,6 +1,5 @@
 package hillbillies.part3.programs.statement;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
@@ -11,7 +10,6 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-@Value
 public abstract class MyStatement {
 	
 	public MyStatement(SourceLocation sourceLocation){

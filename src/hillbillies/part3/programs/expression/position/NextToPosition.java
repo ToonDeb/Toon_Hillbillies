@@ -2,7 +2,6 @@ package hillbillies.part3.programs.expression.position;
 
 import java.util.Random;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
@@ -14,7 +13,6 @@ import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
  * @author  ...
  * @version 1.0
  */
-@Value
 public class NextToPosition extends MyExpression<int[]> {
 	
 	public NextToPosition(MyExpression<int[]> position, SourceLocation sourceLocation){

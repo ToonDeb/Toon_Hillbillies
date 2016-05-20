@@ -17,7 +17,6 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-@Value
 public class Sequence extends MyStatement {
 
 	/**

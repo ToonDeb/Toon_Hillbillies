@@ -3,7 +3,6 @@ package hillbillies.part3.programs.expression.position;
 import java.util.Random;
 import java.util.Set;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Log;
 import hillbillies.model.Unit;
 import hillbillies.part3.programs.SourceLocation;
@@ -15,7 +14,6 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-@Value
 public class LogPosition extends MyExpression<int[]> {
 	
 	public LogPosition(SourceLocation sourceLocation){

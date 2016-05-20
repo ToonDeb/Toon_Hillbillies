@@ -3,7 +3,6 @@ package hillbillies.part3.programs.expression.position;
 import java.util.Random;
 import java.util.Set;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Boulder;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
@@ -16,7 +15,6 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-@Value
 public class BoulderPosition extends MyExpression<int[]> {
 	
 	public BoulderPosition(SourceLocation sourceLocation){

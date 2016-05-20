@@ -1,6 +1,5 @@
 package hillbillies.part3.programs.statement.action;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
@@ -12,7 +11,6 @@ import hillbillies.part3.programs.expression.MyExpression;
  * @author  ...
  * @version 1.0
  */
-@Value
 public class MoveTo extends Action<int[]> {
 
 	/**

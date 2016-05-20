@@ -2,7 +2,6 @@ package hillbillies.part3.programs.statement.action;
 
 import java.util.NoSuchElementException;
 
-import be.kuleuven.cs.som.annotate.Value;
 import hillbillies.model.Unit;
 import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
@@ -16,7 +15,6 @@ import hillbillies.part3.programs.statement.StatementIterator;
  * @author  ...
  * @version 1.0
  */
-@Value
 public abstract class Action<T> extends MyStatement {
 
 	/**
