@@ -7,7 +7,7 @@ import hillbillies.part3.programs.SourceLocation;
 /**
  * A class of statements
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public abstract class MyStatement {

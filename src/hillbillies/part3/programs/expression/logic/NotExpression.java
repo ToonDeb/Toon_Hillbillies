@@ -5,9 +5,9 @@ import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
 /**
- * A class of ...
+ * A class of NotExpressions
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class NotExpression extends MyExpression<Boolean> {

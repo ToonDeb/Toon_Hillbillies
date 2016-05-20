@@ -4,7 +4,7 @@ package hillbillies.model;
 
 
 /**
- * A class of Logs
+ * A class of Logs, extends GameItem
  * 
  *
  * @author  Toon Deburchgrave

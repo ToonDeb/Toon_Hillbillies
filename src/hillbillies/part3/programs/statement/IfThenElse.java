@@ -8,9 +8,9 @@ import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
 /**
- * A class of ...
+ * A class of If then Else statements
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class IfThenElse extends MyStatement {

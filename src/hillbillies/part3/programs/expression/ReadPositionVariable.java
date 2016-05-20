@@ -4,9 +4,9 @@ package hillbillies.part3.programs.expression;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
- * A class of ...
+ * A class of readPositionVariables expressions
  *
- * @author  ...
+ * @author Toon Deburchgrave
  * @version 1.0
  */
 public class ReadPositionVariable extends ReadVariable<int[]> {

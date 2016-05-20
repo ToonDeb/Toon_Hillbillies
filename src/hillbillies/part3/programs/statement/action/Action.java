@@ -10,9 +10,9 @@ import hillbillies.part3.programs.statement.MyStatement;
 import hillbillies.part3.programs.statement.StatementIterator;
 
 /**
- * A class of ...
+ * A class of Action statments
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public abstract class Action<T> extends MyStatement {

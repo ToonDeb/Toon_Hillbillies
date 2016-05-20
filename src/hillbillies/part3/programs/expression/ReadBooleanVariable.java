@@ -4,9 +4,9 @@ package hillbillies.part3.programs.expression;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
- * A class of ...
+ * A class of ReadBooleanVariables
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class ReadBooleanVariable extends ReadVariable<Boolean> {

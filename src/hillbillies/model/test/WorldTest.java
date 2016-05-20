@@ -15,7 +15,7 @@ import hillbillies.util.ConnectedToBorder;
 /**
  * A class of world tests
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class WorldTest {

@@ -6,9 +6,9 @@ import hillbillies.part3.programs.expression.MyExpression;
 
 
 /**
- * A class of ...
+ * A class of True expressions
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class TrueExpression extends MyExpression<Boolean> {

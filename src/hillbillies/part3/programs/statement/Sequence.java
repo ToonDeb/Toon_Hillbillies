@@ -9,12 +9,12 @@ import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
- * A class of ...
+ * A class of SequenceStatments
  * 
  * @invar   Each Sequence must have proper MyStatements.
  *        | hasProperMyStatements()	
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class Sequence extends MyStatement {

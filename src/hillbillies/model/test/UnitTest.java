@@ -24,7 +24,7 @@ import javax.vecmath.*;
 /**
  * A class of unit tests
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class UnitTest {

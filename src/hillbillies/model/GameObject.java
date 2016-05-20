@@ -12,18 +12,6 @@ import ogp.framework.util.Util;
  *         GameObject.
  *       | isValidPosition(getPosition())
  *       
- * @invar  The fallDestination of each GameObject must be a valid fallDestination for any
- *         GameObject.
- *       | isValidFallDestination(getFallDestination())
- *       
- * @invar  The fallTimer of each GameObject must be a valid fallTimer for any
- *         GameObject.
- *       | isValidFallTimer(getFallTimer())
- *       
- * @invar  The fallDepth of each GameObject must be a valid fallDepth for any
- *         GameObject.
- *       | isValidFallDepth(getFallDepth())
- *       
  * @invar The world of each GameObject must be a valid World for any GameObject
  * 		 | isValidWorld(getWorld())
  *

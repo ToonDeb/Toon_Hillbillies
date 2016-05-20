@@ -5,9 +5,9 @@ import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
 /**
- * A class of ...
+ * A class of AndExpressions
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class AndExpression extends MyExpression<Boolean> {

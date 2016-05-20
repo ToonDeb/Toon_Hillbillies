@@ -48,38 +48,14 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * @invar The stamina of each Unit must be a valid stamina for any Unit. 
  * 		  | isValidStamina(getStamina())
  *
- * @invar The workTime of each Unit must be a valid workTime for any Unit. 
- * 		  | isValidWorkTime(getWorkTime())
- *
- * @invar The attackCountDown of each Unit must be a valid attackCountDown for
- *        any Unit. 
- *        | isValidAttackCountDown(getAttackCountDown())
- *
  * @invar The status of each Unit must be a valid status for any Unit. 
  * 		  | isValidStatus(getStatus())
  *
- * @invar The restTime of each Unit must be a valid restTime for any Unit. 
- *     	  | isValidRestTime(getRestTime())
- * 
  * @invar The name of each unit must be a valid name for any unit. 
  * 		  | isValidName(getName())
  *
  * @invar The orientation of each unit must be a valid orientation for any unit.
  *        | isValidOrientation(getOrientation())
- *        
- * @invar The adjacentDestination of each unit must be a valid
- *        adjacentDestination for any unit.
- *        | isValidAdjacentDestination(getAdjacentDestination())
- *        
- * @invar The finalDestination of each unit must be a valid finalDestination for
- *        any unit. 
- *        | isValidFinalDestination(getFinalDestination())
- * 
- * @invar The walkTimer of each Unit must be a valid walkTimer for any Unit. 
- *        | isValidWalkTimer(getWalkTimer())
- *
- * @invar The origin of each Unit must be a valid origin for any Unit.
- *        | isValidOrigin(getOrigin())
  *
  * @invar  The Faction of each Unit must be a valid Faction for any
  *         Unit.
@@ -88,14 +64,6 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * @invar  The Experience of each Unit must be a valid Experience for any
  *         Unit.
  *       | isValidExperience(getExperience())
- *       
- * @invar  The gameItem of each Unit must be a valid gameItem for any
- *         Unit.
- *       | isValidGameItem(getGameItem())
- *       
- * @invar  The workTarget of each Unit must be a valid workTarget for any
- *         Unit.
- *       | isValidWorkTarget(getWorkTarget())
  *       
  * @invar  The Task of each	 Unit must be a valid Task for any
  *         Unit.	
@@ -196,20 +164,6 @@ public class Unit extends GameObject {
 	 * @throws 	IllegalArgumentException
 	 * 		   	The given position is not a valid position for this Unit
 	 * 			| ! isValidOrigin(new.getCubePosition)
-	 * 
-	 * @post	The new unit is added to the given world
-	 * 			| world.hasAsUnit(this) == true
-	 * 
-	 * @pararm	faction
-	 * 			The faction of this new unit.
-	 * @effect	The faction of this new unit is set to the given faction
-	 * 			| this.setFaction(faction)
-	 * @throws	IllegalArgumentException
-	 * 			The faction is not a valid faction for this Unit
-	 * 			| !faction.canHaveAsUnit(this)
-	 * 
-	 * @post	The new unit is added to the given faction
-	 * 			| faction.hasAsUnit(this) == true
 	 * 
 	 * @param	defaultBehaviour
 	 * 			The defaultbehaviour of this new unit
@@ -392,6 +346,21 @@ public class Unit extends GameObject {
 			this.moveToAdjacent(nextPosition);
 	}
 	
+	
+	
+	/**
+	 * Check if the Unit is moving
+	 * 
+	 * @return	true if the unit is walking or sprinting
+	 * 			| result == (unit.getStatus() == UnitStatus.WALKING) 
+	 * 			| 	&& (unit.getStatus() == UnitStatus.SPRINTING))
+	 */
+	public boolean isMoving(){
+		 return ((this.getStatus() == UnitStatus.WALKING) 
+				 || (this.getStatus() == UnitStatus.SPRINTING)
+				 || (this.getStatus() == UnitStatus.FOLLOWING));
+	}
+	
 	/**
 	 * Start following the given Unit
 	 * 
@@ -419,6 +388,16 @@ public class Unit extends GameObject {
 			this.followUnit = null;
 			this.setStatus(UnitStatus.IDLE);
 		}
+	}
+	
+	/**
+	 * check if this unit is currently following another unit
+	 * 
+	 * @return 
+	 * 		|(this.getStatus == FOLLOWING)
+	 */
+	public boolean isFollowing(){
+		return this.getStatus() == UnitStatus.FOLLOWING;
 	}
 	
 	/**
@@ -450,31 +429,44 @@ public class Unit extends GameObject {
 	}
 	
 	/**
-	 * check if this unit is currently following another unit
-	 * 
-	 * @return 
-	 * 		|(this.getStatus == FOLLOWING)
-	 */
-	public boolean isFollowing(){
-		return this.getStatus() == UnitStatus.FOLLOWING;
-	}
-	
-	/**
 	 * The Unit this unit is currently following
 	 */
 	private Unit followUnit;
 	
 	/**
-	 * Check if the Unit is moving
+	 * set a random destination in the gameworld
 	 * 
-	 * @return	true if the unit is walking or sprinting
-	 * 			| result == (unit.getStatus() == UnitStatus.WALKING) 
-	 * 			| 	&& (unit.getStatus() == UnitStatus.SPRINTING))
+	 * @effect Call the moveTo method, and give a random, valid position in the gameworld
+	 * 			with passable terrain, and neighbouring a solid cube
+	 *         | this.moveTo(randomPosition)
+	 *         | where	(this.getWorld().isValidWorldPosition(randomPosition)
+	 *		   |			&&(this.getWorld().isPassableTerrain(randomPosition))
+	 *		   |			&& (this.getWorld().isNeighbouringSolid(randomPosition))
+	 * 
 	 */
-	public boolean isMoving(){
-		 return ((this.getStatus() == UnitStatus.WALKING) 
-				 || (this.getStatus() == UnitStatus.SPRINTING)
-				 || (this.getStatus() == UnitStatus.FOLLOWING));
+	private void moveToRandom(){
+		this.resetPath();
+		int counter = 0;
+		int[] position = {-1,-1,-1};
+		while (counter < 100) {
+			
+			position[0] = new Random().nextInt(this.getWorld().getNbCubesX());
+			position[1] = new Random().nextInt(this.getWorld().getNbCubesY());
+			position[2] = new Random().nextInt(this.getWorld().getNbCubesZ());
+
+			counter++;
+			// in this way, because ispassableterrain requires a valid position
+			if(this.getWorld().isValidWorldPosition(position))
+				if(this.getWorld().isPassableTerrain(position))
+					if(this.getWorld().isNeighbouringSolid(position)){
+						this.setFinalDestination(position);
+						int[] nextpos = this.findPath();
+						if(nextpos != null)
+							break;
+					}
+		}
+		this.setFinalDestination(this.getCubePosition());
+		this.moveTo(position);
 	}
 
 	/** 
@@ -797,28 +789,7 @@ public class Unit extends GameObject {
 		return 1.5 * (this.getStrength() + this.getAgility()) / (200 * weight / 100);
 	}
 
-	/**
-	 * Return the speed of this unit.
-	 */
-	public double getSpeed() {
-		UnitStatus status = this.getStatus();
-		if(!this.isMoving())
-			return 0;
-
-		double vbase = this.getBaseSpeed();
-		double v;
-		
-		if (this.getOrigin()[2] - this.getAdjacentDestination()[2] < 0)
-			v = 0.5 * vbase;
-		else if (this.getOrigin()[2] - this.getAdjacentDestination()[2] > 0)
-			v = 1.2 * vbase;
-		else
-			v = vbase;
-
-		if (status == UnitStatus.SPRINTING)
-			return 2 * v;
-		return v;
-	}
+	
 
 	/**
 	 * Updates the orientation of this unit, so it faces its destination.
@@ -840,7 +811,7 @@ public class Unit extends GameObject {
 		double newOrientation = Math.atan2(vy, vx);
 		this.setOrientation(newOrientation);
 	}
-
+	
 	/**
 	 * Checks wether the current unit can sprint.
 	 * 
@@ -854,6 +825,29 @@ public class Unit extends GameObject {
 	private boolean canSprint() {
 		return (this.getStatus() == UnitStatus.WALKING) && 
 				(this.getStamina() > 0);
+	}
+	
+	/**
+	 * Return the speed of this unit.
+	 */
+	public double getSpeed() {
+		UnitStatus status = this.getStatus();
+		if(!this.isMoving())
+			return 0;
+
+		double vbase = this.getBaseSpeed();
+		double v;
+		
+		if (this.getOrigin()[2] - this.getAdjacentDestination()[2] < 0)
+			v = 0.5 * vbase;
+		else if (this.getOrigin()[2] - this.getAdjacentDestination()[2] > 0)
+			v = 1.2 * vbase;
+		else
+			v = vbase;
+
+		if (status == UnitStatus.SPRINTING)
+			return 2 * v;
+		return v;
 	}
 
 	/**
@@ -897,6 +891,55 @@ public class Unit extends GameObject {
 	public boolean isSprinting(){
 		return (this.getStatus() == UnitStatus.SPRINTING);
 	}
+	
+	/**
+	 * Check if the unit can still sprint
+	 * 
+	 * @param 	deltaT
+	 * 			The time to advance
+	 * @throws 	IllegalArgumentException
+	 * 			The given time is not a valid time
+	 * 			| !isValidTime(deltaT)
+	 * @post	The stamina of this Unit is reduced
+	 * 			by 1 for every 0.1 seconds this unit
+	 * 			is sprinting.
+	 * 			| while ((this.getStamina() > 0) && (this.sprintTime > 0.1))
+	 *			|	this.sprintTime -= 0.1;
+	 *			|	this.setStamina(this.getStamina()-1);
+	 * @effect	If the new Stamina is 0, this unit starts
+	 * 			walking, and the moveTo method is called again
+	 * 			| if new.getStamina == 0 then
+	 * 			| this.setStatus(WALKING)
+	 * 			| this.moveTo(this.getFinalDestination)
+	 * 			| this.sprintTime = 0
+	 * @effect	The position is updated
+	 * 			| this.updatePosition(deltaT)
+	 */
+	private void updateSprint(double deltaT) {
+		if(!isValidTime(deltaT))
+			throw new IllegalArgumentException();
+		
+		this.sprintTime += deltaT;
+		while ((this.getStamina() > 0) && (this.sprintTime > 0.1)){
+			this.sprintTime -= 0.1;
+			this.setStamina(this.getStamina()-1);
+		}
+		
+		if (this.getStamina() == 0){
+			this.setStatus(UnitStatus.WALKING);
+			this.moveTo(this.getFinalDestination());
+			
+			this.sprintTime = 0;
+		}
+		
+		this.updatePosition(deltaT);
+
+	}
+	
+	/**
+	 * Variable registering the amount of time left in this sprint
+	 */
+	private double sprintTime;
 
 	/**
 	 * Return the name of this unit.
@@ -928,7 +971,7 @@ public class Unit extends GameObject {
 	 *         	| 		then result == true
 	 *
 	 */
-	private static boolean isValidName(String name) {
+	public static boolean isValidName(String name) {
 		if (name == null)
 			return false;
 		if (name.length() < 2)
@@ -990,7 +1033,7 @@ public class Unit extends GameObject {
 	 *  		|  orientation >= 0 && orientation < 2*Math.PI
 	 * 
 	 */
-	private static boolean isValidOrientation(double orientation) {
+	public static boolean isValidOrientation(double orientation) {
 		return (orientation >= 0) && (orientation < 2 * Math.PI);
 	}
 
@@ -1015,12 +1058,7 @@ public class Unit extends GameObject {
 		assert(isValidOrientation(orientation));
 		this.orientation = (orientation);
 	}
-
-	/**
-	 * Variable registering the orientation of this unit.
-	 */
-	private double orientation = Math.PI / 2;
-
+	
 	/**
 	 * Set the orientation of THIS Unit to face the other Unit
 	 *
@@ -1045,6 +1083,11 @@ public class Unit extends GameObject {
 			this.setOrientation(this_orientation);
 		}
 	}
+	
+	/**
+	 * Variable registering the orientation of this unit.
+	 */
+	private double orientation = Math.PI / 2;
 
 	/**
 	 * The Unit moves instantaniously to a random position bordering its current
@@ -1128,43 +1171,6 @@ public class Unit extends GameObject {
 				&& (Math.abs(this.getCubePosition()[0] - other.getCubePosition()[0]) < 2)
 				&& (Math.abs(this.getCubePosition()[1] - other.getCubePosition()[1]) < 2);
 	}
-
-	/**
-	 * set a random destination in the gameworld
-	 * 
-	 * @effect Call the moveTo method, and give a random, valid position in the gameworld
-	 * 			with passable terrain, and neighbouring a solid cube
-	 *         | this.moveTo(randomPosition)
-	 *         | where	(this.getWorld().isValidWorldPosition(randomPosition)
-	 *		   |			&&(this.getWorld().isPassableTerrain(randomPosition))
-	 *		   |			&& (this.getWorld().isNeighbouringSolid(randomPosition))
-	 * 
-	 */
-	private void moveToRandom(){
-		this.resetPath();
-		int counter = 0;
-		int[] position = {-1,-1,-1};
-		while (counter < 100) {
-			
-			position[0] = new Random().nextInt(this.getWorld().getNbCubesX());
-			position[1] = new Random().nextInt(this.getWorld().getNbCubesY());
-			position[2] = new Random().nextInt(this.getWorld().getNbCubesZ());
-
-			counter++;
-			// in this way, because ispassableterrain requires a valid position
-			if(this.getWorld().isValidWorldPosition(position))
-				if(this.getWorld().isPassableTerrain(position))
-					if(this.getWorld().isNeighbouringSolid(position)){
-						this.setFinalDestination(position);
-						int[] nextpos = this.findPath();
-						if(nextpos != null)
-							break;
-					}
-		}
-		this.setFinalDestination(this.getCubePosition());
-		this.moveTo(position);
-	}
-	
 
 	/**
 	 * Return the adjacentDestination of this unit.
@@ -1317,7 +1323,7 @@ public class Unit extends GameObject {
 	 * @return 	| result == ((1 < weight) && (weight < 200)) && (weight >=
 	 *         		(this.getStrength() + this.getAgility())/2))
 	 */
-	private boolean isValidWeight(int weight) {
+	public boolean isValidWeight(int weight) {
 		return ((1 < weight) && (weight < 200) && 
 				(weight >= (this.getStrength() + this.getAgility()) / 2));
 	}
@@ -1331,7 +1337,7 @@ public class Unit extends GameObject {
 	 * @return 	| result == ((25 <= weight) && (weight <= 100) && (weight >=
 	 *         	(this.getStrength() + this.getAgility())/2))
 	 */
-	private boolean isValidStartWeight(int weight) {
+	public boolean isValidStartWeight(int weight) {
 		return ((25 <= weight) && (weight <= 100) && 
 				(weight >= (this.getStrength() + this.getAgility()) / 2));
 	}
@@ -1368,7 +1374,7 @@ public class Unit extends GameObject {
 	 *          The attribute to check.
 	 * @return 	| result == ((1 <= attribute) && (attribute < 200))
 	 */
-	private static boolean isValidUnitAttribute(int attribute) {
+	public static boolean isValidUnitAttribute(int attribute) {
 		return ((1 <= attribute) && (attribute <= 200));
 	}
 
@@ -1380,7 +1386,7 @@ public class Unit extends GameObject {
 	 *          The attribute to check
 	 * @return 	| result == ((25 <= attribute) && (attribute <= 100)
 	 */
-	private static boolean isValidStartAttribute(int attribute) {
+	public static boolean isValidStartAttribute(int attribute) {
 		return ((25 <= attribute) && (attribute <= 100));
 	}
 
@@ -1509,7 +1515,7 @@ public class Unit extends GameObject {
 	 *          The hitpoints to check.
 	 * @return 	| result == ((0 <= hp) && (hp <= this.getMaxHP))
 	 */
-	private boolean isValidHP(int hp) {
+	public boolean isValidHP(int hp) {
 		return (0 <= hp) && (hp <= this.getMaxHP());
 	}
 
@@ -1581,7 +1587,7 @@ public class Unit extends GameObject {
 	 *         	The stamina to check.
 	 * @return 	| result == ((0 <= stamina) && (stamina <= this.getMaxStamina))
 	 */
-	private boolean isValidStamina(int stamina) {
+	public boolean isValidStamina(int stamina) {
 		return ((0 <= stamina) && (stamina <= this.getMaxStamina()));
 	}
 
@@ -1639,6 +1645,15 @@ public class Unit extends GameObject {
 		this.setWorkTarget(workTarget);
 		
 		this.face(workTarget);
+	}
+	
+	/**
+	 * Return true if this unit is working
+	 * @return
+	 * 			| result == (this.getStatus()==UnitStatus.WORKING)
+	 */
+	public boolean isWorking(){
+		return (this.getStatus()==UnitStatus.WORKING);
 	}
 	
 	/**
@@ -1811,15 +1826,6 @@ public class Unit extends GameObject {
 				boulder.setAtPosition(this.getCubePosition());
 			this.setGameItem(null);
 		}
-	}
-	
-	/**
-	 * Return true if this unit is working
-	 * @return
-	 * 			| result == (this.getStatus()==UnitStatus.WORKING)
-	 */
-	public boolean isWorking(){
-		return (this.getStatus()==UnitStatus.WORKING);
 	}
 
 
@@ -2369,7 +2375,7 @@ public class Unit extends GameObject {
 	 *          The status to check.
 	 * @return 	| result == (status != null)
 	 */
-	private static boolean isValidStatus(UnitStatus status) {
+	public static boolean isValidStatus(UnitStatus status) {
 		return (status != null);
 	}
 
@@ -2491,50 +2497,6 @@ public class Unit extends GameObject {
 		}
 		
 	}
-
-	/**
-	 * Check if the unit can still sprint
-	 * 
-	 * @param 	deltaT
-	 * 			The time to advance
-	 * @throws 	IllegalArgumentException
-	 * 			The given time is not a valid time
-	 * 			| !isValidTime(deltaT)
-	 * @post	The stamina of this Unit is reduced
-	 * 			by 1 for every 0.1 seconds this unit
-	 * 			is sprinting.
-	 * 			| while ((this.getStamina() > 0) && (this.sprintTime > 0.1))
-	 *			|	this.sprintTime -= 0.1;
-	 *			|	this.setStamina(this.getStamina()-1);
-	 * @effect	If the new Stamina is 0, this unit starts
-	 * 			walking, and the moveTo method is called again
-	 * 			| if new.getStamina == 0 then
-	 * 			| this.setStatus(WALKING)
-	 * 			| this.moveTo(this.getFinalDestination)
-	 * 			| this.sprintTime = 0
-	 * @effect	The position is updated
-	 * 			| this.updatePosition(deltaT)
-	 */
-	private void updateSprint(double deltaT) {
-		if(!isValidTime(deltaT))
-			throw new IllegalArgumentException();
-		
-		this.sprintTime += deltaT;
-		while ((this.getStamina() > 0) && (this.sprintTime > 0.1)){
-			this.sprintTime -= 0.1;
-			this.setStamina(this.getStamina()-1);
-		}
-		
-		if (this.getStamina() == 0){
-			this.setStatus(UnitStatus.WALKING);
-			this.moveTo(this.getFinalDestination());
-			
-			this.sprintTime = 0;
-		}
-		
-		this.updatePosition(deltaT);
-
-	}
 	
 	/**
 	 * Variable registering the amount of time since the last
@@ -2542,10 +2504,7 @@ public class Unit extends GameObject {
 	 */
 	private double rest3MinTime;
 	
-	/**
-	 * Variable registering the amount of time left in this sprint
-	 */
-	private double sprintTime;
+
 
 	/**
 	 * Check whether the given time is valid for any Unit
@@ -2620,6 +2579,15 @@ public class Unit extends GameObject {
 	public void stopDefaultBehaviour() {
 		this.setDefaultBoolean(false);
 	}
+	
+	/**
+	 * Return the defaultBoolean of this Unit.
+	 */
+	@Basic
+	@Raw
+	public boolean getDefaultBoolean() {
+		return this.defaultBoolean;
+	}
 
 	/**
 	 * Determine the next behaviour
@@ -2667,16 +2635,6 @@ public class Unit extends GameObject {
 			if(Util.fuzzyLessThanOrEqualTo(chance, 0.875d) && (this.getStamina()>1))
 				this.startSprint();
 		}
-	}
-	
-
-	/**
-	 * Return the defaultBoolean of this Unit.
-	 */
-	@Basic
-	@Raw
-	public boolean getDefaultBoolean() {
-		return this.defaultBoolean;
 	}
 
 
@@ -2767,7 +2725,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == (experience >= 0)
 	*/
-	private static boolean isValidExperience(int experience) {
+	public static boolean isValidExperience(int experience) {
 		return experience >= 0;
 	}
 
@@ -2884,7 +2842,7 @@ public class Unit extends GameObject {
 	 * @return 
 	 *       | result == true if (task == null) || (task.getUnit() == null) 
 	*/
-	private static boolean isValidTask(Task task) {
+	public static boolean isValidTask(Task task) {
 		if(task == null)
 			return true;
 		else

@@ -10,9 +10,9 @@ import hillbillies.part3.programs.expression.MyExpression;
 
 
 /**
- * A class of ...
+ * A class of WhileLoop statements
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class WhileLoop extends MyStatement {

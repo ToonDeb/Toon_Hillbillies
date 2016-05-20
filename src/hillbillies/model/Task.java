@@ -17,10 +17,6 @@ import hillbillies.part3.programs.statement.action.Action;
  *
  * @invar  Each Task can have its name as name.
  *       | canHaveAsName(this.getName())
- * 
- * @invar  The priority of each Task must be a valid priority for any
- *         Task.
- *       | isValidPriority(getPriority())
  *       
  * @invar  The Statement of each Task must be a valid Statement for any
  *         Task.
@@ -29,8 +25,7 @@ import hillbillies.part3.programs.statement.action.Action;
  * @invar  The AssignedVariables of each Task must be a valid AssignedVariables for any
  *         Task.
  *       | isValidAssignedVariables(getAssignedVariables())
- *       
- *       
+ *          
  * @invar   Each Task must have proper Schedulers.
  *        | hasProperSchedulers()
  *       
@@ -97,7 +92,7 @@ public class Task implements Comparable<Task>{
 	 *       | result == (name != null)
 	*/
 	@Raw
-	private static boolean canHaveAsName(String name) {
+	public static boolean canHaveAsName(String name) {
 		return (name != null);
 	}
 	
@@ -158,7 +153,7 @@ public class Task implements Comparable<Task>{
 	 * @return 
 	 *       | result == (statement != null)
 	*/
-	private static boolean isValidStatement(MyStatement statement) {
+	public static boolean isValidStatement(MyStatement statement) {
 		return (statement != null);
 	}
 

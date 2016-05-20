@@ -6,9 +6,9 @@ import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
 /**
- * A class of ...
+ * A class of moveTo statements
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class MoveTo extends Action<int[]> {

@@ -4,9 +4,9 @@ import hillbillies.model.Unit;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
- * A class of ...
+ * A class of ReadUnitVariable expressions
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class ReadUnitVariable extends ReadVariable<Unit> {

@@ -8,9 +8,9 @@ import hillbillies.part3.programs.expression.MyExpression;
 
 import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
 /**
- * A class of ...
+ * A class of NextToPosition expressions
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class NextToPosition extends MyExpression<int[]> {

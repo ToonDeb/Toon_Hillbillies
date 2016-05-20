@@ -1,11 +1,7 @@
 package hillbillies.model;
 
 /**
- * A class of Boulders
- * 
- * @invar  The World of each Boulder must be a valid World for any
- *         Boulder.
- *       | isValidWorld(getWorld())
+ * A class of Boulders, extends the GameItem class
  *
  * @author  Toon Deburchgrave
  * @version 1.0

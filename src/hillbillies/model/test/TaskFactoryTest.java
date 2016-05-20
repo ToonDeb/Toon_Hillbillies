@@ -29,7 +29,7 @@ import hillbillies.part3.programs.statement.action.*;
 /**
  * A class of TaskFactory tests
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class TaskFactoryTest {

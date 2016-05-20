@@ -10,9 +10,9 @@ import hillbillies.part3.programs.expression.MyExpression;
 import hillbillies.part3.programs.expression.ReadVariable;
 
 /**
- * A class of ...
+ * A class of AsssignStatments
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class Assignment extends MyStatement {

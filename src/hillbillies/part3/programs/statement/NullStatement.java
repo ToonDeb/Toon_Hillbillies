@@ -8,9 +8,9 @@ import hillbillies.model.World;
 import hillbillies.part3.programs.SourceLocation;
 
 /**
- * A class of ...
+ * A class of nullStatements
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 public class NullStatement extends MyStatement {

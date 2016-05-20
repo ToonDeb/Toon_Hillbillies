@@ -186,7 +186,7 @@ public class World {
 	 * @return true if terraintType is not null
 	 * 		   | result = (terrainType != null)
 	*/
-	private static boolean isValidTerrainType(int[][][] terrainType) {
+	public static boolean isValidTerrainType(int[][][] terrainType) {
 		return (terrainType != null);
 	}
 	

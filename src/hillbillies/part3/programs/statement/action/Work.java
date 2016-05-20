@@ -6,9 +6,9 @@ import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
 /**
- * A class of ...
- *
- * @author  ...
+ * A class of work Statments
+ * 
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 

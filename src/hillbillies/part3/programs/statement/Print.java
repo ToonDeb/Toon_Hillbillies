@@ -8,9 +8,9 @@ import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.expression.MyExpression;
 
 /**
- * A class of ...
+ * A class of Print Statements
  *
- * @author  ...
+ * @author  Toon Deburchgrave
  * @version 1.0
  */
 

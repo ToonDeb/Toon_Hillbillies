@@ -4,7 +4,8 @@ import hillbillies.model.Unit;
 import hillbillies.model.World;
 
 /**
- * A class of ...
+ * A class of Heuristic
+ * Used in AStarPathFinder, determines cost.
  *
  * @author  ...
  * @version 1.0
