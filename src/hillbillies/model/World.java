@@ -8,16 +8,10 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
-//import javax.vecmath.Vector3d;
-
 import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 import hillbillies.model.CubeType;
-
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-
 
 import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
 import static hillbillies.model.Constants.MAX_NB_UNITS_IN_WORLD;

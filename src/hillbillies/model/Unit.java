@@ -28,6 +28,7 @@ import static hillbillies.model.Constants.MAX_NB_UNITS_IN_FACTION;
  * A class for Units
  * 
  * @author Toon Deburchgrave CWS-ELT
+ * repository: https://github.com/ToonDeb/Toon_Hillbillies
  *
  * @invar The weight of each Unit must be a valid weight for any Unit. 
  * 		  | isValidWeight(getWeight())
