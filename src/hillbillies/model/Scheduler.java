@@ -235,11 +235,12 @@ public class Scheduler {
 	 * @effect Add the task to this Scheduler
 	 * 		   | this.addTask(task)
 	 * @thows IllegalArgumentException
-	 * 		  task can't be null
+	 * 		  task can't be null, or can't be in this
+	 *		  scheduler already
 	 * 		  | task == null
 	 */
 	public void scheduleTask(Task task){
-		if(task == null)
+		if((task == null)||(this.hasAsTask(task)))
 			throw new IllegalArgumentException("task can't be null");
 		task.addScheduler(this);
 		this.addTask(task);

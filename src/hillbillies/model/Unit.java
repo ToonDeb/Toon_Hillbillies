@@ -1300,7 +1300,6 @@ public class Unit extends GameObject {
 	 * 			| 	then return this.weight + this.getGameItem.getWeight
 	 * 			| else return this.weight
 	 */
-	@Basic
 	@Raw
 	public int getWeight() {
 		int weight = this.weight;

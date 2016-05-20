@@ -23,9 +23,6 @@ import static hillbillies.model.Constants.MAX_NB_ACTIVE_FACTIONS;
 
 /**
  * A class of Worlds
- * @invar  The TerrainChangeListener of each World must be a valid TerrainChangeListener for any
- *         World.
- *       | isValidTerrainChangeListener(getTerrainChangeListener())
  *       
  * @invar  The terrainTypes of each World must be a valid terrainTypes for any
  *         World.

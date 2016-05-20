@@ -27,7 +27,6 @@ public class IsAlive extends MyExpression<Boolean> {
 	 */
 	@Override
 	public Boolean evaluateExpression(Unit unit) {
-		System.out.println(unit);
 		return !unitExpression.evaluateExpression(unit).isTerminated();
 	}
 
