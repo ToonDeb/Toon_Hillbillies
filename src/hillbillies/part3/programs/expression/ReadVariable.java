@@ -9,7 +9,6 @@ import hillbillies.part3.programs.SourceLocation;
  * @author  ...
  * @version 1.0
  */
-//@SuppressWarnings("rawtypes")
 public abstract class ReadVariable<T> extends MyExpression<T>{
 
 	/**

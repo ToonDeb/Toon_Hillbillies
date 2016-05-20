@@ -28,8 +28,4 @@ public class Log extends GameItem{
 		super(position, world);
 		
 	}
-	
-
-	
-
 }

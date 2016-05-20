@@ -58,7 +58,7 @@ public abstract class GameItem extends GameObject{
 	 * @return true if the weight is within the limits
 	 * 		   | result = (MIN_OBJECT_WEIGHT <= weight)&& (weight <= MAX_OBJECT_WEIGHT)
 	 */
-	public boolean isValidWeight(int weight){
+	public static boolean isValidWeight(int weight){
 		return((MIN_OBJECT_WEIGHT <= weight)&& (weight <= MAX_OBJECT_WEIGHT));
 	}
 
@@ -113,7 +113,7 @@ public abstract class GameItem extends GameObject{
 	 *       | world = this.getWorld 
 	 * 		 | if this instanceof Log
 	 * 		 | then !(new World).hasAsLog(new)
-	 * 		 | else
+	 * 		 | else if this instanceof Boulder
 	 * 		 | 		!(new World).hasAsBoulder(new)
 	 */
 	 public void terminate() {
@@ -122,7 +122,7 @@ public abstract class GameItem extends GameObject{
 		 if (this instanceof Log){
 			 this.getWorld().removeLog((Log)this);
 		 }
-		 else{
+		 else if (this instanceof Boulder){
 			 this.getWorld().removeBoulder((Boulder)this);
 		 }
 		 this.setWorld(null);
