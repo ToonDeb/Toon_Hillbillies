@@ -189,29 +189,29 @@ public class UnitTest {
 	@Test
 	public void testIsValidPosition$TrueCase(){
 		Vector3d position = new Vector3d(1.5,1.5,0.5);
-		assertTrue(GameObject.isValidPosition(position, world));
+		assertTrue(Unit.isValidPosition(position, world));
 	}
 	
 	@Test
 	public void testIsValidPosition$FalseCase(){
 		Vector3d position = new Vector3d(-1.5,1.5,0.5);
-		assertFalse(GameObject.isValidPosition(position, world));
+		assertFalse(Unit.isValidPosition(position, world));
 	}
 	
 	@Test
 	public void testToCubePosition(){
 		Vector3d position = new Vector3d(2.9,1.1,3.5);
-		assertTrue(GameObject.toCubePosition(position)[0] == 2 &&
-				GameObject.toCubePosition(position)[1] == 1 &&
-				GameObject.toCubePosition(position)[2] == 3 );
+		assertTrue(Unit.toCubePosition(position)[0] == 2 &&
+				Unit.toCubePosition(position)[1] == 1 &&
+				Unit.toCubePosition(position)[2] == 3 );
 	}
 	
 	@Test
 	public void testToVectorPosition(){
 		int[] position = new int[] {2,1,3};
-		assertTrue(GameObject.toVectorPosition(position).x == 2.5d &&
-				GameObject.toVectorPosition(position).y == 1.5d &&
-				GameObject.toVectorPosition(position).z == 3.5d);
+		assertTrue(Unit.toVectorPosition(position).x == 2.5d &&
+				Unit.toVectorPosition(position).y == 1.5d &&
+				Unit.toVectorPosition(position).z == 3.5d);
 	}
 	
 	@Test
