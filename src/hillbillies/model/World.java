@@ -816,7 +816,9 @@ public class World {
 	 * Return the set of all Units in this world
 	 */
 	public Set<Unit> getUnits(){
-		return this.units;
+		Set<Unit> units = new HashSet<Unit>();
+		units.addAll(this.units);
+		return units;
 	}
 
 	/**
@@ -1080,7 +1082,7 @@ public class World {
 		faction.addUnit(unit);
 	}
 	
-	/**
+	/** TODO stream
 	 * Returns the log at the given position, if there is one. returns null otherwise.
 	 * 
 	 * @param 	position
