@@ -27,15 +27,16 @@ public class NextToPosition extends MyExpression<int[]> {
 	public int[] evaluateExpression(Unit unit) {
 		int[] firstPosition;
 		
-		firstPosition = otherPosition.evaluateExpression(unit);
+		//firstPosition = otherPosition.evaluateExpression(unit);
 		
 		int counter = 0;
-		while (counter < 100){
+		while (counter < 10){
 			int random = new Random().nextInt(6);
+			firstPosition = otherPosition.evaluateExpression(unit);
 			firstPosition[0] += DIRECTLYNEIGHBOURINGLIST[random][0];
 			firstPosition[1] += DIRECTLYNEIGHBOURINGLIST[random][1];
 			firstPosition[2] += DIRECTLYNEIGHBOURINGLIST[random][2];
-			if (unit.getWorld().isValidWorldPosition(firstPosition))
+			if (unit.getWorld().isValidWorldPosition(firstPosition)&&unit.isNeighbouringCube(firstPosition))
 				return firstPosition;
 		}
 		return null;

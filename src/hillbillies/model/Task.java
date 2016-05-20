@@ -331,7 +331,8 @@ public class Task implements Comparable<Task>{
 			 throw new IllegalStateException("task already terminated");
 		 
 		 this.isTerminated = true;
-		 this.getUnit().setTask(null);
+		 if(this.getUnit() != null)
+			 this.getUnit().setTask(null);
 		 
 		 this.setUnit(null);
 		 
@@ -511,12 +512,11 @@ public class Task implements Comparable<Task>{
 	 * @return True if and only if the given Scheduler is effective
 	 *         and that Scheduler is a valid Scheduler for a Task.
 	 *       | result ==
-	 *       |   (scheduler != null) &&
-	 *       |   scheduler.canHaveAsTask(this)
+	 *       |   (scheduler != null)
 	 */
 	@Raw
 	public boolean canHaveAsScheduler(Scheduler scheduler) {
-		return (scheduler != null) && (scheduler.canHaveAsTask(this));
+		return (scheduler != null);
 	}
 
 	/**
@@ -588,8 +588,8 @@ public class Task implements Comparable<Task>{
 	public void removeScheduler(Scheduler scheduler) {
 		if (!this.hasAsScheduler(scheduler))
 			throw new IllegalArgumentException("scheduler is not in this task");
-		scheduler.removeTask(this);
 		schedulers.remove(scheduler);
+		scheduler.removeTask(this);
 	}
 	
 	/**

@@ -382,7 +382,13 @@ public class Unit extends GameObject {
 			return;
 		this.setFinalDestination(finalDestination);
 		this.resetPath();
-		this.moveToAdjacent(this.findPath());
+		int[] nextPosition = this.findPath();
+		if(nextPosition == null){
+			this.setStatus(UnitStatus.IDLE);
+			this.setFinalDestination(this.getCubePosition());
+		}
+		else
+			this.moveToAdjacent(nextPosition);
 	}
 	
 	/**
@@ -1137,8 +1143,8 @@ public class Unit extends GameObject {
 		this.resetPath();
 		int counter = 0;
 		int[] position = {-1,-1,-1};
-		while (counter < 1000) {
-			// Returns a double between -1 and +1
+		while (counter < 100) {
+			
 			position[0] = new Random().nextInt(this.getWorld().getNbCubesX());
 			position[1] = new Random().nextInt(this.getWorld().getNbCubesY());
 			position[2] = new Random().nextInt(this.getWorld().getNbCubesZ());

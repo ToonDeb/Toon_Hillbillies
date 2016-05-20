@@ -35,8 +35,7 @@ public class Scheduler {
  	 * @post   This new Scheduler has no Tasks yet.
 	 *       | new.getNbTasks() == 0
 	 */
-	public Scheduler(Faction faction)
-			throws IllegalArgumentException {
+	public Scheduler(Faction faction)throws IllegalArgumentException {
 		this.setFaction(faction);
 	}
 
@@ -56,10 +55,10 @@ public class Scheduler {
 	 * @param  faction
 	 *         The faction to check.
 	 * @return 
-	 *       | result == (faction != null)
+	 *       | result == (faction != null) && faction.getScheduler == null
 	*/
 	public static boolean isValidFaction(Faction faction) {
-		return (faction != null);
+		return (faction != null) && (faction.getScheduler() == null);
 	}
 	
 	/**
@@ -76,8 +75,7 @@ public class Scheduler {
 	 *       | ! isValidFaction(getFaction())
 	 */
 	@Raw
-	public void setFaction(Faction faction) 
-			throws IllegalArgumentException {
+	private void setFaction(Faction faction) throws IllegalArgumentException {
 		if (! isValidFaction(faction))
 			throw new IllegalArgumentException();
 		this.faction = faction;
@@ -153,7 +151,7 @@ public class Scheduler {
 	 *       |     (index == I) || (getTaskAt(I) != task)
 	 */
 	@Raw
-	public boolean canHaveAsTaskAt(Task task, int index) {
+	private boolean canHaveAsTaskAt(Task task, int index) {
 		if ((index < 1) || (index > getNbTasks() + 1))
 			return false;
 		if (!this.canHaveAsTask(task))
@@ -220,7 +218,7 @@ public class Scheduler {
 	 *       | (this.hasAsTask(task))
 	 */
 	private void addTask(@Raw Task task) {
-		if ((task == null) || (!task.hasAsScheduler(this)) && (this.hasAsTask(task))){
+		if ((task == null) || (!task.hasAsScheduler(this)) || (this.hasAsTask(task))){
 			throw new IllegalArgumentException("task is not valid for this scheduler");
 		}
 		tasks.add(task);
@@ -258,7 +256,7 @@ public class Scheduler {
 	 */
 	public void addMultipleTasks(@Raw List<Task> tasks){
 		for(Task task: tasks){
-			this.addTask(task);
+			this.scheduleTask(task);
 		}
 	}
 
@@ -283,15 +281,15 @@ public class Scheduler {
 	 * @throws IllegalArgumentException   
 	 * 		   The given Task is effective, this Scheduler has the
 	 *         given Task as one of its Tasks, and the given
-	 *         Task does not reference any Scheduler. 
+	 *         Task references this Scheduler. 
 	 *         Else throw the exception
 	 *       | (task == null) ||
 	 *       | !this.hasAsTask(task) ||
-	 *       | (task.getScheduler() != null)
+	 *       | (task.getScheduler() == null)
 	 */
 	@Raw
 	public void removeTask(Task task) {
-		if ((task == null) || !this.hasAsTask(task) || (!task.hasAsScheduler(this))){
+		if ((task == null) || !this.hasAsTask(task) || (task.hasAsScheduler(this))){
 			throw new IllegalArgumentException("tasks can't be removed");
 		}
 		tasks.remove(task);
@@ -305,11 +303,11 @@ public class Scheduler {
 	 * 
 	 * @effect The tasks are removed
 	 * 			for(Task task in tasks)
-	 * 			do this.removeTask(task)
+	 * 			do task.removeScheduler(this)
 	 */
 	public void removeMultipleTasks(List<Task> tasks){
 		for(Task task: tasks){
-			this.removeTask(task);
+			task.removeScheduler(this);
 		}
 	}
 
@@ -357,20 +355,17 @@ public class Scheduler {
 	 *
 	 */
 	public void replaceTask(Task original, Task replacement) throws IllegalArgumentException{
-		if (this.hasAsTask(original))
+		if (!this.hasAsTask(original))
 			throw new IllegalArgumentException("the given task is not part of this scheduler");
 		if(!this.canHaveAsTask(replacement))
 			throw new IllegalArgumentException("can't have this task as task");
 		
 		if(original.getUnit() != null){
-			original.getUnit().setTask(null);
-			original.setUnit(null);
+			original.interrupt();
 		}
 		
 		original.removeScheduler(this);
-		this.removeTask(original);
-		replacement.addScheduler(this);
-		this.addTask(replacement);
+		this.scheduleTask(replacement);
 	}
 	
 	/**
@@ -393,7 +388,8 @@ public class Scheduler {
 	}
 	
 	/**
-	 * Return an iterator over all tasks in this scheduler
+	 * Return an iterator over all tasks in this scheduler,
+	 * in descending order of priority.
 	 */
 	public Iterator<Task> iterator(){
 		return new Iterator<Task>(){
@@ -454,8 +450,14 @@ public class Scheduler {
 	 * 		  The unit executing the task
 	 * @effect interrupt the task being executed
 	 * 			| unit.interruptTask()
+	 * @throws illegalArgumentException
+	 * 			task executed by this unit, is not a task in this 
+	 * 			scheduler.
+	 * 			| !this.hasAsTask(unit.getTask)
 	 */
-	public void interruptTaskOf(Unit unit){
+	public void interruptTaskOf(Unit unit)throws IllegalArgumentException{
+		if(!this.hasAsTask(unit.getTask()))
+			throw new IllegalArgumentException();
 		unit.interruptTask();
 	}
 	

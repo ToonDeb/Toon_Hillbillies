@@ -33,20 +33,23 @@ public class Enemy extends MyExpression<Unit> {
 		World world = unit.getWorld();
 		Set<Faction> factions = world.getActiveFactions();
 		Faction enemyFaction = null;
-		int random = (new Random().nextInt(factions.size()-1));
-		int i = -1;
-		for(Faction faction: factions){
-			if (faction != unit.getFaction()){
-				i +=1;
-				if (i == random){
-					enemyFaction = faction;
-					break;
+		if (factions.size() == 1)
+			enemyFaction = factions.iterator().next();
+		else{
+			int random = (new Random().nextInt(factions.size()-1));
+			int i = -1;
+			for(Faction faction: factions){
+				if (faction != unit.getFaction()){
+					i +=1;
+					if (i == random){
+						enemyFaction = faction;
+						break;
+					}
 				}
 			}
 		}
-		
-		random = new Random().nextInt(enemyFaction.getNbUnits());
-		i = -1;
+		int random = new Random().nextInt(enemyFaction.getNbUnits());
+		int i = -1;
 		for (Unit anyUnit: enemyFaction.getUnitsOfFaction()){
 			i += 1;
 			if (i == random){
