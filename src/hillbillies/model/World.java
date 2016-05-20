@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
@@ -13,6 +14,9 @@ import be.kuleuven.cs.som.annotate.*;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.util.ConnectedToBorder;
 import hillbillies.model.CubeType;
+
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 
 
 import static hillbillies.model.Constants.DIRECTLYNEIGHBOURINGLIST;
@@ -903,7 +907,30 @@ public class World {
 	 * 			| result = this.getActiveFactions.size()
 	 */
 	public int getNbActiveFactions(){
-		return this.getActiveFactions().size();
+		if(this.getNbFactions() == 0)
+			return 0;
+		Set<Faction> activeFactions = new HashSet<Faction>();
+		activeFactions.addAll(factions);
+		Optional<Integer> total = activeFactions.stream().
+				map(new Function<Faction, Integer>(){
+
+			@Override
+			public Integer apply(Faction faction) {
+				if (faction.getNbUnits() > 0)
+					return 1;
+				else
+					return 0;
+			}
+			
+		}).reduce(new BinaryOperator<Integer>() {
+
+			@Override
+			public Integer apply(Integer arg0, Integer arg1) {
+				return arg0 + arg1;
+			}
+			
+		});
+		return total.get();
 	}
 	
 	

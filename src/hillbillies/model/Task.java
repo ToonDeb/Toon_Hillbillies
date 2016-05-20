@@ -374,7 +374,6 @@ public class Task implements Comparable<Task>{
 	  * 		If an action is executed, the task stops going through the statements.
 	  * 		If all statements have been executed/reviewed, this task is terminated.
 	  */
-	@SuppressWarnings("unchecked")
 	public void advanceTime(double deltaT) throws IllegalStateException{
 		if((this.isTerminated) || (!this.isAssigned()))
 			throw new IllegalStateException("can't advance time when terminated");

@@ -654,7 +654,7 @@ public class Unit extends GameObject {
 	 */
 	private int pathIndex;
 	
-	/** TODO LISKOV
+	/** 
 	 * Reduce the hp of this unit, and  set its status to idle
 	 * implementation of the takeFallDamage method in GameObject
 	 * 

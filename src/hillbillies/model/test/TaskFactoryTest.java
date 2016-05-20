@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,7 +20,6 @@ import hillbillies.part2.listener.DefaultTerrainChangeListener;
 import hillbillies.part2.listener.TerrainChangeListener;
 import hillbillies.part3.programs.SourceLocation;
 import hillbillies.part3.programs.TaskFactory;
-import hillbillies.part3.programs.expression.*;
 import hillbillies.part3.programs.expression.logic.*;
 import hillbillies.part3.programs.expression.position.*;
 import hillbillies.part3.programs.expression.unit.*;
@@ -84,9 +82,9 @@ public class TaskFactoryTest {
 	private Friend friendUnit;
 	private ThisUnit thisUnit;
 	
-	private ReadBooleanVariable readBool;
-	private ReadPositionVariable readPos;
-	private ReadUnitVariable readUnit;
+//	private ReadBooleanVariable readBool;
+//	private ReadPositionVariable readPos;
+//	private ReadUnitVariable readUnit;
 	
 	
 	@Before
@@ -435,15 +433,42 @@ public class TaskFactoryTest {
 	public void testCreateIf(){
 		Print print = (Print) factory.createPrint(herePos, sourceLocation);
 		Print print2 = (Print) factory.createPrint(nextToPos, sourceLocation);
-		IfThenElse ifthen = (IfThenElse) factory.createIf(isAliveExpr, print, print2, sourceLocation);
-		System.out.println(isAliveExpr.evaluateExpression(testUnit));
+		IfThenElse ifthen = (IfThenElse) factory.createIf(trueExpr, print, print2, sourceLocation);
 		Iterator<MyStatement> iterator = ifthen.iterator(world, testUnit);
 		assertTrue(iterator.hasNext());
 		assertEquals(iterator.next(), print);
 		assertFalse(iterator.hasNext());
-		assertEquals(iterator.next(), print);
-		testUnit.terminate();
+	}
+	
+	@Test
+	public void testCreateWhile(){
+		Print print = (Print) factory.createPrint(herePos, sourceLocation);
+		WhileLoop whileloop = (WhileLoop) factory.createWhile(trueExpr, print, sourceLocation);
+		Iterator<MyStatement> iterator = whileloop.iterator(world, testUnit);
 		assertTrue(iterator.hasNext());
-		
+		assertEquals(iterator.next(), print);
+		assertTrue(iterator.hasNext());
+		assertEquals(iterator.next(), print);
+		((Print)iterator.next()).execute(testUnit);
+		whileloop = (WhileLoop) factory.createWhile(falseExpr, print, sourceLocation);
+		iterator = whileloop.iterator(world, testUnit);
+		assertFalse(iterator.hasNext());
+	}
+	
+	@Test
+	public void testCreateAssignment(){
+//		Assignment boolAssignment = (Assignment) factory.createAssignment("bool", trueExpr, sourceLocation);
+//		Assignment posAssignemnt = (Assignment) factory.createAssignment("pos", herePos, sourceLocation);
+//		Assignment unitAssignment = (Assignment) factory.createAssignment("unit", thisUnit, sourceLocation);
+//		
+//		ReadBooleanVariable readBool = (ReadBooleanVariable) factory.createReadVariable("bool", sourceLocation);
+//		ReadPositionVariable readPos	= (ReadPositionVariable) factory.createReadVariable("pos", sourceLocation);
+//		ReadUnitVariable readUnit = (ReadUnitVariable) factory.createReadVariable("unit", sourceLocation);
+//		
+//		boolAssignment.
+//		assertTrue(readBool.evaluateExpression(testUnit));
+//		assertTrue(Arrays.equals(readPos.evaluateExpression(testUnit), testUnit.getCubePosition()));
+//		assertEquals(readUnit.evaluateExpression(testUnit), testUnit);
+//	
 	}
 }

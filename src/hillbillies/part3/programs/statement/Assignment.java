@@ -16,16 +16,16 @@ import hillbillies.part3.programs.expression.ReadVariable;
  * @author  ...
  * @version 1.0
  */
-@Value @SuppressWarnings("rawtypes")
+@Value
 public class Assignment extends MyStatement {
 	
-	public Assignment(String variableName, MyExpression expression, SourceLocation sourceLocation){
+	public Assignment(String variableName, MyExpression<?> expression, SourceLocation sourceLocation){
 		super(sourceLocation);
 		this.expression = expression;
 		this.variableName = variableName;
 	}
 	
-	public MyExpression getExpression(){
+	public MyExpression<?> getExpression(){
 		return this.expression;
 	}
 	
@@ -33,18 +33,18 @@ public class Assignment extends MyStatement {
 		return this.variableName;
 	}
 	
-	private final MyExpression expression;
+	private final MyExpression<?> expression;
 	private final String variableName;
 	
-	public void setReadVariable(ReadVariable readVariable){
+	public void setReadVariable(ReadVariable<?> readVariable){
 		this.readVariable = readVariable;
 	}
 	
-	public ReadVariable getReadVariable(){
+	public ReadVariable<?> getReadVariable(){
 		return this.readVariable;
 	}
 	
-	private ReadVariable readVariable;
+	private ReadVariable<?> readVariable;
 	
 	/* (non-Javadoc)
 	 * @see hillbillies.part3.programs.statement.MyStatement#iterator()
