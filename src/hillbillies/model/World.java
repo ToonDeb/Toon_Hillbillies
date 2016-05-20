@@ -912,24 +912,8 @@ public class World {
 		Set<Faction> activeFactions = new HashSet<Faction>();
 		activeFactions.addAll(factions);
 		Optional<Integer> total = activeFactions.stream().
-				map(new Function<Faction, Integer>(){
-
-			@Override
-			public Integer apply(Faction faction) {
-				if (faction.getNbUnits() > 0)
-					return 1;
-				else
-					return 0;
-			}
-			
-		}).reduce(new BinaryOperator<Integer>() {
-
-			@Override
-			public Integer apply(Integer arg0, Integer arg1) {
-				return arg0 + arg1;
-			}
-			
-		});
+				map(x -> (Integer) ((x.getNbUnits() > 0) ? 1 : 0))
+				.reduce((x,y) -> x + y);
 		return total.get();
 	}
 	
@@ -1106,7 +1090,7 @@ public class World {
 		faction.addUnit(unit);
 	}
 	
-	/** TODO stream
+	/** 
 	 * Returns the log at the given position, if there is one. returns null otherwise.
 	 * 
 	 * @param 	position

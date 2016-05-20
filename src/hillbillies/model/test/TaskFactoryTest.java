@@ -369,13 +369,6 @@ public class TaskFactoryTest {
 		assertTrue(isSolidExpr.evaluateExpression(testUnit));
 	}
 	
-
-	
-	@Test
-	public void testCreateReadVariable(){
-		//TODO
-	}
-	
 	@Test
 	public void testCreateAttack(){
 		Attack attack = (Attack) factory.createAttack(enemyUnit, sourceLocation);

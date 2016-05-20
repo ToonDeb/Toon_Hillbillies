@@ -22,7 +22,6 @@ public class Enemy extends MyExpression<Unit> {
 	 */
 	public Enemy(SourceLocation sourceLocation) {
 		super(sourceLocation);
-		// TODO Auto-generated constructor stub
 	}
 
 	/* (non-Javadoc)

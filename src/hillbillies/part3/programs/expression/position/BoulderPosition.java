@@ -21,7 +21,6 @@ public class BoulderPosition extends MyExpression<int[]> {
 		super(sourceLocation);
 	}
 	
-	//TODO: boulderposition als er geen boulder is?
 	public int[] evaluateExpression(Unit unit){
 		World world = unit.getWorld();
 		Set<Boulder> boulders = world.getBoulders();
